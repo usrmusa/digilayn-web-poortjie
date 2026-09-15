@@ -21,3 +21,12 @@
 .dark .local-spotlight,.dark #spotlight-gallery { background:#1e293b; color:#f1f5f9; border-color:#475569; }
 .dark .spotlight-eyebrow { color:#86efac; }
 @media(min-width:768px) { .spotlight-layout { display:grid; grid-template-columns:1.1fr 1fr; } .spotlight-photo { height:100%; max-height:520px; } .spotlight-details { padding:2rem; justify-content:center; } .spotlight-heading { padding:1.5rem 2rem; } }
+
+#spotlight-profile { width:calc(100% - 1rem); max-width:640px; max-height:92dvh; padding:1.25rem; border-radius:20px; background:#fff; color:#0f172a; text-align:left; overflow-wrap:anywhere; }
+#spotlight-profile::backdrop { background:#020617dd; }
+#spotlight-profile-close { min-width:48px; min-height:48px; }
+.spotlight-profile-content { display:flex; flex-direction:column; gap:1rem; padding-top:1rem; }
+.spotlight-profile-content h3 { font-size:1.125rem; font-weight:700; margin-top:.5rem; }
+.spotlight-profile-content p { white-space:pre-line; }
+.spotlight-profile-content a { display:block; text-align:center; }
+.dark #spotlight-profile { background:#1e293b; color:#f1f5f9; }

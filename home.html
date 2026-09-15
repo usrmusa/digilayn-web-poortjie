@@ -137,6 +137,8 @@
                     <p id="spotlight-address" class="text-sm opacity-70"></p>
                     <a id="spotlight-contact" class="underline" hidden></a>
                     <div class="spotlight-actions">
+                        <a id="spotlight-whatsapp" class="spotlight-primary text-center" target="_blank" rel="noopener noreferrer" hidden>WhatsApp</a>
+                        <button id="spotlight-full-details" class="spotlight-secondary" type="button">View Full Details</button>
                         <button id="spotlight-pictures" class="spotlight-primary" type="button">View Pictures</button>
                         <button id="spotlight-next" class="spotlight-secondary" type="button">Discover Another →</button>
                     </div>
@@ -145,6 +147,10 @@
             </div>
         </article>
     </section>
+    <dialog id="spotlight-profile" aria-labelledby="spotlight-profile-title">
+        <div class="spotlight-gallery-header"><h2 id="spotlight-profile-title">Business details</h2><button id="spotlight-profile-close" type="button" aria-label="Close business details">✕</button></div>
+        <div id="spotlight-profile-content" class="spotlight-profile-content"></div>
+    </dialog>
     <dialog id="spotlight-gallery" aria-labelledby="spotlight-gallery-title">
         <div class="spotlight-gallery-header"><h2 id="spotlight-gallery-title">Business pictures</h2><button id="spotlight-close" type="button" aria-label="Close pictures">✕</button></div>
         <img id="spotlight-gallery-photo" alt="">

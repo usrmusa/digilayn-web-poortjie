@@ -16,6 +16,77 @@
     try { return typeof value === 'string' && new URL(value).protocol === 'https:'; }
     catch { return false; }
   };
+  function whatsappUrl(value) {
+    if (typeof value !== 'string' || !/^\+?[\d\s()-]+$/.test(value)) return null;
+    let digits = value.replace(/\D/g, '');
+    if (/^0\d{9}$/.test(digits)) digits = `27${digits.slice(1)}`;
+    return /^[1-9]\d{7,14}$/.test(digits) ? `https://wa.me/${digits}` : null;
+  }
+  function openFullDetails() {
+    const content = element('profile-content');
+    content.replaceChildren();
+    text('profile-title', current.businessName);
+    const addText = (tag, value) => {
+      if (typeof value !== 'string' || !value.trim()) return;
+      const node = document.createElement(tag);
+      node.textContent = value;
+      content.appendChild(node);
+      return node;
+    };
+    const addLink = (label, href, event) => {
+      const link = addText('a', label);
+      link.href = href;
+      link.className = 'spotlight-secondary';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.addEventListener('click', () => track(event, { source: 'full_details' }));
+    };
+    addText('p', current.category);
+    addText('h3', current.subHeading);
+    addText('p', current.description);
+    addText('h3', 'Services & pricing');
+    const services = Array.isArray(current.services) ? current.services : [];
+    const listed = services.filter(service => service && typeof service.name === 'string' && service.name.trim());
+    if (!listed.length) addText('p', 'No services or prices listed yet. Contact this business for details.');
+    for (const service of listed) {
+      const price = typeof service.price === 'string' ? service.price.trim() :
+        typeof service.price === 'number' && Number.isFinite(service.price) ? String(service.price) : '';
+      addText('p', `${service.name} — ${price ? (/^\d/.test(price) ? `R ${price}` : price) : 'Price not listed'}`);
+    }
+    addText('h3', 'Location');
+    addText('p', current.address || 'Location not listed.');
+    const { latitude, longitude } = current;
+    if (typeof latitude === 'number' && Number.isFinite(latitude) && Math.abs(latitude) <= 90 &&
+        typeof longitude === 'number' && Number.isFinite(longitude) && Math.abs(longitude) <= 180) {
+      addLink('View on map', `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`, 'spotlight_map_open');
+    } else if (typeof current.address === 'string' && current.address.trim()) {
+      addLink('Find address on map', `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.address)}`, 'spotlight_map_open');
+    }
+    const hours = current.hours || current.operatingHours || current.businessHours;
+    if (typeof hours === 'string' && hours.trim()) { addText('h3', 'Opening hours'); addText('p', hours); }
+    addText('h3', 'Contact');
+    if (!element('contact').hidden) addLink(element('contact').textContent, element('contact').href, 'spotlight_contact');
+    const whatsapp = whatsappUrl(current.whatsapp);
+    if (whatsapp) addLink('WhatsApp', whatsapp, 'spotlight_whatsapp');
+    for (const [field, label] of [['website', 'Website'], ['facebook', 'Facebook']]) {
+      try {
+        const url = new URL(current[field]);
+        if (['https:', 'http:'].includes(url.protocol)) addLink(label, url.href, 'spotlight_external_open');
+      } catch { /* Only display explicitly supplied valid public links. */ }
+    }
+    addText('h3', 'Gallery');
+    const gallery = document.createElement('button');
+    gallery.type = 'button';
+    gallery.className = 'spotlight-primary';
+    gallery.textContent = `View Pictures (${current.photos.length})`;
+    gallery.addEventListener('click', () => element('pictures').click());
+    content.appendChild(gallery);
+    element('profile').showModal();
+    track('spotlight_details_open');
+  }
+  element('full-details').addEventListener('click', openFullDetails);
+  element('profile-close').addEventListener('click', () => element('profile').close());
+  element('whatsapp').addEventListener('click', () => track('spotlight_whatsapp'));
   function loadPhoto(url) {
     return new Promise(resolve => {
       const image = new Image();
@@ -28,6 +99,7 @@
   async function showNext() {
     element('next').disabled = true;
     element('pictures').disabled = true;
+    element('full-details').disabled = true;
     root.setAttribute('aria-busy', 'true');
     const pool = candidates.filter(item => item !== current);
     let chosen;
@@ -56,6 +128,10 @@
         element('contact').href = `tel:${current.phone.replace(/[\s()-]/g, '')}`;
         text('contact', `Call ${current.phone}`);
       }
+      const whatsapp = whatsappUrl(current.whatsapp);
+      element('whatsapp').hidden = !whatsapp;
+      if (whatsapp) element('whatsapp').href = whatsapp;
+      else element('whatsapp').removeAttribute('href');
       element('category-link').href = `/services/${encodeURIComponent(current.category.toLowerCase())}`;
       element('card').hidden = false;
       element('status').hidden = true;
@@ -71,6 +147,7 @@
     element('next').hidden = candidates.length < 2;
     element('next').disabled = false;
     element('pictures').disabled = false;
+    element('full-details').disabled = false;
     root.setAttribute('aria-busy', 'false');
   }
   function showGalleryPhoto() {
