@@ -54,6 +54,7 @@
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/spotlight.css">
 </head>
 <body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
 <div class="fixed top-5 left-5 z-50" id="business-form-control">
@@ -109,7 +110,7 @@
         </div>
     </div>
 </div>
-<header class="max-w-6xl mx-auto pt-24 pb-16 px-6 text-center">
+<header class="max-w-6xl mx-auto pt-24 pb-8 px-4 sm:px-6 text-center">
     <div id="loader-overlay" class="fixed inset-0 bg-white dark:bg-slate-900 z-[60] flex items-center justify-center transition-opacity duration-500">
         <div class="flex flex-col items-center">
             <div class="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mb-4"></div>
@@ -121,7 +122,35 @@
             services
         </div>
     </div>
-    <h1 class="text-6xl font-extrabold mb-4 tracking-tight">Poortjie</h1>
+    <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 tracking-tight">Poortjie</h1>
+    <p class="text-lg opacity-80 mb-6">Discover the people and businesses around you.</p>
+    <section id="local-spotlight" class="local-spotlight" aria-label="Discover local businesses" aria-busy="true">
+        <p id="spotlight-status" role="status" class="p-6">Finding a local business with pictures…</p>
+        <article id="spotlight-card" hidden>
+            <div class="spotlight-heading"><span class="spotlight-eyebrow">Discover local</span><h2 id="spotlight-category"></h2></div>
+            <div class="spotlight-layout">
+                <img id="spotlight-photo" class="spotlight-photo" alt="" decoding="async">
+                <div class="spotlight-details">
+                    <p id="spotlight-service" class="spotlight-eyebrow"></p>
+                    <h3 id="spotlight-name"></h3>
+                    <p id="spotlight-description"></p>
+                    <p id="spotlight-address" class="text-sm opacity-70"></p>
+                    <a id="spotlight-contact" class="underline" hidden></a>
+                    <div class="spotlight-actions">
+                        <button id="spotlight-pictures" class="spotlight-primary" type="button">View Pictures</button>
+                        <button id="spotlight-next" class="spotlight-secondary" type="button">Discover Another →</button>
+                    </div>
+                    <a id="spotlight-category-link" class="text-sm underline">Explore this category</a>
+                </div>
+            </div>
+        </article>
+    </section>
+    <dialog id="spotlight-gallery" aria-labelledby="spotlight-gallery-title">
+        <div class="spotlight-gallery-header"><h2 id="spotlight-gallery-title">Business pictures</h2><button id="spotlight-close" type="button" aria-label="Close pictures">✕</button></div>
+        <img id="spotlight-gallery-photo" alt="">
+        <p id="spotlight-gallery-status" role="status"></p>
+        <div class="spotlight-gallery-controls"><button id="spotlight-previous-photo" type="button">← Previous</button><span id="spotlight-count" aria-live="polite"></span><button id="spotlight-next-photo" type="button">Next →</button></div>
+    </dialog>
     <div id="alert-container" class="max-w-2xl mx-auto mb-4 hidden">
     </div>
     <div id="news-slider-container" class="max-w-2xl mx-auto mb-8 hidden">
@@ -195,6 +224,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="scripts/firebase.js" defer></script>
+<script src="scripts/spotlight.js" defer></script>
 <script src="scripts/core/observable.js" defer></script>
 <script src="scripts/core/case-mapper.js" defer></script>
 <script src="scripts/models/user-model.js" defer></script>
