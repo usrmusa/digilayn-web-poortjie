@@ -125,7 +125,8 @@
     <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 tracking-tight">Poortjie</h1>
     <p class="text-lg opacity-80 mb-6">Discover the people and businesses around you.</p>
     <section id="local-spotlight" class="local-spotlight" aria-label="Discover local businesses" aria-busy="true">
-        <p id="spotlight-status" role="status" class="p-6">Finding a local business with pictures…</p>
+        <div id="spotlight-loader" class="spotlight-loader" role="status" aria-label="Loading local businesses"></div>
+        <p id="spotlight-status" role="status" class="p-6" hidden></p>
         <article id="spotlight-card" hidden>
             <div class="spotlight-heading"><span class="spotlight-eyebrow">Discover local</span><h2 id="spotlight-category"></h2></div>
             <div class="spotlight-layout">
@@ -147,10 +148,6 @@
             </div>
         </article>
     </section>
-    <dialog id="spotlight-profile" aria-labelledby="spotlight-profile-title">
-        <div class="spotlight-gallery-header"><h2 id="spotlight-profile-title">Business details</h2><button id="spotlight-profile-close" type="button" aria-label="Close business details">✕</button></div>
-        <div id="spotlight-profile-content" class="spotlight-profile-content"></div>
-    </dialog>
     <dialog id="spotlight-gallery" aria-labelledby="spotlight-gallery-title">
         <div class="spotlight-gallery-header"><h2 id="spotlight-gallery-title">Business pictures</h2><button id="spotlight-close" type="button" aria-label="Close pictures">✕</button></div>
         <img id="spotlight-gallery-photo" alt="">

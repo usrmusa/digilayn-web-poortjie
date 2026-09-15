@@ -1,32 +1,346 @@
+/* ============================================================
+   Local business spotlight — styled to match the site's
+   Tailwind green/slate design system (solid green-600 CTAs,
+   green-outline secondaries, rounded cards, soft shadows).
+   Uses the shared theme tokens from main.css where possible.
+   ============================================================ */
 
-.local-spotlight { text-align:left; margin:0 auto 2rem; border:1px solid #cbd5e1; border-radius:24px; overflow:hidden; background:#f8fafc; }
-.spotlight-heading { padding:1.25rem; }
-.spotlight-eyebrow { color:#15803d; font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.12em; }
-.spotlight-heading h2 { font-size:clamp(1.65rem,5vw,2.5rem); font-weight:800; line-height:1.15; margin-top:.4rem; overflow-wrap:anywhere; }
-.spotlight-photo { width:100%; aspect-ratio:4/3; object-fit:cover; background:#e2e8f0; }
-.spotlight-details { display:flex; flex-direction:column; gap:1rem; padding:1.25rem; min-width:0; overflow-wrap:anywhere; }
-.spotlight-details h3 { font-size:1.75rem; font-weight:800; line-height:1.15; }
-.spotlight-actions { display:grid; gap:.75rem; margin-top:.25rem; }
-.spotlight-primary,.spotlight-secondary { min-height:48px; padding:.75rem 1rem; border-radius:12px; font-weight:700; }
-.spotlight-primary { background:#15803d; color:white; }
-.spotlight-secondary { border:1px solid #94a3b8; }
-.local-spotlight button:disabled { opacity:.5; cursor:wait; }
-.local-spotlight [hidden] { display:none; }
-#spotlight-gallery { width:calc(100% - 1rem); max-width:800px; max-height:92dvh; padding:1rem; border-radius:20px; background:#fff; color:#0f172a; }
-#spotlight-gallery::backdrop { background:#020617dd; }
-.spotlight-gallery-header,.spotlight-gallery-controls { display:flex; align-items:center; justify-content:space-between; gap:.5rem; }
-.spotlight-gallery-header h2 { font-weight:700; overflow-wrap:anywhere; }
-#spotlight-gallery button { min-width:48px; min-height:48px; padding:.5rem; }
-#spotlight-gallery-photo { width:100%; height:60dvh; object-fit:contain; }
-.dark .local-spotlight,.dark #spotlight-gallery { background:#1e293b; color:#f1f5f9; border-color:#475569; }
-.dark .spotlight-eyebrow { color:#86efac; }
-@media(min-width:768px) { .spotlight-layout { display:grid; grid-template-columns:1.1fr 1fr; } .spotlight-photo { height:100%; max-height:520px; } .spotlight-details { padding:2rem; justify-content:center; } .spotlight-heading { padding:1.5rem 2rem; } }
+.local-spotlight {
+    text-align: left;
+    margin: 0 auto 2.5rem;
+    max-width: 56rem;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-left: 4px solid #22c55e;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .1), 0 12px 30px -18px rgba(15, 23, 42, .25);
+}
 
-#spotlight-profile { width:calc(100% - 1rem); max-width:640px; max-height:92dvh; padding:1.25rem; border-radius:20px; background:#fff; color:#0f172a; text-align:left; overflow-wrap:anywhere; }
-#spotlight-profile::backdrop { background:#020617dd; }
-#spotlight-profile-close { min-width:48px; min-height:48px; }
-.spotlight-profile-content { display:flex; flex-direction:column; gap:1rem; padding-top:1rem; }
-.spotlight-profile-content h3 { font-size:1.125rem; font-weight:700; margin-top:.5rem; }
-.spotlight-profile-content p { white-space:pre-line; }
-.spotlight-profile-content a { display:block; text-align:center; }
-.dark #spotlight-profile { background:#1e293b; color:#f1f5f9; }
+.dark .local-spotlight {
+    background: #1e293b;
+    border-color: #334155;
+    border-left-color: #22c55e;
+}
+
+#spotlight-status { opacity: .7; }
+
+/* Indeterminate linear loading bar shown while a business is being found. */
+.spotlight-loader {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background: rgba(34, 197, 94, .15);
+    overflow: hidden;
+}
+
+.spotlight-loader::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    background: #16a34a;
+    border-radius: 9999px;
+    animation: spotlight-loading 1.2s ease-in-out infinite;
+}
+
+@keyframes spotlight-loading {
+    0% { left: -40%; }
+    100% { left: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spotlight-loader::before {
+        animation-duration: 2.4s;
+    }
+}
+
+.spotlight-heading {
+    padding: 1.5rem 1.5rem 0;
+}
+
+.spotlight-eyebrow {
+    display: inline-block;
+    color: #15803d;
+    background: rgba(34, 197, 94, .12);
+    font-size: .7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    padding: .3rem .7rem;
+    border-radius: 9999px;
+}
+
+.spotlight-heading h2 {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-top: .65rem;
+    overflow-wrap: anywhere;
+}
+
+.spotlight-photo {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    background: #e2e8f0;
+}
+
+.spotlight-details {
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+    padding: 1.5rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.spotlight-details h3 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+#spotlight-description {
+    opacity: .8;
+    line-height: 1.6;
+}
+
+#spotlight-contact {
+    color: #15803d;
+    font-weight: 600;
+    text-underline-offset: 3px;
+    width: fit-content;
+}
+
+.dark #spotlight-contact {
+    color: #86efac;
+}
+
+/* ---- Action buttons -------------------------------------- */
+.spotlight-actions {
+    display: grid;
+    gap: .75rem;
+    margin-top: .5rem;
+}
+
+@media (min-width: 480px) {
+    .spotlight-actions {
+        grid-template-columns: 1fr 1fr;
+    }
+    /* WhatsApp CTA and "Discover another" stretch across both columns,
+       while Full details / View pictures pair up side by side. */
+    #spotlight-whatsapp,
+    #spotlight-next {
+        grid-column: 1 / -1;
+    }
+}
+
+.spotlight-primary,
+.spotlight-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: .75rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color .2s ease, color .2s ease,
+                transform .2s ease, box-shadow .2s ease;
+}
+
+.spotlight-primary {
+    background: #16a34a;
+    color: #fff;
+    border: 2px solid #16a34a;
+    box-shadow: 0 8px 18px -8px rgba(22, 163, 74, .7);
+}
+
+.spotlight-primary:hover:not(:disabled) {
+    background: #15803d;
+    border-color: #15803d;
+    transform: translateY(-1px);
+}
+
+.spotlight-secondary {
+    background: transparent;
+    color: #16a34a;
+    border: 2px solid #16a34a;
+}
+
+.spotlight-secondary:hover:not(:disabled) {
+    background: #16a34a;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.dark .spotlight-secondary {
+    color: #4ade80;
+    border-color: #22c55e;
+}
+
+.dark .spotlight-secondary:hover:not(:disabled) {
+    background: #22c55e;
+    color: #052e16;
+}
+
+#spotlight-category-link {
+    align-self: flex-start;
+    margin-top: .25rem;
+    color: #15803d;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.dark #spotlight-category-link {
+    color: #86efac;
+}
+
+.local-spotlight button:disabled {
+    opacity: .5;
+    cursor: wait;
+    transform: none;
+}
+
+.local-spotlight [hidden] {
+    display: none;
+}
+
+/* ---- Desktop two-column layout --------------------------- */
+@media (min-width: 768px) {
+    .spotlight-layout {
+        display: grid;
+        grid-template-columns: 1.05fr 1fr;
+    }
+    .spotlight-photo {
+        height: 100%;
+        max-height: 540px;
+        aspect-ratio: auto;
+    }
+    .spotlight-details {
+        padding: 2rem;
+        justify-content: center;
+    }
+    .spotlight-heading {
+        padding: 1.75rem 2rem 0;
+    }
+}
+
+/* ============================================================
+   Picture gallery dialog
+   ============================================================ */
+
+#spotlight-gallery {
+    width: calc(100% - 1.5rem);
+    max-width: 800px;
+    max-height: 92dvh;
+    padding: 0;
+    border: none;
+    border-radius: 20px;
+    background: var(--card-bg, #fff);
+    color: var(--text-color, #0f172a);
+    overflow: hidden;
+    box-shadow: 0 25px 60px -15px rgba(2, 6, 23, .6);
+}
+
+#spotlight-gallery[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+#spotlight-gallery::backdrop {
+    background: rgba(2, 6, 23, .72);
+    backdrop-filter: blur(3px);
+}
+
+.spotlight-gallery-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    flex-shrink: 0;
+}
+
+.spotlight-gallery-controls {
+    flex-shrink: 0;
+}
+
+.spotlight-gallery-header h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.spotlight-gallery-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+/* Close / navigation icon buttons */
+#spotlight-close,
+#spotlight-previous-photo,
+#spotlight-next-photo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: .5rem .9rem;
+    border-radius: 10px;
+    font-weight: 700;
+    color: var(--text-color, #0f172a);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease;
+}
+
+#spotlight-previous-photo,
+#spotlight-next-photo {
+    border-color: var(--border-color, #cbd5e1);
+}
+
+#spotlight-close:hover,
+#spotlight-previous-photo:hover:not(:disabled),
+#spotlight-next-photo:hover:not(:disabled) {
+    background: rgba(34, 197, 94, .12);
+    border-color: #16a34a;
+    color: #15803d;
+}
+
+#spotlight-previous-photo:disabled,
+#spotlight-next-photo:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+#spotlight-count {
+    font-weight: 700;
+    font-size: .9rem;
+    opacity: .75;
+}
+
+#spotlight-gallery-photo {
+    width: 100%;
+    height: 60dvh;
+    object-fit: contain;
+    background: #0f172a;
+}
+
+#spotlight-gallery-status {
+    padding: .5rem 1.25rem 0;
+    opacity: .7;
+    font-size: .9rem;
+}
