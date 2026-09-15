@@ -668,7 +668,6 @@
         const homeAdminLink = document.getElementById('home-admin-link');
         const taxiAdminLink = document.getElementById('taxi-admin-link');
         const newsAdminLink = document.getElementById('news-admin-link');
-        const addBusinessBtn = document.getElementById('add-business-btn');
         const authDivider = document.getElementById('auth-divider');
         const loginLink = document.getElementById('login-link');
         const logoutBtn = document.getElementById('logout-btn');
@@ -686,7 +685,6 @@
             const roles = (user && user.roles) || {};
 
             if (authDivider) authDivider.classList.toggle('hidden', !resolved);
-            if (addBusinessBtn) addBusinessBtn.classList.toggle('hidden', !isAuth);
             if (loginLink) loginLink.classList.toggle('hidden', isAuth);
             if (logoutBtn) logoutBtn.classList.toggle('hidden', !isAuth);
 
