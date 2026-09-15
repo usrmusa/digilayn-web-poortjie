@@ -344,7 +344,7 @@
         <div class="p-6 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center">
             <div>
                 <h3 class="text-xl font-bold">Business Gallery</h3>
-                <p class="text-xs opacity-50">Upload up to 5 photos (max 1MB each)</p>
+                <p class="text-xs opacity-50">Upload up to 5 photos (compressed to under 1 MB each)</p>
             </div>
             <button type="button" id="close-gallery-modal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition">
                 <i class="fa-solid fa-xmark text-xl"></i>
@@ -368,6 +368,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
+<script src="../scripts/image-upload.js"></script>
 <script src="../scripts/card-renderer.js"></script>
 
 <script>
@@ -831,7 +832,7 @@
                     slot.innerHTML = `
                         <div class="flex flex-col items-center gap-2">
                             <div class="animate-spin h-5 w-5 border-2 border-green-500 border-t-transparent rounded-full"></div>
-                            <span class="text-[8px] font-bold opacity-50 uppercase">Processing...</span>
+                            <span class="text-xs font-medium text-center">Compressing to under 1 MB…</span>
                         </div>
                     `;
 
@@ -839,53 +840,15 @@
                         const user = auth.currentUser;
                         if (!user) throw new Error("User not authenticated.");
 
-                        const processImage = (file) => {
-                            return new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.onload = (event) => {
-                                    const img = new Image();
-                                    img.onload = () => {
-                                        const canvas = document.createElement('canvas');
-                                        const width = img.width;
-                                        const height = img.height;
-                                        const size = Math.min(width, height);
-                                        const xOffset = (width - size) / 2;
-                                        const yOffset = (height - size) / 2;
-                                        const targetSize = Math.min(size, 1200);
-
-                                        canvas.width = targetSize;
-                                        canvas.height = targetSize;
-
-                                        const ctx = canvas.getContext('2d');
-                                        ctx.drawImage(img, xOffset, yOffset, size, size, 0, 0, targetSize, targetSize);
-
-                                        let quality = 0.9;
-                                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
-
-                                        while (dataUrl.length * 0.75 > 1024 * 1024 && quality > 0.1) {
-                                            quality -= 0.1;
-                                            dataUrl = canvas.toDataURL('image/jpeg', quality);
-                                        }
-
-                                        fetch(dataUrl)
-                                            .then(res => res.blob())
-                                            .then(blob => resolve(blob))
-                                            .catch(reject);
-                                    };
-                                    img.onerror = reject;
-                                    img.src = event.target.result;
-                                };
-                                reader.onerror = reject;
-                                reader.readAsDataURL(file);
-                            });
+                        const reportProgress = message => {
+                            const label = slot.querySelector('span');
+                            if (label) { label.textContent = message; label.setAttribute('role', 'status'); }
                         };
-
-                        const processedBlob = await processImage(file);
-                        slot.querySelector('span').textContent = 'Uploading...';
+                        const processedBlob = await ImageUpload.compressFile(file, reportProgress, true);
 
                         const fileName = `${Date.now()}_${i}`;
                         const storageRef = firebase.storage().ref(`business-photos/${user.uid}/${fileName}`);
-                        const snapshot = await storageRef.put(processedBlob);
+                        const snapshot = await ImageUpload.upload(storageRef, processedBlob, reportProgress);
                         const url = await snapshot.ref.getDownloadURL();
 
                         uploadedPhotos.push(url);

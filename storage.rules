@@ -2,9 +2,16 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
+    function isWebImagePath(path) {
+      return path.matches('business-photos/.*') || path.matches('market/.*')
+        || path.matches('user-photos/.*') || path.matches('users/[^/]+/profile/.*');
+    }
     match /{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null
+        && (request.resource == null || !isWebImagePath(allPaths)
+          || (request.resource.size > 0 && request.resource.size < 1000000
+            && request.resource.contentType.matches('image/.*')));
     }
   }
 }

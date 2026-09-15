@@ -203,6 +203,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script src="../scripts/firebase.js"></script>
+<script src="../scripts/image-upload.js"></script>
 
 <script>
     const profileForm = document.getElementById('profile-form');
@@ -322,52 +323,6 @@
         }
     });
 
-    // ---- NEW: convert canvas to JPEG Blob with <= 1MB target (quality + scale down) ----
-    async function canvasToJpegBlobUnder1MB(canvas) {
-        const MAX_BYTES = 1024 * 1024; // 1MB
-        let quality = 0.9;
-
-        // Lower quality first
-        for (let i = 0; i < 9; i++) {
-            const blob = await new Promise((resolve) =>
-                canvas.toBlob(resolve, "image/jpeg", quality)
-            );
-            if (blob && blob.size <= MAX_BYTES) return blob;
-            quality -= 0.1;
-            if (quality < 0.1) break;
-        }
-
-        // If still too big, scale down dimensions and retry
-        let w = canvas.width;
-        let h = canvas.height;
-
-        for (let j = 0; j < 6; j++) {
-            w = Math.floor(w * 0.85);
-            h = Math.floor(h * 0.85);
-
-            const smaller = document.createElement("canvas");
-            smaller.width = w;
-            smaller.height = h;
-            const ctx = smaller.getContext("2d");
-            ctx.drawImage(canvas, 0, 0, w, h);
-
-            quality = 0.8;
-            for (let i = 0; i < 8; i++) {
-                const blob = await new Promise((resolve) =>
-                    smaller.toBlob(resolve, "image/jpeg", quality)
-                );
-                if (blob && blob.size <= MAX_BYTES) return blob;
-                quality -= 0.1;
-                if (quality < 0.1) break;
-            }
-        }
-
-        // Worst case: return something
-        return await new Promise((resolve) =>
-            canvas.toBlob(resolve, "image/jpeg", 0.6)
-        );
-    }
-
     // Image error fallback
     profilePicture.addEventListener('error', () => {
         profilePicture.src = DEFAULT_AVATAR;
@@ -470,17 +425,27 @@
         const canvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
 
         try {
-            showStatus("Uploading photo...");
+            let progress = document.getElementById('photo-compression-progress');
+            if (!progress) {
+                progress = document.createElement('p');
+                progress.id = 'photo-compression-progress';
+                progress.setAttribute('role', 'status');
+                progress.className = 'text-sm my-3';
+                applyCropBtn.parentElement.before(progress);
+            }
             applyCropBtn.disabled = true;
 
-            const blob = await canvasToJpegBlobUnder1MB(canvas);
+            const reportProgress = message => {
+                progress.textContent = message;
+            };
+            const blob = await ImageUpload.compressCanvas(canvas, reportProgress);
             if (!blob) throw new Error("Could not convert image");
 
             const storageRef = firebase.storage().ref();
             const time = Date.now();
             const fileRef = storageRef.child(`user-photos/${user.uid}/profile-${time}.jpg`);
 
-            await fileRef.put(blob, {
+            await ImageUpload.upload(fileRef, blob, reportProgress, {
                 contentType: "image/jpeg",
                 cacheControl: "public,max-age=86400"
             });
@@ -501,7 +466,9 @@
             showStatus("Photo uploaded. Now save changes.");
         } catch (err) {
             console.error("Upload failed:", err);
-            showStatus("Upload failed. Check Storage rules / permissions.", true);
+            const progress = document.getElementById('photo-compression-progress');
+            if (progress) progress.textContent = 'Picture upload failed. Please try again or choose another image.';
+            showStatus('Picture upload failed. Please try again or choose another image.', true);
         } finally {
             applyCropBtn.disabled = false;
         }

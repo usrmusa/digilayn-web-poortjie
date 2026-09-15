@@ -678,10 +678,16 @@
 
   /** Upload the profile photo to users/{uid}/profile/{ts}.jpg (mirrors Android). */
   async function uploadProfilePhoto(file, uid) {
-    const ext = (file.name && file.name.includes('.')) ? file.name.split('.').pop().toLowerCase() : 'jpg';
-    const path = `users/${uid}/profile/${Date.now()}.${ext}`;
+    const reportProgress = message => {
+      if (profilePhotoHint) {
+        profilePhotoHint.textContent = message;
+        profilePhotoHint.setAttribute('role', 'status');
+      }
+    };
+    const blob = await ImageUpload.compressFile(file, reportProgress);
+    const path = `users/${uid}/profile/${Date.now()}.jpg`;
     const ref = storage.ref().child(path);
-    await ref.put(file, { contentType: file.type || 'image/jpeg' });
+    await ImageUpload.upload(ref, blob, reportProgress);
     return ref.getDownloadURL();
   }
 
@@ -757,6 +763,7 @@
       }
     } catch (err) {
       console.error('Failed to save profile:', err);
+      if (profilePhotoHint) profilePhotoHint.textContent = 'Profile save failed. Please try again or choose another picture.';
       showProfileError('Could not save your profile. Please try again.');
     } finally {
       if (profileSaveBtn) {

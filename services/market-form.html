@@ -185,6 +185,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
+<script src="../scripts/image-upload.js"></script>
 
 <script>
     let uploadedPhotos = [];
@@ -278,22 +279,6 @@
         reader.readAsDataURL(file);
     }
 
-    async function canvasToJpegBlobUnder1MB(canvas) {
-        const MAX_BYTES = 1024 * 1024; // 1MB
-        let quality = 0.9;
-
-        for (let i = 0; i < 9; i++) {
-            const blob = await new Promise((resolve) =>
-                canvas.toBlob(resolve, "image/jpeg", quality)
-            );
-            if (blob && blob.size <= MAX_BYTES) return blob;
-            quality -= 0.1;
-            if (quality < 0.1) break;
-        }
-
-        return await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.6));
-    }
-
     applyCropBtn.onclick = async () => {
         if (!cropper) return;
 
@@ -303,14 +288,19 @@
         const slot = photoGrid.children[currentUploadIndex];
         slot.innerHTML = `<div class="animate-spin h-5 w-5 border-2 border-green-500 border-t-transparent rounded-full"></div>`;
         cropModal.classList.add('hidden');
+        const progress = document.createElement('p');
+        progress.setAttribute('role', 'status');
+        progress.className = 'text-xs mt-2';
+        slot.appendChild(progress);
+        const reportProgress = message => { progress.textContent = message; };
 
         try {
             const canvas = cropper.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 });
-            const blob = await canvasToJpegBlobUnder1MB(canvas);
+            const blob = await ImageUpload.compressCanvas(canvas, reportProgress);
 
             const fileName = `market/${user.uid}/${Date.now()}_${currentUploadIndex}.jpg`;
             const storageRef = firebase.storage().ref(fileName);
-            const snapshot = await storageRef.put(blob);
+            const snapshot = await ImageUpload.upload(storageRef, blob, reportProgress);
             const url = await snapshot.ref.getDownloadURL();
 
             uploadedPhotos.push(url);
