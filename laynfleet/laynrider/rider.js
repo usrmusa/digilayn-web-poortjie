@@ -1977,7 +1977,7 @@
       return;
     }
 
-    // Open short and friendly confirmation dialog showing details of their ride & 50% test discount
+    // Open confirmation dialog showing ride details
     openConfirmBookingModal();
   }
 
