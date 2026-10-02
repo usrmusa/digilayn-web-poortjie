@@ -111,15 +111,16 @@
     estimatedDistanceKm: null,
     ratePerKmSnapshot: null,
     minimumFareSnapshot: null,
+    curveScaleKmSnapshot: null,
     returnPercentSnapshot: null
   };
 
   const DEFAULT_PRICING_RATES = {
-    PRIVATE_CAR: { ratePerKm: 10.0, minimumFare: 25.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10 },
-    MINI_BUS: { ratePerKm: 12.0, minimumFare: 30.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10 },
-    BAKKIE: { ratePerKm: 12.0, minimumFare: 30.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10 },
-    MOTORBIKE: { ratePerKm: 7.0, minimumFare: 18.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10 },
-    TUK_TUK: { ratePerKm: 6.0, minimumFare: 15.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10 }
+    PRIVATE_CAR: { ratePerKm: 10.0, minimumFare: 25.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10, curveScaleKm: null },
+    MINI_BUS: { ratePerKm: 12.0, minimumFare: 30.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10, curveScaleKm: null },
+    BAKKIE: { ratePerKm: 12.0, minimumFare: 30.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10, curveScaleKm: null },
+    MOTORBIKE: { ratePerKm: 7.0, minimumFare: 18.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10, curveScaleKm: null },
+    TUK_TUK: { ratePerKm: 6.0, minimumFare: 15.0, returnTripPercent: 80.0, waitRatePerMinute: 1.50, freeWaitMinutes: 10, curveScaleKm: null }
   };
   let activePricingRates = { ...DEFAULT_PRICING_RATES };
 
@@ -454,6 +455,10 @@
   function updateUpfrontFarePreview(overrideDistanceKm = null) {
     const vType = (bookingState.vehicleType || 'PRIVATE_CAR').toUpperCase();
     const rateInfo = activePricingRates[vType] || DEFAULT_PRICING_RATES[vType] || { ratePerKm: 10.0, minimumFare: 25.0, returnTripPercent: 80.0 };
+    // Null / <= 0 curve scale means a straight line (no curve), i.e. linear pricing.
+    const rateCurveScaleKm = (typeof rateInfo.curveScaleKm === 'number' && isFinite(rateInfo.curveScaleKm) && rateInfo.curveScaleKm > 0)
+      ? rateInfo.curveScaleKm
+      : null;
 
     const fareAmountEl = document.getElementById('booking-fare-amount') || document.getElementById('booking-distance-amount');
     const fareBreakdownEl = document.getElementById('booking-fare-breakdown') || document.getElementById('booking-distance-breakdown');
@@ -477,6 +482,7 @@
       bookingState.upfrontPrice = null;
       bookingState.ratePerKmSnapshot = rateInfo.ratePerKm;
       bookingState.minimumFareSnapshot = rateInfo.minimumFare;
+      bookingState.curveScaleKmSnapshot = rateCurveScaleKm;
       bookingState.returnPercentSnapshot = bookingState.isReturnTrip !== false ? rateInfo.returnTripPercent : null;
 
       if (fareAmountEl) fareAmountEl.textContent = 'R --';
@@ -504,6 +510,7 @@
       bookingState.upfrontPrice = null;
       bookingState.ratePerKmSnapshot = rateInfo.ratePerKm;
       bookingState.minimumFareSnapshot = rateInfo.minimumFare;
+      bookingState.curveScaleKmSnapshot = rateCurveScaleKm;
       bookingState.returnPercentSnapshot = bookingState.isReturnTrip !== false ? rateInfo.returnTripPercent : null;
 
       if (fareAmountEl) fareAmountEl.textContent = 'R ...';
@@ -520,7 +527,11 @@
     const isReturn = bookingState.isReturnTrip !== false;
     const displayDistKm = isReturn ? (oneWayDistKm * 2.0) : oneWayDistKm;
     const returnPercent = typeof rateInfo.returnTripPercent === 'number' ? rateInfo.returnTripPercent : 80.0;
-    const singlePrice = Math.max(oneWayDistKm * rateInfo.ratePerKm, rateInfo.minimumFare);
+    // One-way basis with logarithmic distance curve. Null curve scale => linear.
+    const distanceComponent = rateCurveScaleKm != null
+      ? rateCurveScaleKm * Math.log(1 + oneWayDistKm / rateCurveScaleKm)
+      : oneWayDistKm;
+    const singlePrice = Math.max(rateInfo.minimumFare, rateInfo.ratePerKm * distanceComponent);
 
     let fare;
     if (isReturn) {
@@ -541,6 +552,7 @@
     bookingState.upfrontPrice = fare;
     bookingState.ratePerKmSnapshot = rateInfo.ratePerKm;
     bookingState.minimumFareSnapshot = rateInfo.minimumFare;
+    bookingState.curveScaleKmSnapshot = rateCurveScaleKm;
     bookingState.returnPercentSnapshot = isReturn ? returnPercent : null;
 
     if (fareAmountEl) fareAmountEl.textContent = `R ${fare}`;
@@ -570,7 +582,8 @@
             minimumFare: typeof data.minimumFare === 'number' ? data.minimumFare : (DEFAULT_PRICING_RATES[vType]?.minimumFare || 25.0),
             returnTripPercent: typeof data.returnTripPercent === 'number' ? data.returnTripPercent : (DEFAULT_PRICING_RATES[vType]?.returnTripPercent || 80.0),
             waitRatePerMinute: typeof data.waitRatePerMinute === 'number' ? data.waitRatePerMinute : (DEFAULT_PRICING_RATES[vType]?.waitRatePerMinute || 1.50),
-            freeWaitMinutes: typeof data.freeWaitMinutes === 'number' ? data.freeWaitMinutes : (DEFAULT_PRICING_RATES[vType]?.freeWaitMinutes || 10)
+            freeWaitMinutes: typeof data.freeWaitMinutes === 'number' ? data.freeWaitMinutes : (DEFAULT_PRICING_RATES[vType]?.freeWaitMinutes || 10),
+            curveScaleKm: (typeof data.curveScaleKm === 'number' && isFinite(data.curveScaleKm) && data.curveScaleKm > 0) ? data.curveScaleKm : null
           };
         });
         updateUpfrontFarePreview();
@@ -1863,6 +1876,7 @@
       upfrontPrice: bookingState.upfrontPrice,
       ratePerKmSnapshot: bookingState.ratePerKmSnapshot,
       minimumFareSnapshot: bookingState.minimumFareSnapshot,
+      curveScaleKmSnapshot: bookingState.curveScaleKmSnapshot,
       returnPercentSnapshot: bookingState.returnPercentSnapshot,
       targetDriverId: bookingTargetDriver ? bookingTargetDriver.uid : null
     };
@@ -2114,6 +2128,7 @@
         upfrontPrice: bookingState.upfrontPrice || null,
         ratePerKmSnapshot: bookingState.ratePerKmSnapshot || null,
         minimumFareSnapshot: bookingState.minimumFareSnapshot || null,
+        curveScaleKmSnapshot: (typeof bookingState.curveScaleKmSnapshot === 'number' && bookingState.curveScaleKmSnapshot > 0) ? bookingState.curveScaleKmSnapshot : null,
         estimatedDistanceKm: bookingState.estimatedDistanceKm || null,
         createdAt: now,
         updatedAt: now
