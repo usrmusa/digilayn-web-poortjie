@@ -223,6 +223,56 @@
       transition: all 0.15s ease;
       cursor: pointer;
       border: none;
+      position: relative;
+      overflow: hidden;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .press-progress {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 4px;
+      width: 0%;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 2px;
+      pointer-events: none;
+      transition: width 0.12s ease-out;
+    }
+
+    .app-download-btn.is-pressing .press-progress {
+      width: 100%;
+      transition: width 0.55s linear;
+    }
+
+    .app-download-btn.is-pressing {
+      transform: scale(0.985);
+      filter: brightness(0.96);
+    }
+
+    @keyframes dlPulse {
+      0% { transform: scale(0.985); }
+      50% { transform: scale(1.025); }
+      100% { transform: scale(1); }
+    }
+
+    .app-download-btn.dl-success {
+      animation: dlPulse 0.35s ease;
+    }
+
+    .app-meta-tip {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      margin-top: 6px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      letter-spacing: normal;
+    }
+
+    .app-meta-tip strong {
+      color: var(--brand);
     }
 
     .app-download-btn.primary {
@@ -475,11 +525,13 @@
           </div>
         </div>
 
-        <a href="https://play.google.com/store/apps/details?id=com.digilayn.laynrider" class="app-download-btn primary">
+        <a href="https://play.google.com/store/apps/details?id=com.digilayn.laynrider" class="app-download-btn primary" data-apk="laynrider-release.apk" data-apk-name="laynrider-release.apk" data-name="LaynRider">
           <span>📥</span>Play Store
+          <span class="press-progress" aria-hidden="true"></span>
         </a>
         <div class="app-meta-text">
           Public release v1.1.2 · Android 10+ · Download size shown in Google Play
+          <div class="app-meta-tip">💡 <strong>Long press</strong> to download APK directly</div>
         </div>
 
         <ul class="app-features-list">
@@ -525,11 +577,13 @@
           </div>
         </div>
 
-        <a href="https://play.google.com/apps/testing/com.digilayn.layndriver" class="app-download-btn primary" style="background: #1e293b;">
+        <a href="https://play.google.com/apps/testing/com.digilayn.layndriver" class="app-download-btn primary" style="background: #1e293b;" data-apk="../layndriver/layndriver-release.apk" data-apk-name="layndriver-release.apk" data-name="LaynDriver">
           <span>📥</span> Open LaynDriver Closed Testing
+          <span class="press-progress" aria-hidden="true"></span>
         </a>
         <div class="app-meta-text">
           Closed testing · Approved testers only · Requirements and size shown in Google Play
+          <div class="app-meta-tip">💡 <strong>Long press</strong> to download APK directly</div>
         </div>
 
         <ul class="app-features-list">
@@ -576,7 +630,7 @@
         <div class="step-card">
           <div class="step-num">1</div>
           <h4>Open Google Play</h4>
-          <p>Tap <strong>Get LaynRider on Google Play</strong> above on your Android phone.</p>
+          <p>Tap <strong>Play Store</strong> above on your Android phone, or hold down the button to download the APK directly.</p>
         </div>
         <div class="step-card">
           <div class="step-num">2</div>
@@ -651,6 +705,170 @@
     </div>
 
   </main>
+
+  <!-- ===================== TOAST NOTIFICATION ===================== -->
+  <div id="dl-toast" class="toast is-hidden" role="status" aria-live="polite"></div>
+
+  <!-- ===================== LONG-PRESS APK DOWNLOAD SCRIPT ===================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      const LONG_PRESS_DURATION = 550; // ms to trigger direct APK download
+      const MOVE_THRESHOLD = 12; // px movement threshold to cancel hold
+
+      const downloadButtons = document.querySelectorAll('.app-download-btn[data-apk]');
+      const toastEl = document.getElementById('dl-toast');
+      let toastTimer = null;
+
+      function showToast(message, duration = 3500) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        toastEl.classList.remove('is-hidden');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastEl.classList.add('is-hidden');
+        }, duration);
+      }
+
+      function downloadDirectApk(btn) {
+        const apkRelUrl = btn.getAttribute('data-apk');
+        if (!apkRelUrl) return;
+
+        const apkUrl = new URL(apkRelUrl, window.location.href).href;
+        const apkName = btn.getAttribute('data-apk-name') || apkRelUrl.split('/').pop();
+        const appTitle = btn.getAttribute('data-name') || 'App';
+
+        // Trigger direct APK download
+        const dlLink = document.createElement('a');
+        dlLink.href = apkUrl;
+        dlLink.download = apkName;
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        setTimeout(() => {
+          if (dlLink.parentNode) {
+            dlLink.parentNode.removeChild(dlLink);
+          }
+        }, 300);
+
+        // Haptic feedback (if supported)
+        if ('vibrate' in navigator) {
+          try {
+            navigator.vibrate([40, 30, 40]);
+          } catch (_) {}
+        }
+
+        // Visual feedback
+        btn.classList.add('dl-success');
+        setTimeout(() => {
+          btn.classList.remove('dl-success');
+        }, 600);
+
+        showToast('📥 Downloading ' + appTitle + ' APK directly...');
+      }
+
+      downloadButtons.forEach((btn) => {
+        let pressTimer = null;
+        let startX = 0;
+        let startY = 0;
+        let isPressing = false;
+        let longPressFired = false;
+        let suppressClickUntil = 0;
+
+        function getCoords(e) {
+          if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          }
+          return { x: e.clientX || 0, y: e.clientY || 0 };
+        }
+
+        function startPress(e) {
+          // Ignore secondary/right mouse clicks
+          if (e.button !== undefined && e.button !== 0) return;
+
+          isPressing = true;
+          longPressFired = false;
+          const coords = getCoords(e);
+          startX = coords.x;
+          startY = coords.y;
+
+          btn.classList.add('is-pressing');
+
+          if (pressTimer) clearTimeout(pressTimer);
+          pressTimer = setTimeout(() => {
+            if (!isPressing) return;
+            longPressFired = true;
+            suppressClickUntil = Date.now() + 800;
+            btn.classList.remove('is-pressing');
+            downloadDirectApk(btn);
+          }, LONG_PRESS_DURATION);
+        }
+
+        function cancelPress() {
+          if (pressTimer) {
+            clearTimeout(pressTimer);
+            pressTimer = null;
+          }
+          if (isPressing) {
+            isPressing = false;
+            btn.classList.remove('is-pressing');
+          }
+        }
+
+        function checkMove(e) {
+          if (!isPressing) return;
+          const coords = getCoords(e);
+          const dx = coords.x - startX;
+          const dy = coords.y - startY;
+          if (Math.hypot(dx, dy) > MOVE_THRESHOLD) {
+            cancelPress();
+          }
+        }
+
+        // Pointer Events (Touch, Mouse, Pen)
+        if ('PointerEvent' in window) {
+          btn.addEventListener('pointerdown', startPress);
+          btn.addEventListener('pointermove', checkMove);
+          btn.addEventListener('pointerup', cancelPress);
+          btn.addEventListener('pointercancel', cancelPress);
+          btn.addEventListener('pointerleave', cancelPress);
+        } else {
+          // Touch / Mouse fallbacks for legacy browsers
+          btn.addEventListener('touchstart', startPress, { passive: true });
+          btn.addEventListener('touchmove', checkMove, { passive: true });
+          btn.addEventListener('touchend', cancelPress);
+          btn.addEventListener('touchcancel', cancelPress);
+          btn.addEventListener('mousedown', startPress);
+          btn.addEventListener('mousemove', checkMove);
+          btn.addEventListener('mouseup', cancelPress);
+          btn.addEventListener('mouseleave', cancelPress);
+        }
+
+        // Prevent context menu (especially on mobile long press)
+        btn.addEventListener('contextmenu', (e) => {
+          if (isPressing || longPressFired || Date.now() < suppressClickUntil) {
+            e.preventDefault();
+          }
+        });
+
+        // Suppress default Play Store navigation if long-press was triggered
+        btn.addEventListener('click', (e) => {
+          if (longPressFired || Date.now() < suppressClickUntil) {
+            e.preventDefault();
+            e.stopPropagation();
+            longPressFired = false;
+            return false;
+          }
+        });
+      });
+
+      window.addEventListener('blur', () => {
+        downloadButtons.forEach((btn) => {
+          btn.classList.remove('is-pressing');
+        });
+      });
+    })();
+  </script>
 
 </body>
 </html>
