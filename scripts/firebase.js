@@ -7,7 +7,7 @@
  */
 const firebaseConfig = {
   apiKey: "AIzaSyANCpYHeLyWkgVtWL06xpI7XsP08xu9GPA",
-  authDomain: "digilayn-projects.firebaseapp.com",
+  authDomain: "auth.digilayn.co.za",
   projectId: "digilayn-projects",
   storageBucket: "digilayn-projects.firebasestorage.app",
   messagingSenderId: "95485356681",
