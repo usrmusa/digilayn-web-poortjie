@@ -108,6 +108,24 @@
     </div>
 </main>
 
+<dialog id="password-reset-dialog" aria-labelledby="password-reset-title"
+        class="w-full max-w-md rounded-2xl p-6 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xl backdrop:bg-black/60">
+    <div class="flex items-center justify-between gap-4 mb-3">
+        <h2 id="password-reset-title" class="text-2xl font-bold">Reset your password</h2>
+        <button id="close-password-reset" type="button" aria-label="Close password reset" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800">&#10005;</button>
+    </div>
+    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Choose how you’d like to recover access to your account.</p>
+    <button id="reset-with-google" type="button" class="w-full p-3 rounded-lg border border-green-600 text-green-700 dark:text-green-400 font-bold">Continue with Google</button>
+    <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 mb-6">Use the Google account linked to your Poortjie account, then set a new password.</p>
+    <form id="email-reset-form" class="border-t border-gray-200 dark:border-slate-700 pt-5">
+        <label for="reset-email" class="block font-bold text-sm mb-2">Or request an email reset link</label>
+        <input id="reset-email" type="email" autocomplete="email" required placeholder="Your account email"
+               class="w-full p-3 rounded-lg bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-slate-700">
+        <button id="send-reset-email" type="submit" class="w-full mt-3 p-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 disabled:opacity-60">Email me a reset link</button>
+    </form>
+    <p id="reset-status" role="status" aria-live="polite" class="text-sm mt-4" hidden></p>
+</dialog>
+
 <footer class="text-center py-12 border-t border-gray-100 dark:border-slate-800 opacity-50 text-xs">
     &copy; 2026 Poortjie Services. Empowering poortjie economies.<br><a href="../support" class="hover:underline">Data Policy</a>
 </footer>
@@ -377,14 +395,85 @@
     }
 
     const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+    const resetDialog = document.getElementById('password-reset-dialog');
+    const resetWithGoogleBtn = document.getElementById('reset-with-google');
+    const resetEmailInput = document.getElementById('reset-email');
+    const resetStatus = document.getElementById('reset-status');
+    const emailResetForm = document.getElementById('email-reset-form');
+    const sendResetEmailBtn = document.getElementById('send-reset-email');
+    let resetRequestPending = false;
+    const resetEmailConfirmation = 'If this email has an eligible account, you’ll receive a reset link. Check your inbox and spam folder.';
+    // Fixed categories only. Analytics must never interrupt account recovery.
+    function trackPasswordRecovery(eventName, method, outcome) {
+        try {
+            analytics.logEvent(eventName, {
+                recovery_method: method,
+                ...(outcome ? { outcome } : {})
+            });
+        } catch { /* Recovery remains available if analytics is blocked. */ }
+    }
+    document.getElementById('close-password-reset').addEventListener('click', () => resetDialog.close());
+    resetDialog.addEventListener('close', () => forgotPasswordBtn?.focus());
     if (forgotPasswordBtn) {
-        forgotPasswordBtn.addEventListener('click', async (e) => {
+        forgotPasswordBtn.addEventListener('click', () => {
+            if (!resetRequestPending) {
+                resetEmailInput.value = emailInput.value.trim();
+                resetStatus.hidden = true;
+            }
+            resetDialog.showModal();
+            trackPasswordRecovery('password_recovery_open', 'choice');
+        });
+    }
+    emailResetForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (resetRequestPending) return;
+        resetRequestPending = true;
+        sendResetEmailBtn.disabled = true;
+        resetWithGoogleBtn.disabled = true;
+        sendResetEmailBtn.textContent = 'Sending…';
+        resetStatus.hidden = true;
+        trackPasswordRecovery('password_reset_request', 'email');
+        let resetOutcome = 'other_error';
+        try {
+            await firebase.auth().sendPasswordResetEmail(resetEmailInput.value.trim());
+            resetOutcome = 'accepted';
+            resetStatus.textContent = resetEmailConfirmation;
+        } catch (error) {
+            if (['auth/user-not-found', 'auth/user-disabled'].includes(error.code)) {
+                // Do not expose account existence through event parameters either.
+                resetOutcome = 'accepted';
+                resetStatus.textContent = resetEmailConfirmation;
+            } else if (error.code === 'auth/network-request-failed') {
+                resetOutcome = 'network_error';
+                resetStatus.textContent = 'Couldn’t connect. Check your connection and try again.';
+            } else if (error.code === 'auth/too-many-requests') {
+                resetOutcome = 'throttled';
+                resetStatus.textContent = 'Too many requests. Please wait before trying again.';
+            } else if (error.code === 'auth/invalid-email') {
+                resetStatus.textContent = 'Enter a valid email address.';
+            } else {
+                resetStatus.textContent = 'Couldn’t request a reset link. Please try again later.';
+            }
+        } finally {
+            trackPasswordRecovery('password_reset_result', 'email', resetOutcome);
+            resetStatus.hidden = false;
+            resetRequestPending = false;
+            sendResetEmailBtn.disabled = false;
+            resetWithGoogleBtn.disabled = false;
+            sendResetEmailBtn.textContent = 'Email me a reset link';
+        }
+    });
+    if (resetWithGoogleBtn) {
+        resetWithGoogleBtn.addEventListener('click', async (e) => {
             e.preventDefault();
+            trackPasswordRecovery('password_recovery_google_start', 'google');
             errorMessage.classList.add('hidden');
 
-            forgotPasswordBtn.disabled = true;
-            const originalContent = forgotPasswordBtn.innerHTML;
-            forgotPasswordBtn.innerHTML = `<span class="inline-flex items-center justify-center gap-2">
+            resetWithGoogleBtn.disabled = true;
+            sendResetEmailBtn.disabled = true;
+            resetStatus.hidden = true;
+            const originalContent = resetWithGoogleBtn.innerHTML;
+            resetWithGoogleBtn.innerHTML = `<span class="inline-flex items-center justify-center gap-2">
                 <svg class="animate-spin h-4 w-4 text-green-600 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -420,11 +509,12 @@
                     window.location.replace('profile?action=set-password');
                 }
             } catch (error) {
-                forgotPasswordBtn.disabled = false;
-                forgotPasswordBtn.innerHTML = originalContent;
+                resetWithGoogleBtn.disabled = false;
+                sendResetEmailBtn.disabled = false;
+                resetWithGoogleBtn.innerHTML = originalContent;
                 if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-                    errorMessage.textContent = getFriendlyErrorMessage(error.code || error.message);
-                    errorMessage.classList.remove('hidden');
+                    resetStatus.textContent = getFriendlyErrorMessage(error.code || error.message);
+                    resetStatus.hidden = false;
                 }
             }
         });
