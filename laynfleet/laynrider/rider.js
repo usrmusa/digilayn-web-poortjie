@@ -18,16 +18,10 @@
   const rtdb = global.rtdb || firebase.database();
   const storage = global.storage || firebase.storage();
 
-  const FS = global.FS || {
-    users: 'users',
-    laynfleet: 'laynfleet',
-    laynfleetDoc: 'main',
-    drivers: 'drivers',
-    riders: 'riders',
-    bookings: 'bookings',
-    ratings: 'ratings'
-  };
-  const RTDB_LOCATIONS = global.RTDB_LOCATIONS || 'driverLocations';
+  const FS = global.FS;
+  if (!FS) throw new Error('Firebase layout is required');
+  if (FS.laynfleetDoc !== 'main') throw new Error('Public rider requires production');
+  const RTDB_LOCATIONS = 'driverLocations';
   const HEARTBEAT_FRESHNESS_WINDOW_MS = global.HEARTBEAT_FRESHNESS_WINDOW_MS || 60000;
   const SERVICE_AREA = global.SERVICE_AREA || {
     center: { lat: -26.57537, lng: 27.68133 },
@@ -45,7 +39,7 @@
    */
   async function callFn(name, payload) {
     const callable = functions.httpsCallable(name);
-    const res = await callable(payload || {});
+    const res = await callable({ ...payload, environment: 'main' });
     return res && res.data;
   }
 
