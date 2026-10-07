@@ -1279,7 +1279,10 @@
 
     // Check for Driver Location
     const driverUid = b.driverId || b.requestedDriverId;
-    const driverPresence = driverUid ? rtdbPresence[driverUid] : null;
+    const rawPresence = driverUid ? rtdbPresence[driverUid] : null;
+    const driverPresence = rawPresence && Object.prototype.hasOwnProperty.call(rawPresence, 'activeSessionId')
+      ? rawPresence.sessions?.[rawPresence.activeSessionId]
+      : rawPresence;
     const hasDriverLoc = driverPresence && typeof driverPresence.lat === 'number' && typeof driverPresence.lng === 'number' && driverPresence.lat !== 0;
 
     if (hasDriverLoc) {
