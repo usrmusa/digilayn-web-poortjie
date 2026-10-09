@@ -14,14 +14,14 @@
   // 1. Firebase instances initialized globally from scripts/firebase.js
   const auth = global.auth || firebase.auth();
   const db = global.db || firebase.firestore();
-  const functions = global.functions || firebase.app().functions(global.FUNCTIONS_REGION || 'us-central1');
   const rtdb = global.rtdb || firebase.database();
   const storage = global.storage || firebase.storage();
 
   const FS = global.FS;
   if (!FS) throw new Error('Firebase layout is required');
-  if (FS.laynfleetDoc !== 'main') throw new Error('Public rider requires production');
-  const RTDB_LOCATIONS = 'driverLocations';
+  const fleetEnvironment = 'prod';
+  const riderApi = new global.RiderApi(auth);
+  const RTDB_LOCATIONS = `laynfleet/${fleetEnvironment}/driverLocations`;
   const HEARTBEAT_FRESHNESS_WINDOW_MS = global.HEARTBEAT_FRESHNESS_WINDOW_MS || 60000;
   const SERVICE_AREA = global.SERVICE_AREA || {
     center: { lat: -26.57537, lng: 27.68133 },
@@ -33,16 +33,6 @@
   };
   const POORTJIE_MAP_CENTER = { lat: -26.4568052, lng: 27.7678277 }; // Poortjie Taxi Rank
 
-  /**
-   * Invoke a dispatch Cloud Function callable (server-authoritative). Mirrors
-   * DispatchGateway.call() on Android. Never mutate booking status directly.
-   */
-  async function callFn(name, payload) {
-    const callable = functions.httpsCallable(name);
-    const res = await callable({ ...payload, environment: 'main' });
-    return res && res.data;
-  }
-
   /** Reads an epoch-millis field stored as a Firestore Timestamp or a Long. */
   function readEpochMillis(value) {
     if (value == null) return null;
@@ -53,11 +43,10 @@
   }
 
   // Collections
-  const driversCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.drivers);
-  const ridersCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.riders);
-  const bookingsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.bookings);
-  const ratingsCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.ratings || 'ratings');
-  const reviewLikesCol = db.collection(FS.laynfleet).doc(FS.laynfleetDoc).collection(FS.reviewLikes || 'reviewLikes');
+  const driversCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection(FS.drivers);
+  const bookingsCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection(FS.bookings);
+  const ratingsCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection(FS.ratings);
+  const reviewLikesCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection(FS.reviewLikes);
   const usersCol = db.collection(FS.users);
 
   // State
@@ -65,9 +54,8 @@
   let userProfile = null;
   let isProfileComplete = false;
 
-  let allOnlineDrivers = [];
-  let selectedCategory = 'ALL';
-  let driverListenersUnsub = null;
+  let rtdbPresence = {};
+  let presenceUnsub = null;
   let activeBookingUnsub = null;
   let currentBookingDoc = null;
 
@@ -566,7 +554,7 @@
   /** Listen for dynamic democratic pricing rates from Firestore */
   function initPricingRatesListener() {
     try {
-      const pricingCol = db.collection('laynfleet').doc('main').collection('pricing');
+      const pricingCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection('pricing');
       pricingCol.onSnapshot((snapshot) => {
         snapshot.forEach((doc) => {
           const data = doc.data() || {};
@@ -865,7 +853,7 @@
 
   /**
    * Fetch a driver's real completed trips count from Firestore bookings collection.
-   * Cross-checks with driver document and keeps tripsCount aggregate updated.
+   * Reads completed trips without writing driver statistics from the browser.
    * STRICT: Real count from bookings (status == 'COMPLETED').
    */
   async function getDriverTripsCount(driverUid) {
@@ -886,13 +874,6 @@
       const driverDoc = await getDriverRecord(driverUid);
       const docCount = typeof driverDoc.tripsCount === 'number' ? driverDoc.tripsCount : 0;
       const realTrips = Math.max(completedCount, docCount);
-
-      if (completedCount > docCount && currentUser) {
-        driversCol.doc(driverUid).set(
-          { tripsCount: realTrips },
-          { merge: true }
-        ).catch((err) => console.warn('Could not sync driver tripsCount:', err));
-      }
 
       driverTripsCache.set(driverUid, realTrips);
       return realTrips;
@@ -928,7 +909,7 @@
           const likesSnap = await reviewLikesCol
             .where('byUid', '==', currentUser.uid)
             .get();
-          likedSet = new Set(likesSnap.docs.map(d => d.data().ratingId));
+          likedSet = new Set(likesSnap.docs.filter(d => d.data().liked === true).map(d => d.data().ratingId));
         } catch (err) {
           console.warn('Error fetching review likes:', err);
         }
@@ -963,27 +944,8 @@
       showToast('Sign in to like reviews.');
       return;
     }
-    const likeDocRef = reviewLikesCol.doc(`${ratingId}_${currentUser.uid}`);
-    const ratingDocRef = ratingsCol.doc(ratingId);
     try {
-      await db.runTransaction(async (transaction) => {
-        const likeDoc = await transaction.get(likeDocRef);
-        if (likeDoc.exists) {
-          transaction.delete(likeDocRef);
-          transaction.update(ratingDocRef, {
-            likes: firebase.firestore.FieldValue.increment(-1)
-          });
-        } else {
-          transaction.set(likeDocRef, {
-            ratingId: ratingId,
-            byUid: currentUser.uid,
-            createdAt: Date.now()
-          });
-          transaction.update(ratingDocRef, {
-            likes: firebase.firestore.FieldValue.increment(1)
-          });
-        }
-      });
+      await riderApi.request('POST', `/ratings/${ratingId}/like`, {});
       driverReviewsCache.delete(driverUid);
       if (activeDriverModal && activeDriverModal.uid === driverUid) {
         openDriverModal(activeDriverModal);
@@ -1529,7 +1491,7 @@
       return;
     }
 
-    if (currentBookingDoc && ['PENDING', 'ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP'].includes(currentBookingDoc.status)) {
+    if (currentBookingDoc && ['PENDING', 'ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP'].includes(currentBookingDoc.status)) {
       showToast('You already have an active ride in progress.');
       openActiveTripModal();
       return;
@@ -2053,7 +2015,7 @@
     if (confirmBookingModal) confirmBookingModal.classList.add('is-hidden');
   }
 
-  /** Confirm and Dispatch Booking directly to Firestore */
+  /** Create the booking and rider pointer atomically through the same API as Android. */
   async function handleConfirmBookingSubmit() {
     if (!currentUser) {
       savePendingBookingState();
@@ -2070,28 +2032,9 @@
         confirmBookingSubmitBtn.innerHTML = '<div class="spinner" style="width:16px;height:16px;"></div> Requesting…';
       }
 
-      const now = Date.now();
-      const riderUidPrefix = currentUser.uid.substring(0, 6);
-      const bookingId = `b_${now}_${riderUidPrefix}`;
-
       const requestedDriverId = bookingTargetDriver ? bookingTargetDriver.uid : null;
-      const initialDetail = requestedDriverId
-        ? `Requested specific driver: ${requestedDriverId}`
-        : 'Quick Ride auto-dispatch';
-
-      const initialEvent = {
-        event: 'DISPATCHED',
-        actorUid: currentUser.uid,
-        detail: initialDetail,
-        timestamp: now
-      };
-
       const isReturn = bookingState.isReturnTrip !== false;
-
-      const bookingDocData = {
-        id: bookingId,
-        riderId: currentUser.uid,
-        type: 'ASAP',
+      const result = await riderApi.createBooking({
         pickup: {
           address: bookingState.pickup.address,
           lat: bookingState.pickup.lat,
@@ -2104,39 +2047,14 @@
         },
         note: bookingState.note || '',
         vehicleType: bookingState.vehicleType || 'PRIVATE_CAR',
-        scheduledTime: null,
-        status: 'PENDING',
-        driverId: null,
         requestedDriverId: requestedDriverId,
-        currentDriverId: null,
-        offerExpiresAt: null,
-        attemptedDriverIds: [],
-        dispatchMessage: 'Finding your ride…',
-        deliveredAt: null,
-        availabilityEtaMinutes: null,
-        priceApproved: true,
-        cancelReason: '',
-        cancelledByDriver: false,
-        events: [initialEvent],
         isReturnTrip: isReturn,
         returnWaitMinutes: isReturn ? (bookingState.returnWaitMinutes || 15) : null,
-        waitPriceSnapshot: isReturn ? (bookingState.waitPriceSnapshot != null ? bookingState.waitPriceSnapshot : 7.50) : null,
-        returnPercentSnapshot: bookingState.returnPercentSnapshot || null,
-        upfrontPrice: bookingState.upfrontPrice || null,
-        ratePerKmSnapshot: bookingState.ratePerKmSnapshot || null,
-        minimumFareSnapshot: bookingState.minimumFareSnapshot || null,
-        curveScaleKmSnapshot: (typeof bookingState.curveScaleKmSnapshot === 'number' && bookingState.curveScaleKmSnapshot > 0) ? bookingState.curveScaleKmSnapshot : null,
-        estimatedDistanceKm: bookingState.estimatedDistanceKm || null,
-        createdAt: now,
-        updatedAt: now
-      };
-
-      await bookingsCol.doc(bookingId).set(bookingDocData);
-
-      await ridersCol.doc(currentUser.uid).set({
-        uid: currentUser.uid,
-        lastRequestedAt: now
-      }, { merge: true });
+      });
+      const saved = await bookingsCol.doc(result.bookingId).get({ source: 'server' });
+      if (!saved.exists || saved.data().riderId !== currentUser.uid) throw new Error('Your booking could not be loaded.');
+      currentBookingDoc = { id: saved.id, ...saved.data() };
+      riderApi.finishBookingRequest();
 
       closeConfirmBookingModal();
       closeBookingModal();
@@ -2145,7 +2063,7 @@
     } catch (err) {
       console.error('Failed to create booking:', err);
       if (confirmModalError) {
-        confirmModalError.textContent = 'Failed to request ride. Please check your connection and try again.';
+        confirmModalError.textContent = err.message || 'Failed to request ride. Please check your connection and try again.';
         confirmModalError.classList.remove('is-hidden');
       } else {
         showToast('Failed to request ride. Please try again.');
@@ -2187,7 +2105,7 @@
           list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
           const active = list.find(it => [
-            'PENDING', 'ACCEPTED', 'SCHEDULED_CONFIRMED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP'
+            'PENDING', 'ACCEPTED', 'SCHEDULED_CONFIRMED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP'
           ].includes(it.status));
 
           const bookingToDisplay = active || list[0];
@@ -2516,7 +2434,7 @@
 
       startPendingCountdown(booking);
       updateCancelPendingButton(booking);
-    } else if (['ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP'].includes(status)) {
+    } else if (['ACCEPTED', 'EN_ROUTE', 'ARRIVED', 'IN_TRIP', 'AT_DESTINATION', 'RETURN_TRIP'].includes(status)) {
       // 2. Active En Route / Arrived / In Trip Section (Direct Accept)
       if (trackActiveSection) trackActiveSection.classList.remove('is-hidden');
       await renderDriverInfoForTracking(booking);
@@ -2769,12 +2687,11 @@
 
     try {
       if (cancelPendingBtn) cancelPendingBtn.disabled = true;
-      await callFn('cancelBookingCallable', {
-        bookingId: currentBookingDoc.id,
+      await riderApi.request('POST', `/bookings/${currentBookingDoc.id}/cancel`, {
+        actionId: global.crypto.randomUUID(),
         reason: isScheduled
           ? 'Cancelled by rider after 1 min scheduled wait.'
           : 'Cancelled by rider before dispatch confirmation.',
-        byDriver: false
       });
       showToast('Ride request cancelled.');
     } catch (err) {
@@ -2797,7 +2714,6 @@
 
       if (driverUid) {
         try {
-          // Dedupe: one rating per trip per rider (Android hasRated).
           const existing = await ratingsCol
             .where('tripId', '==', currentBookingDoc.id)
             .where('byUid', '==', currentUser.uid)
@@ -2805,24 +2721,11 @@
             .get();
 
           if (existing.empty) {
-            const now = Date.now();
-            const ratingId = `r_${now}_${currentUser.uid.substring(0, 6)}`;
-            const reviewerName = (userProfile && userProfile.displayName) || currentUser.displayName || 'Rider';
-
-            await ratingsCol.doc(ratingId).set({
-              id: ratingId,
+            await riderApi.request('POST', '/ratings', {
               tripId: currentBookingDoc.id,
-              byUid: currentUser.uid,
-              targetUid: driverUid,
-              direction: 'RIDER_TO_DRIVER',
               stars: selectedStars,
               review: comment,
-              reviewerName: reviewerName,
-              likes: 0,
-              createdAt: now
-            }, { merge: true });
-
-            await updateDriverRatingAggregates(driverUid);
+            });
             driverReviewsCache.delete(driverUid);
             driverTripsCache.delete(driverUid);
             await getDriverTripsCount(driverUid);
@@ -2831,15 +2734,17 @@
             const existingData = existingDoc.data();
             const elapsed = Date.now() - (existingData.createdAt || 0);
             if (elapsed <= 60000) {
-              await ratingsCol.doc(existingDoc.id).update({
+              await riderApi.request('PATCH', `/ratings/${existingDoc.id}`, {
                 review: comment,
-                updatedAt: Date.now()
               });
               driverReviewsCache.delete(driverUid);
             }
           }
         } catch (e) {
           console.warn('Error saving rating:', e);
+          showToast(e.message || 'Your rating could not be saved. Please try again.');
+          if (completedDoneBtn) completedDoneBtn.disabled = false;
+          return;
         }
       }
     }
@@ -2849,29 +2754,6 @@
       if (completedDoneBtn) completedDoneBtn.disabled = false;
       closeActiveTripModal();
     }, 1000);
-  }
-
-  /**
-   * Recompute a driver's ratingAvg/ratingCount from all RIDER_TO_DRIVER ratings
-   * (mirrors Android updateRatingAggregates). STRICT: derived only from real
-   * rating docs — no defaults.
-   */
-  async function updateDriverRatingAggregates(driverUid) {
-    const snap = await ratingsCol
-      .where('targetUid', '==', driverUid)
-      .where('direction', '==', 'RIDER_TO_DRIVER')
-      .get();
-
-    const stars = snap.docs
-      .map(d => d.data().stars)
-      .filter(s => typeof s === 'number');
-    if (stars.length === 0) return;
-
-    const avg = stars.reduce((a, b) => a + b, 0) / stars.length;
-    await driversCol.doc(driverUid).set(
-      { ratingAvg: avg, ratingCount: stars.length },
-      { merge: true }
-    );
   }
 
   /** Resume pending booking saved in sessionStorage before login */
@@ -2944,7 +2826,8 @@
       currentUser = null;
       userProfile = null;
       isProfileComplete = false;
-      if (driverListenersUnsub) { driverListenersUnsub(); driverListenersUnsub = null; }
+      if (presenceUnsub) { presenceUnsub(); presenceUnsub = null; }
+      rtdbPresence = {};
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
 
       if (headerSignInBtn) headerSignInBtn.classList.remove('is-hidden');
@@ -2994,6 +2877,19 @@
     }
 
     showView('app');
+    if (!presenceUnsub) {
+      const presenceRef = rtdb.ref(RTDB_LOCATIONS);
+      const onPresence = snapshot => {
+        rtdbPresence = snapshot.val() || {};
+        if (currentBookingDoc) updateTrackingMap(currentBookingDoc);
+      };
+      presenceRef.on('value', onPresence, error => {
+        rtdbPresence = {};
+        console.warn('Driver presence unavailable:', error);
+        if (currentBookingDoc) updateTrackingMap(currentBookingDoc);
+      });
+      presenceUnsub = () => presenceRef.off('value', onPresence);
+    }
     startActiveBookingListener(authUser.uid);
 
     // Check if there is a pending ride booking from before login
@@ -3003,6 +2899,7 @@
   /** Sign Out */
   async function handleSignOut() {
     try {
+      await riderApi.signOut();
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
       if (typeof AuthStore !== 'undefined' && AuthStore.signOut) {
         await AuthStore.signOut();
