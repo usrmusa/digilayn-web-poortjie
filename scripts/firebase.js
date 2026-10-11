@@ -90,3 +90,5 @@ if (typeof window !== 'undefined' && location.protocol !== 'file:' && db && type
     });
 }
 
+
+if (auth && db) window.installAccountAccess();

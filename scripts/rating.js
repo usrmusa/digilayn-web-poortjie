@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Main Initialization ---
     const initializeModal = () => {
         // Initial check for currentUser
-        currentUser = firebase.auth().currentUser;
+        currentUser = AccountAccess.currentUser;
 
         // Use event delegation for the modal to handle dynamically loaded HTML
         document.body.addEventListener('click', (e) => {
@@ -38,16 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Listen for Firebase auth state changes
-        firebase.auth().onAuthStateChanged(user => {
+        AccountAccess.observe(user => {
             currentUser = user;
         });
     };
 
     // --- Like Comment Action ---
     const handleLikeClick = async (btn, sId, sKey) => {
-        // If currentUser is not yet set, try to get it from firebase.auth() directly
+        // If currentUser is not yet set, read the verified account gate
         if (!currentUser) {
-            currentUser = firebase.auth().currentUser;
+            currentUser = AccountAccess.currentUser;
         }
         
         if (!currentUser) {
@@ -102,9 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Modal Control & Data Loading ---
     window.openRatingModal = async (sId, sKey) => {
-        // If currentUser is not yet set, try to get it from firebase.auth() directly
+        // If currentUser is not yet set, read the verified account gate
         if (!currentUser) {
-            currentUser = firebase.auth().currentUser;
+            currentUser = AccountAccess.currentUser;
         }
 
         if (!currentUser) {

@@ -184,6 +184,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 <script src="../scripts/image-upload.js"></script>
 
@@ -282,7 +284,7 @@
     applyCropBtn.onclick = async () => {
         if (!cropper) return;
 
-        const user = firebase.auth().currentUser;
+        const user = AccountAccess.currentUser;
         if (!user) return;
 
         const slot = photoGrid.children[currentUploadIndex];
@@ -498,7 +500,7 @@
             const doc = await firebase.firestore().collection('poortjie').doc('market').collection('items').doc(editingId).get();
             if (doc.exists) {
                 const data = doc.data();
-                const user = firebase.auth().currentUser;
+                const user = AccountAccess.currentUser;
 
                 if (user && data.userId !== user.uid) {
                     alert("Unauthorized access.");
@@ -539,7 +541,7 @@
             return;
         }
 
-        const user = firebase.auth().currentUser;
+        const user = AccountAccess.currentUser;
         if (!user) return;
 
         submitBtn.disabled = true;
@@ -621,7 +623,7 @@
         });
     });
 
-    firebase.auth().onAuthStateChanged(user => {
+    AccountAccess.observe(user => {
         if (!user) {
             sessionStorage.setItem('redirectUrl', window.location.href);
             window.location.href = '../authentication/login';

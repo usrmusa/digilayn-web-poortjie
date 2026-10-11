@@ -243,6 +243,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="scripts/account-access-core.js"></script>
+<script src="scripts/account-access-compat.js"></script>
 <script src="scripts/firebase.js"></script>
 
 <script>
@@ -326,7 +328,7 @@
 
     function filterItems() {
         const searchTerm = searchInput.value.toLowerCase();
-        const currentUser = firebase.auth().currentUser;
+        const currentUser = AccountAccess.currentUser;
         let filtered = allItems;
 
         // Security/Privacy Filter
@@ -440,7 +442,7 @@
         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + id;
         window.history.pushState({path: newUrl}, '', newUrl);
 
-        const currentUser = firebase.auth().currentUser;
+        const currentUser = AccountAccess.currentUser;
         const isOwner = currentUser && item.userId === currentUser.uid;
 
         // Render Carousel
@@ -699,7 +701,7 @@
         if (menuItems && !menuItems.contains(e.target)) menuItems.classList.add('hidden');
     };
 
-    firebase.auth().onAuthStateChanged(user => {
+    AccountAccess.observe(user => {
         if (user) {
             myListingsPill.classList.remove('hidden');
         } else {

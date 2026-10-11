@@ -367,6 +367,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 <script src="../scripts/image-upload.js"></script>
 <script src="../scripts/card-renderer.js"></script>
@@ -645,7 +647,7 @@
     });
 
     window.cancelPendingApplication = async (appId) => {
-        const user = auth.currentUser;
+        const user = AccountAccess.currentUser;
         if (!user || !appId) return;
 
         if (!confirm('Are you sure you want to cancel your pending application? This action cannot be undone.')) return;
@@ -768,7 +770,7 @@
         descCounter.textContent = '0/200';
         updatePreview();
 
-        const user = auth.currentUser;
+        const user = AccountAccess.currentUser;
         if (user) {
             populateUserProfile(user).then(() => {
                 restoreDraft();
@@ -837,7 +839,7 @@
                     `;
 
                     try {
-                        const user = auth.currentUser;
+                        const user = AccountAccess.currentUser;
                         if (!user) throw new Error("User not authenticated.");
 
                         const reportProgress = message => {
@@ -1587,7 +1589,7 @@
         longitudeInput.value = '';
     });
 
-    auth.onAuthStateChanged(user => {
+    AccountAccess.observe(user => {
         const photosSection = document.getElementById('photos-section');
 
         if (user) {
@@ -1696,7 +1698,7 @@
             return;
         }
 
-        const user = auth.currentUser;
+        const user = AccountAccess.currentUser;
 
         if (!user) {
             saveDraft();

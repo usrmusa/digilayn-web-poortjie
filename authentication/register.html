@@ -189,6 +189,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 <script src="../scripts/core/observable.js"></script>
 <script src="../scripts/core/case-mapper.js"></script>
@@ -245,6 +247,8 @@
 
     const getFriendlyErrorMessage = (errorCode) => {
         switch (errorCode) {
+            case 'auth/account-suspended': return AccountAccessCore.messages['auth/account-suspended'];
+            case 'auth/account-unverified': return AccountAccessCore.messages['auth/account-unverified'];
             case 'auth/claims-too-large':
                 return 'The claims payload provided exceeds the maximum allowed size of 1000 bytes.';
             case 'auth/email-already-exists':
@@ -471,8 +475,8 @@
             Creating Account...
         </span>`;
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .then(async (userCredential) => {
+        AccountAccess.signIn(async () => {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 const usernameRef = db.collection('usernames').doc(username);
                 const userRef = db.collection('users').doc(user.uid);
@@ -511,12 +515,12 @@
                         sessionStorage.removeItem('authUserCache');
                     } catch (e) {}
 
-                    navigateAfterAuth();
+                    return userCredential;
                 } catch (transactionError) {
                     await user.delete().catch(deleteError => {});
                     throw transactionError;
                 }
-            })
+            }).then(() => navigateAfterAuth())
             .catch(error => {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -580,12 +584,13 @@
 
     // Check redirect login results if redirect mode was used
     if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().getRedirectResult()
+        AccountAccess.signIn(async () => {
+            const credential = await firebase.auth().getRedirectResult();
+            if (credential.user) await AuthStore.ensureUserDoc(credential.user, credential.additionalUserInfo?.isNewUser === true);
+            return credential;
+        })
             .then(async (result) => {
                 if (result && result.user) {
-                    if (AuthStore.ensureUserDoc) {
-                        await AuthStore.ensureUserDoc(result.user);
-                    }
                     navigateAfterAuth();
                 }
             })

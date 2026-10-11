@@ -20,7 +20,10 @@
   const FS = global.FS;
   if (!FS) throw new Error('Firebase layout is required');
   const fleetEnvironment = 'prod';
-  const riderApi = new global.RiderApi(auth);
+  const riderApi = new global.RiderApi({
+    get currentUser() { return global.AccountAccess.currentUser; },
+    signOut: () => auth.signOut()
+  });
   const RTDB_LOCATIONS = `laynfleet/${fleetEnvironment}/driverLocations`;
   const HEARTBEAT_FRESHNESS_WINDOW_MS = global.HEARTBEAT_FRESHNESS_WINDOW_MS || 60000;
   const SERVICE_AREA = global.SERVICE_AREA || {
@@ -3218,7 +3221,7 @@
     initListeners();
     initPricingRatesListener();
 
-    auth.onAuthStateChanged(async (authUser) => {
+    AccountAccess.observe(async (authUser) => {
       if (!authUser) {
         renderUserState(null, null);
         return;
@@ -3226,27 +3229,15 @@
 
       try {
         const userDocRef = db.collection(FS.users).doc(authUser.uid);
-        const doc = await userDocRef.get();
-
-        let data = doc.exists ? doc.data() : {};
-
-        if (!doc.exists) {
-          data = {
-            email: authUser.email || '',
-            displayName: authUser.displayName || '',
-            photoUrl: authUser.photoURL || '',
-            phone: authUser.phoneNumber || '',
-            registeredWith: global.APP_PACKAGE,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          };
-          await userDocRef.set(data, { merge: true });
-        }
+        const doc = await userDocRef.get({ source: 'server' });
+        if (AccountAccess.currentUser?.uid !== authUser.uid) return;
+        if (!doc.exists) throw new Error(AccountAccessCore.messages['auth/account-unverified']);
+        const data = doc.data();
 
         renderUserState(authUser, data);
       } catch (err) {
         console.error('Failed to load user profile doc:', err);
-        renderUserState(authUser, {});
+        renderUserState(null, null);
       }
     });
   }

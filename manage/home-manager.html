@@ -127,6 +127,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 
 <script>
@@ -135,9 +137,10 @@
     const modal = document.getElementById('edit-modal');
     const categoryForm = document.getElementById('category-form');
 
-    firebase.auth().onAuthStateChanged(user => {
+    AccountAccess.observe(user => {
         if (user) {
-            db.collection('users').doc(user.uid).get().then(doc => {
+            db.collection('users').doc(user.uid).get({ source: 'server' }).then(doc => {
+                if (AccountAccess.currentUser?.uid !== user.uid) return;
                 if (doc.exists && doc.data().roles?.digilayn?.isSuperUser) {
                     document.getElementById('admin-content').classList.remove('hidden');
                     loadHomeData();

@@ -202,6 +202,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 <script src="../scripts/image-upload.js"></script>
 
@@ -329,7 +331,7 @@
     });
 
     // Load profile
-    firebase.auth().onAuthStateChanged(user => {
+    AccountAccess.observe(user => {
         if (user) {
             emailInput.value = user.email || '';
             const defaultUsername = user.email ? user.email.split('@')[0] : '';
@@ -344,7 +346,8 @@
                 profilePicture.src = user.photoURL;
             }
 
-            firebase.firestore().collection('users').doc(user.uid).get().then(doc => {
+            firebase.firestore().collection('users').doc(user.uid).get({ source: 'server' }).then(doc => {
+                if (AccountAccess.currentUser?.uid !== user.uid) return;
                 const userData = doc.exists ? (doc.data() || {}) : {};
 
                 const resolvedDisplayName = userData.displayName || user.displayName || '';
@@ -416,7 +419,7 @@
     applyCropBtn.addEventListener('click', async () => {
         if (!cropper) return;
 
-        const user = firebase.auth().currentUser;
+        const user = AccountAccess.currentUser;
         if (!user) {
             showStatus("Not logged in.", true);
             return;
@@ -488,7 +491,7 @@
 
     profileForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const user = firebase.auth().currentUser;
+        const user = AccountAccess.currentUser;
         if (!user) return;
 
         saveBtn.disabled = true;
@@ -673,7 +676,7 @@
             </span>`;
 
             try {
-                const currentUser = firebase.auth().currentUser;
+                const currentUser = AccountAccess.currentUser;
                 if (!currentUser) throw new Error('Not authenticated.');
 
                 const hasPassword = (currentUser.providerData || []).some(p => p.providerId === 'password');

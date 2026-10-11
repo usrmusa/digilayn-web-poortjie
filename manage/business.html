@@ -91,6 +91,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 
 <script>
@@ -99,7 +101,7 @@
     let currentFilter = 'all';
     let isSuperUser = false;
 
-    firebase.auth().onAuthStateChanged(user => {
+    AccountAccess.observe(user => {
         if (user) {
             const userRef = db.collection('users').doc(user.uid);
             userRef.get().then((doc) => {
@@ -562,7 +564,7 @@
         if (!confirm('Are you sure you want to disable this listing? It will be removed from public view.')) return;
 
         try {
-            const currentUserId = firebase.auth().currentUser?.uid;
+            const currentUserId = AccountAccess.currentUser?.uid;
             const appRef = db.collection('poortjie').doc('applications').collection('listings').doc(appId);
             const appDoc = await appRef.get();
             if (!appDoc.exists) throw "Application does not exist!";
@@ -663,7 +665,7 @@
     }
 
     async function approveApplication(appId) {
-        const currentUserId = firebase.auth().currentUser?.uid;
+        const currentUserId = AccountAccess.currentUser?.uid;
         const appRef = db.collection('poortjie').doc('applications').collection('listings').doc(appId);
         const servicesRef = db.collection('poortjie').doc('services');
 
@@ -758,7 +760,7 @@
 
     function rejectApplication(appId) {
         if (confirm('Are you sure you want to reject this application?')) {
-            const currentUserId = firebase.auth().currentUser?.uid;
+            const currentUserId = AccountAccess.currentUser?.uid;
             db.doc(`poortjie/applications/listings/${appId}`).update({
                 status: 'rejected',
                 rejectedBy: currentUserId,
@@ -773,7 +775,7 @@
 
     function requestUpdate(appId) {
         if (confirm('Request user to update this application?')) {
-            const currentUserId = firebase.auth().currentUser?.uid;
+            const currentUserId = AccountAccess.currentUser?.uid;
             db.doc(`poortjie/applications/listings/${appId}`).update({
                 status: 'update',
                 updateRequestedBy: currentUserId

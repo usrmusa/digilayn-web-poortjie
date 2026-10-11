@@ -136,6 +136,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 <script src="../scripts/core/observable.js"></script>
 <script src="../scripts/core/case-mapper.js"></script>
@@ -151,6 +153,8 @@
 
     const getFriendlyErrorMessage = (errorCode) => {
         switch (errorCode) {
+            case 'auth/account-suspended': return AccountAccessCore.messages['auth/account-suspended'];
+            case 'auth/account-unverified': return AccountAccessCore.messages['auth/account-unverified'];
             case 'auth/claims-too-large':
                 return 'The claims payload provided exceeds the maximum allowed size of 1000 bytes.';
             case 'auth/email-already-exists':
@@ -492,7 +496,11 @@
 
                 let result;
                 try {
-                    result = await firebase.auth().signInWithPopup(provider);
+                    result = await AccountAccess.signIn(async () => {
+                        const credential = await firebase.auth().signInWithPopup(provider);
+                        if (credential.user) await AuthStore.ensureUserDoc(credential.user, credential.additionalUserInfo?.isNewUser === true);
+                        return credential;
+                    });
                 } catch (popupErr) {
                     if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/cancelled-popup-request') {
                         sessionStorage.setItem('openPasswordModal', 'true');
@@ -502,9 +510,6 @@
                 }
 
                 if (result && result.user) {
-                    if (AuthStore.ensureUserDoc) {
-                        await AuthStore.ensureUserDoc(result.user);
-                    }
                     sessionStorage.setItem('openPasswordModal', 'true');
                     window.location.replace('profile?action=set-password');
                 }
@@ -522,12 +527,13 @@
 
     // Check redirect login results if redirect mode was used
     if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().getRedirectResult()
+        AccountAccess.signIn(async () => {
+            const credential = await firebase.auth().getRedirectResult();
+            if (credential.user) await AuthStore.ensureUserDoc(credential.user, credential.additionalUserInfo?.isNewUser === true);
+            return credential;
+        })
             .then(async (result) => {
                 if (result && result.user) {
-                    if (AuthStore.ensureUserDoc) {
-                        await AuthStore.ensureUserDoc(result.user);
-                    }
                     if (sessionStorage.getItem('openPasswordModal') === 'true') {
                         sessionStorage.removeItem('openPasswordModal');
                         window.location.replace('profile?action=set-password');

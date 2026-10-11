@@ -121,7 +121,7 @@ async function renderServiceCard(provider, serviceKey, sortOption = 'most-liked'
         let hasMoreThanTwo = false;
         
         if (provider.ratings && Object.keys(provider.ratings).length > 0) {
-            const currentUserId = firebase.auth().currentUser?.uid;
+            const currentUserId = AccountAccess.currentUser?.uid;
 
             const ratingEntries = Object.entries(provider.ratings)
                 .map(([userId, r]) => ({ ...r, userId }))

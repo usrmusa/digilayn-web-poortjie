@@ -188,6 +188,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 
 <script>
@@ -334,7 +336,7 @@
             pad(midnight.getMinutes());
     }
 
-    firebase.auth().onAuthStateChanged(user => {
+    AccountAccess.observe(user => {
         if (user) {
             db.collection('users').doc(user.uid).get().then((doc) => {
                 if (doc.exists) {
@@ -434,7 +436,7 @@
                 showFrom: showFromDate,
                 expiry: expiryDate,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                authorId: firebase.auth().currentUser.uid,
+                authorId: AccountAccess.currentUser.uid,
                 authorName: currentUserName,
                 status: 'active'
             });
@@ -487,7 +489,7 @@
                         scheduleInfo = `<p class="text-[10px] opacity-50 mt-1">Visible: ${fromStr} - ${toStr}</p>`;
                     }
 
-                    const canDelete = isSuperUser || (data.authorId === firebase.auth().currentUser.uid);
+                    const canDelete = isSuperUser || (data.authorId === AccountAccess.currentUser.uid);
                     const deleteBtn = canDelete ? `
                         <button onclick="deleteNews('${doc.id}'); event.stopPropagation();" class="text-red-500 hover:text-red-700 p-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -515,7 +517,7 @@
                 // Fetch doc to verify ownership if not superuser
                 if (!isSuperUser) {
                     const doc = await db.collection('poortjie').doc('news').collection('updates').doc(id).get();
-                    if (doc.exists && doc.data().authorId !== firebase.auth().currentUser.uid) {
+                    if (doc.exists && doc.data().authorId !== AccountAccess.currentUser.uid) {
                         alert('You do not have permission to delete this post.');
                         return;
                     }

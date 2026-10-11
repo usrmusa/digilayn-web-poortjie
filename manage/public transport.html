@@ -201,6 +201,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/firebase.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <!-- Leaflet for Map -->
@@ -290,9 +292,10 @@
         setTimeout(() => statusMsg.classList.add('hidden'), 5000);
     }
 
-    firebase.auth().onAuthStateChanged(user => {
+    AccountAccess.observe(user => {
         if (user) {
-            db.collection('users').doc(user.uid).get().then(doc => {
+            db.collection('users').doc(user.uid).get({ source: 'server' }).then(doc => {
+                if (AccountAccess.currentUser?.uid !== user.uid) return;
                 if (doc.exists) {
                     const userData = doc.data();
                     const isSuperUser = userData.roles?.digilayn?.isSuperUser === true;
@@ -489,7 +492,7 @@
 
     async function saveToFirestore(successMsg = 'Changes saved successfully') {
         try {
-            const currentUserId = firebase.auth().currentUser?.uid;
+            const currentUserId = AccountAccess.currentUser?.uid;
             const dataToSave = {
                 ...currentData,
                 lastModifiedBy: currentUserId,
