@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Manager | Poortjie Services</title>
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#22c55e">
 
     <link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png">
     <link rel="icon" type="image/png" sizes="96x96" href="../favicon/favicon-96x96.png">
@@ -14,6 +15,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
     <script>
         if (window.console && window.console.log) {
             const originalLog = window.console.log;
@@ -23,15 +25,10 @@
             };
         }
     </script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="manifest" href="../favicon/site.webmanifest">
 </head>
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
 <div id="admin-content" class="hidden">
     <header class="max-w-6xl mx-auto pt-24 pb-16 px-6">
@@ -39,7 +36,7 @@
             <h1 class="text-4xl font-extrabold tracking-tight">Home Manager</h1>
             <a href="../"
                onclick="if(history.length > 1) { history.back(); return false; } else { window.top.location.replace('../'); return false; }"
-               class="w-full md:w-auto text-center px-6 py-3 border-2 border-green-600 text-green-600 dark:text-green-400 font-bold rounded-lg hover:bg-green-600 hover:text-white transition whitespace-nowrap">
+               class="w-full md:w-auto text-center px-6 py-3 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-primary hover:text-digilayn-on-primary transition whitespace-nowrap">
                 Back to Home
             </a>
         </div>
@@ -51,7 +48,7 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold">Categories</h2>
                 <button onclick="openNewCategoryModal()"
-                        class="px-6 py-2 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition shadow-md">
+                        class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md">
                     Add Category
                 </button>
             </div>
@@ -64,11 +61,11 @@
 
     <!-- Edit Modal -->
     <div id="edit-modal"
-         class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+         class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-digilayn-scrim/50 backdrop-blur-sm">
+        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div class="flex justify-between items-center mb-6">
                 <h3 id="modal-title" class="text-2xl font-bold">Edit Category</h3>
-                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                <button onclick="closeModal()" class="text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface-variant">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M6 18L18 6M6 6l12 12"></path>
@@ -80,41 +77,41 @@
                 <div>
                     <label class="block text-sm font-bold uppercase mb-1">Category Name (Key)</label>
                     <label for="cat-name"></label><input type="text" id="cat-name"
-                                                         class="w-full p-3 rounded-lg bg-gray-100 dark:bg-slate-700 border-2 border-transparent focus:border-green-500 outline-none transition"
+                                                         class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high border-2 border-transparent focus:border-digilayn-primary outline-none transition"
                                                          disabled>
                 </div>
                 <div>
                     <label class="block text-sm font-bold uppercase mb-1">Subtitle</label>
                     <label for="cat-subtitle"></label><input type="text" id="cat-subtitle"
-                                                             class="w-full p-3 rounded-lg bg-gray-100 dark:bg-slate-700 border-2 border-transparent focus:border-green-500 outline-none transition"
+                                                             class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high border-2 border-transparent focus:border-digilayn-primary outline-none transition"
                                                              required>
                 </div>
                 <div>
                     <label class="block text-sm font-bold uppercase mb-1">Description</label>
                     <label for="cat-description"></label><textarea id="cat-description" rows="3"
-                                                                   class="w-full p-3 rounded-lg bg-gray-100 dark:bg-slate-700 border-2 border-transparent focus:border-green-500 outline-none transition"
+                                                                   class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high border-2 border-transparent focus:border-digilayn-primary outline-none transition"
                                                                    required></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-bold uppercase mb-1">Listings (Comma separated)</label>
                     <label for="cat-listing"></label><input type="text" id="cat-listing"
-                                                            class="w-full p-3 rounded-lg bg-gray-100 dark:bg-slate-700 border-2 border-transparent focus:border-green-500 outline-none transition">
+                                                            class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high border-2 border-transparent focus:border-digilayn-primary outline-none transition">
                 </div>
                 <div>
                     <label class="block text-sm font-bold uppercase mb-1">Status</label>
                     <label for="cat-status"></label><select id="cat-status"
-                                                            class="w-full p-3 rounded-lg bg-gray-100 dark:bg-slate-700 border-2 border-transparent focus:border-green-500 outline-none transition">
+                                                            class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high border-2 border-transparent focus:border-digilayn-primary outline-none transition">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
                 </div>
                 <div class="pt-4 flex gap-4">
                     <button type="submit"
-                            class="flex-grow px-8 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition shadow-md">
+                            class="flex-grow px-8 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md">
                         Save Changes
                     </button>
                     <button type="button" onclick="deleteCategory()" id="delete-btn"
-                            class="px-8 py-3 border-2 border-red-600 text-red-600 font-bold rounded-lg hover:bg-red-600 hover:text-white transition">
+                            class="px-8 py-3 border-2 border-digilayn-error text-digilayn-error font-bold rounded-lg hover:bg-digilayn-error hover:text-digilayn-on-primary transition">
                         Delete
                     </button>
                 </div>
@@ -123,7 +120,6 @@
     </div>
 </div>
 
-<script src="../scripts/theme.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -167,14 +163,14 @@
             const cat = homeScreenData[key];
             const isActive = cat.status !== 'inactive' && cat.status !== 'disabled';
             return `
-                <div class="p-6 border-2 border-gray-100 dark:border-slate-800 rounded-xl hover:border-green-500/50 transition cursor-pointer" onclick="openEditModal('${key}')">
+                <div class="p-6 border-2 border-digilayn-outline-variant dark:border-digilayn-outline-variant rounded-xl hover:border-digilayn-primary/50 transition cursor-pointer" onclick="openEditModal('${key}')">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="text-xl font-bold">${key}</h3>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase ${isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase ${isActive ? 'bg-digilayn-primary-container text-digilayn-on-primary-container' : 'bg-digilayn-surface-container-low text-digilayn-on-surface-variant'}">
                             ${cat.status || 'active'}
                         </span>
                     </div>
-                    <p class="text-sm font-bold text-green-600 mb-1">${cat.subtitle || ''}</p>
+                    <p class="text-sm font-bold text-digilayn-primary mb-1">${cat.subtitle || ''}</p>
                     <p class="text-sm opacity-70 line-clamp-2">${cat.description || ''}</p>
                 </div>
             `;

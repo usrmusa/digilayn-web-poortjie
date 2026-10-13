@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="styles/digilayn-theme.css">
+    <script src="scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Services</title>
     <meta name="author" content="Musa Mgijima">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="scripts/digilayn-tailwind.js"></script>
     <script>
         if (window.console && window.console.log) {
             const originalLog = window.console.log;
@@ -14,11 +17,6 @@
                 if (arguments[0] && typeof arguments[0] === 'string' && (arguments[0].includes('cdn.tailwindcss.com should not be used in production') || arguments[0].includes('Tailwind CSS: You should not use the CDN'))) return;
                 originalLog.apply(window.console, arguments);
             };
-        }
-    </script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
         }
     </script>
     <link rel="stylesheet" href="styles/main.css">
@@ -35,11 +33,11 @@
             background: transparent;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgb(var(--digilayn-shadow-rgb) / 0.1);
             border-radius: 10px;
         }
         .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgb(var(--digilayn-surface-container-lowest-rgb) / 0.1);
         }
         /* Ensure the action menu is always visible and doesn't wrap */
         .emoji-menu {
@@ -50,11 +48,11 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 h-screen flex flex-col">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface h-screen flex flex-col">
 
 <header class="w-full max-w-4xl mx-auto pt-6 pb-4 px-6 flex flex-col items-center shrink-0">
     <div class="w-full flex justify-between items-center">
-        <a href="./" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" aria-label="Go back">
+        <a href="./" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-low transition-colors" aria-label="Go back">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -68,33 +66,33 @@
 <main class="flex-grow w-full max-w-4xl mx-auto px-4 pb-4 flex flex-col overflow-hidden">
     <div id="chat-messages" class="flex-grow overflow-y-auto space-y-8 p-4 custom-scrollbar">
         <div id="loading-spinner" class="flex justify-center items-center h-full">
-            <svg class="animate-spin h-8 w-8 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-8 w-8 text-digilayn-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
         </div>
     </div>
 
-    <div id="reply-preview" class="hidden bg-gray-100 dark:bg-slate-800 p-2 px-4 rounded-t-xl border-l-4 border-green-500 flex justify-between items-center mx-4">
+    <div id="reply-preview" class="hidden bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low p-2 px-4 rounded-t-xl border-l-4 border-digilayn-primary flex justify-between items-center mx-4">
         <div class="overflow-hidden">
-            <p class="text-xs font-bold text-green-600 dark:text-green-400">Replying to <span id="reply-to-name"></span></p>
+            <p class="text-xs font-bold text-digilayn-primary dark:text-digilayn-primary">Replying to <span id="reply-to-name"></span></p>
             <p id="reply-to-text" class="text-sm opacity-70 truncate"></p>
         </div>
-        <button id="cancel-reply" class="text-gray-500 hover:text-red-500">
+        <button id="cancel-reply" class="text-digilayn-on-surface-variant hover:text-digilayn-error">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
     </div>
 
-    <div class="p-4 bg-white dark:bg-slate-900 border-t dark:border-slate-800 shrink-0">
+    <div class="p-4 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface border-t dark:border-digilayn-outline-variant shrink-0">
         <form id="chat-form" class="flex gap-2 items-end">
             <div class="flex-grow">
                 <label for="message-input"></label><textarea id="message-input" rows="1" placeholder="Type a message..."
-                                                             class="w-full p-3 rounded-2xl bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition resize-none max-h-32"></textarea>
+                                                             class="w-full p-3 rounded-2xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition resize-none max-h-32"></textarea>
             </div>
             <button type="submit" id="send-btn"
-                    class="p-3 bg-green-600 text-white rounded-full hover:bg-green-700 transition shadow-md disabled:opacity-50">
+                    class="p-3 bg-digilayn-primary text-digilayn-on-primary rounded-full hover:bg-digilayn-primary transition shadow-md disabled:opacity-50">
                 <svg class="w-6 h-6 transform rotate-90" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
                 </svg>
@@ -103,7 +101,6 @@
     </div>
 </main>
 
-<script src="scripts/theme.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -171,8 +168,8 @@
         const target = document.getElementById(`msg-${msgId}`);
         if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            target.classList.add('ring-4', 'ring-green-500/50', 'bg-green-50/50');
-            setTimeout(() => target.classList.remove('ring-4', 'ring-green-500/50', 'bg-green-50/50'), 2000);
+            target.classList.add('ring-4', 'ring-digilayn-primary/50', 'bg-digilayn-primary-container/50');
+            setTimeout(() => target.classList.remove('ring-4', 'ring-digilayn-primary/50', 'bg-digilayn-primary-container/50'), 2000);
         }
     }
 
@@ -189,7 +186,7 @@
             const count = msg[r.key] ? Object.keys(msg[r.key]).length : 0;
             if (count === 0) return '';
             return `
-                <div class="bg-white dark:bg-slate-700 rounded-full px-2 py-0.5 shadow-sm border border-gray-100 dark:border-slate-600 flex items-center gap-1 text-[11px]">
+                <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-high rounded-full px-2 py-0.5 shadow-sm border border-digilayn-outline-variant dark:border-digilayn-outline-variant flex items-center gap-1 text-[11px]">
                     <span>${r.emoji}</span>
                     <span class="font-bold">${count}</span>
                 </div>
@@ -213,7 +210,7 @@
         let replyHtml = '';
         if (msg.replyTo) {
             replyHtml = `
-                <div onclick="scrollToMessage('${msg.replyTo.msgId}')" class="bg-black/5 dark:bg-white/5 p-2 rounded-lg mb-1 text-xs border-l-2 border-green-500 max-w-full cursor-pointer hover:bg-black/10 transition">
+                <div onclick="scrollToMessage('${msg.replyTo.msgId}')" class="bg-digilayn-scrim/5 dark:bg-digilayn-surface-container-lowest/5 p-2 rounded-lg mb-1 text-xs border-l-2 border-digilayn-primary max-w-full cursor-pointer hover:bg-digilayn-scrim/10 transition">
                     <p class="font-bold opacity-70">${msg.replyTo.userName}</p>
                     <p class="truncate opacity-60">${msg.replyTo.text}</p>
                 </div>
@@ -223,8 +220,8 @@
         messageDiv.innerHTML = `
             ${!isMine ? `<span class="text-[10px] font-bold opacity-40 mb-1 ml-2 uppercase tracking-tighter">${senderMaskName}</span>` : ''}
             <div class="relative max-w-[85%] sm:max-w-[70%]">
-                <div class="absolute -top-10 ${isMine ? 'right-0' : 'left-0'} hidden group-hover:flex flex-row bg-white dark:bg-slate-800 rounded-full shadow-xl p-1.5 gap-2 z-20 border border-gray-200 dark:border-slate-700 emoji-menu">
-                    <button onclick="setReply('${msgId}', '${msg.userId}', '${msg.text.replace(/'/g, "\\'").replace(/\n/g, " ")}')" class="p-1 px-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full border-r dark:border-slate-600">
+                <div class="absolute -top-10 ${isMine ? 'right-0' : 'left-0'} hidden group-hover:flex flex-row bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-full shadow-xl p-1.5 gap-2 z-20 border border-digilayn-outline-variant dark:border-digilayn-outline-variant emoji-menu">
+                    <button onclick="setReply('${msgId}', '${msg.userId}', '${msg.text.replace(/'/g, "\\'").replace(/\n/g, " ")}')" class="p-1 px-2 hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high rounded-full border-r dark:border-digilayn-outline-variant">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                     <button onclick="toggleReaction('${msgId}', 'thumbsUp')" class="hover:scale-150 transition px-1">👍</button>
@@ -234,7 +231,7 @@
                     <button onclick="toggleReaction('${msgId}', 'sad')" class="hover:scale-150 transition px-1">😢</button>
                 </div>
 
-                <div class="${isMine ? 'bg-green-600 text-white rounded-2xl rounded-tr-none' : 'bg-gray-100 dark:bg-slate-800 rounded-2xl rounded-tl-none'} p-3 shadow-sm">
+                <div class="${isMine ? 'bg-digilayn-primary text-digilayn-on-primary rounded-2xl rounded-tr-none' : 'bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low rounded-2xl rounded-tl-none'} p-3 shadow-sm">
                     ${replyHtml}
                     <p class="text-sm whitespace-pre-wrap break-words">${msg.text}</p>
                     <div class="flex items-center justify-end gap-2 mt-1 opacity-40 text-[9px]">

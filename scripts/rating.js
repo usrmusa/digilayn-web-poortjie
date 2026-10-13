@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.id === 'close-modal') closeModal();
             if (e.target.classList.contains('star')) handleStarClick(e);
             if (e.target.id === 'submit-rating') handleSubmit();
-            
+
             // Handle Rate button click
             const rateBtn = e.target.closest('.rate-service');
             if (rateBtn) {
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentUser) {
             currentUser = AccountAccess.currentUser;
         }
-        
+
         if (!currentUser) {
             sessionStorage.setItem('redirectUrl', window.top.location.href);
             window.top.location.replace(window.location.pathname.includes('/services/') ? '../authentication/login' : 'authentication/login');
@@ -75,17 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isLiked) {
                 // Unlike
                 icon.className = 'far fa-heart';
-                btn.classList.remove('text-red-500');
+                btn.classList.remove('text-digilayn-error');
                 btn.classList.add('opacity-60');
                 countSpan.textContent = Math.max(0, count - 1);
-                
+
                 await serviceRef.update({
                     [`${likesPath}.${currentUser.uid}`]: firebase.firestore.FieldValue.delete()
                 });
             } else {
                 // Like
-                icon.className = 'fas fa-heart text-red-500';
-                btn.classList.add('text-red-500');
+                icon.className = 'fas fa-heart text-digilayn-error';
+                btn.classList.add('text-digilayn-error');
                 btn.classList.remove('opacity-60');
                 countSpan.textContent = count + 1;
 
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Sort by selected criteria
         const sortValue = document.getElementById('comment-sort')?.value || 'most-liked';
-        
+
         const sorted = [...commentsToRender].sort((a, b) => {
             const likesA = a.likes ? Object.keys(a.likes).length : 0;
             const likesB = b.likes ? Object.keys(b.likes).length : 0;
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         commentsList.innerHTML = sorted.length > 0 ? sorted.map(c => {
             const likesCount = c.likes ? Object.keys(c.likes).length : 0;
             const isLiked = currentUser && c.likes && c.likes[currentUser.uid];
-            const likeIconClass = isLiked ? 'fas fa-heart text-red-500' : 'far fa-heart';
+            const likeIconClass = isLiked ? 'fas fa-heart text-digilayn-error' : 'far fa-heart';
             const isMe = c.userId === currentUser?.uid;
             const displayName = isMe ? 'You' : maskUserName(c.userName || 'Anonymous');
             const commentTime = c.timestamp?.toMillis ? c.timestamp.toMillis() : (c.timestamp ? new Date(c.timestamp).getTime() : 0);
@@ -198,26 +198,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const canEdit = isMe && (commentTime > 0) && (elapsed < 60000);
 
             return `
-            <div class="p-3 rounded-lg bg-slate-100 dark:bg-slate-700/50 mb-2 relative group">
+            <div class="p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high/50 mb-2 relative group">
                 <div class="flex justify-between items-start mb-1">
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-sm">${displayName}</span>
-                        <div class="text-amber-500 text-xs">
+                        <div class="text-digilayn-warning text-xs">
                             ${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}
                         </div>
-                        ${canEdit ? `<button class="edit-my-comment-btn text-xs text-blue-500 hover:underline ml-1" data-comment="${c.comment || ''}">Edit</button>` : ''}
+                        ${canEdit ? `<button class="edit-my-comment-btn text-xs text-digilayn-info hover:underline ml-1" data-comment="${c.comment || ''}">Edit</button>` : ''}
                     </div>
-                    <button class="like-comment-btn flex items-center gap-1 text-xs transition-colors hover:text-red-500 ${isLiked ? 'text-red-500' : 'opacity-60'}" 
-                            data-comment-uid="${c.userId}" 
-                            data-service-id="${serviceId}" 
+                    <button class="like-comment-btn flex items-center gap-1 text-xs transition-colors hover:text-digilayn-error ${isLiked ? 'text-digilayn-error' : 'opacity-60'}"
+                            data-comment-uid="${c.userId}"
+                            data-service-id="${serviceId}"
                             data-service-key="${serviceKey}">
                         <i class="${likeIconClass}"></i>
                         <span class="likes-count">${likesCount}</span>
                     </button>
                 </div>
-                ${c.comment ? `<p class="text-sm text-slate-800 dark:text-slate-200 italic">"${c.comment}"</p>` : ''}
+                ${c.comment ? `<p class="text-sm text-digilayn-on-surface dark:text-digilayn-on-surface italic">"${c.comment}"</p>` : ''}
             </div>
-        `;}).join('') : '<p class="text-sm text-center text-slate-500">No ratings yet.</p>';
+        `;}).join('') : '<p class="text-sm text-center text-digilayn-on-surface-variant">No ratings yet.</p>';
 
         commentsList.querySelectorAll('.edit-my-comment-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -245,11 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
         stars.forEach(s => {
             const val = parseInt(s.dataset.value);
             if (val <= rating) {
-                s.classList.add('text-amber-500');
-                s.classList.remove('text-slate-300', 'dark:text-slate-600');
+                s.classList.add('text-digilayn-warning');
+                s.classList.remove('text-digilayn-on-surface-variant', 'dark:text-digilayn-on-surface-variant');
             } else {
-                s.classList.remove('text-amber-500');
-                s.classList.add('text-slate-300', 'dark:text-slate-600');
+                s.classList.remove('text-digilayn-warning');
+                s.classList.add('text-digilayn-on-surface-variant', 'dark:text-digilayn-on-surface-variant');
             }
         });
         document.getElementById('submit-rating').disabled = false;

@@ -1,26 +1,21 @@
-/* ============================================================
-   Local business spotlight — styled to match the site's
-   Tailwind green/slate design system (solid green-600 CTAs,
-   green-outline secondaries, rounded cards, soft shadows).
-   Uses the shared theme tokens from main.css where possible.
-   ============================================================ */
+/* Spotlight layout uses the shared Digilayn theme roles. */
 
 .local-spotlight {
     text-align: left;
     margin: 0 auto 2.5rem;
     max-width: 56rem;
-    border: 1px solid var(--border-color, #e2e8f0);
-    border-left: 4px solid #22c55e;
+    border: 1px solid var(--digilayn-outline-variant);
+    border-left: 4px solid var(--digilayn-primary);
     border-radius: 16px;
     overflow: hidden;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, .1), 0 12px 30px -18px rgba(15, 23, 42, .25);
+    background: var(--digilayn-surface-container-lowest);
+    box-shadow: 0 1px 3px rgb(var(--digilayn-shadow-rgb) / .1), 0 12px 30px -18px rgb(var(--digilayn-shadow-rgb) / .25);
 }
 
 .dark .local-spotlight {
-    background: #1e293b;
-    border-color: #334155;
-    border-left-color: #22c55e;
+    background: var(--digilayn-surface-container-low);
+    border-color: var(--digilayn-outline-variant);
+    border-left-color: var(--digilayn-primary);
 }
 
 #spotlight-status { opacity: .7; }
@@ -30,7 +25,7 @@
     position: relative;
     width: 100%;
     height: 4px;
-    background: rgba(34, 197, 94, .15);
+    background: rgb(var(--digilayn-primary-rgb) / .15);
     overflow: hidden;
 }
 
@@ -41,7 +36,7 @@
     bottom: 0;
     left: 0;
     width: 40%;
-    background: #16a34a;
+    background: var(--digilayn-primary);
     border-radius: 9999px;
     animation: spotlight-loading 1.2s ease-in-out infinite;
 }
@@ -63,8 +58,8 @@
 
 .spotlight-eyebrow {
     display: inline-block;
-    color: #15803d;
-    background: rgba(34, 197, 94, .12);
+    color: var(--digilayn-primary);
+    background: rgb(var(--digilayn-primary-rgb) / .12);
     font-size: .7rem;
     font-weight: 800;
     text-transform: uppercase;
@@ -85,7 +80,7 @@
     width: 100%;
     aspect-ratio: 4/3;
     object-fit: cover;
-    background: #e2e8f0;
+    background: var(--digilayn-surface-container-high);
 }
 
 .spotlight-details {
@@ -109,14 +104,14 @@
 }
 
 #spotlight-contact {
-    color: #15803d;
+    color: var(--digilayn-primary);
     font-weight: 600;
     text-underline-offset: 3px;
     width: fit-content;
 }
 
 .dark #spotlight-contact {
-    color: #86efac;
+    color: var(--digilayn-primary);
 }
 
 /* ---- Action buttons -------------------------------------- */
@@ -155,51 +150,51 @@
 }
 
 .spotlight-primary {
-    background: #16a34a;
-    color: #fff;
-    border: 2px solid #16a34a;
-    box-shadow: 0 8px 18px -8px rgba(22, 163, 74, .7);
+    background: var(--digilayn-primary);
+    color: var(--digilayn-on-primary);
+    border: 2px solid var(--digilayn-primary);
+    box-shadow: 0 8px 18px -8px rgb(var(--digilayn-primary-rgb) / .7);
 }
 
 .spotlight-primary:hover:not(:disabled) {
-    background: #15803d;
-    border-color: #15803d;
+    background: var(--digilayn-primary);
+    border-color: var(--digilayn-primary);
     transform: translateY(-1px);
 }
 
 .spotlight-secondary {
     background: transparent;
-    color: #16a34a;
-    border: 2px solid #16a34a;
+    color: var(--digilayn-primary);
+    border: 2px solid var(--digilayn-primary);
 }
 
 .spotlight-secondary:hover:not(:disabled) {
-    background: #16a34a;
-    color: #fff;
+    background: var(--digilayn-primary);
+    color: var(--digilayn-on-primary);
     transform: translateY(-1px);
 }
 
 .dark .spotlight-secondary {
-    color: #4ade80;
-    border-color: #22c55e;
+    color: var(--digilayn-primary);
+    border-color: var(--digilayn-primary);
 }
 
 .dark .spotlight-secondary:hover:not(:disabled) {
-    background: #22c55e;
-    color: #052e16;
+    background: var(--digilayn-primary);
+    color: var(--digilayn-on-primary);
 }
 
 #spotlight-category-link {
     align-self: flex-start;
     margin-top: .25rem;
-    color: #15803d;
+    color: var(--digilayn-primary);
     font-weight: 600;
     text-decoration: underline;
     text-underline-offset: 3px;
 }
 
 .dark #spotlight-category-link {
-    color: #86efac;
+    color: var(--digilayn-primary);
 }
 
 .local-spotlight button:disabled {
@@ -243,10 +238,10 @@
     padding: 0;
     border: none;
     border-radius: 20px;
-    background: var(--card-bg, #fff);
-    color: var(--text-color, #0f172a);
+    background: var(--digilayn-surface-container-low);
+    color: var(--digilayn-on-surface);
     overflow: hidden;
-    box-shadow: 0 25px 60px -15px rgba(2, 6, 23, .6);
+    box-shadow: 0 25px 60px -15px rgb(var(--digilayn-scrim-rgb) / .6);
 }
 
 #spotlight-gallery[open] {
@@ -255,7 +250,7 @@
 }
 
 #spotlight-gallery::backdrop {
-    background: rgba(2, 6, 23, .72);
+    background: rgb(var(--digilayn-scrim-rgb) / .72);
     backdrop-filter: blur(3px);
 }
 
@@ -265,7 +260,7 @@
     justify-content: space-between;
     gap: .5rem;
     padding: 1.1rem 1.25rem;
-    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    border-bottom: 1px solid var(--digilayn-outline-variant);
     flex-shrink: 0;
 }
 
@@ -285,7 +280,7 @@
     justify-content: space-between;
     gap: .5rem;
     padding: 1rem 1.25rem;
-    border-top: 1px solid var(--border-color, #e2e8f0);
+    border-top: 1px solid var(--digilayn-outline-variant);
 }
 
 /* Close / navigation icon buttons */
@@ -300,7 +295,7 @@
     padding: .5rem .9rem;
     border-radius: 10px;
     font-weight: 700;
-    color: var(--text-color, #0f172a);
+    color: var(--digilayn-on-surface);
     background: transparent;
     border: 1px solid transparent;
     cursor: pointer;
@@ -309,15 +304,15 @@
 
 #spotlight-previous-photo,
 #spotlight-next-photo {
-    border-color: var(--border-color, #cbd5e1);
+    border-color: var(--digilayn-outline-variant);
 }
 
 #spotlight-close:hover,
 #spotlight-previous-photo:hover:not(:disabled),
 #spotlight-next-photo:hover:not(:disabled) {
-    background: rgba(34, 197, 94, .12);
-    border-color: #16a34a;
-    color: #15803d;
+    background: rgb(var(--digilayn-primary-rgb) / .12);
+    border-color: var(--digilayn-primary);
+    color: var(--digilayn-primary);
 }
 
 #spotlight-previous-photo:disabled,
@@ -336,7 +331,7 @@
     width: 100%;
     height: 60dvh;
     object-fit: contain;
-    background: #0f172a;
+    background: var(--digilayn-surface);
 }
 
 #spotlight-gallery-status {

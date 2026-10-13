@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Public Transport Manager | Poortjie Services</title>
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#22c55e">
 
     <link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png">
     <link rel="icon" type="image/png" sizes="96x96" href="../favicon/favicon-96x96.png">
@@ -14,6 +15,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
     <script>
         if (window.console && window.console.log) {
             const originalLog = window.console.log;
@@ -23,15 +25,10 @@
             };
         }
     </script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="manifest" href="../favicon/site.webmanifest">
 </head>
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
 <div id="admin-content" class="hidden">
     <header class="max-w-6xl mx-auto pt-24 pb-16 px-6">
@@ -42,7 +39,7 @@
             </div>
             <a href="../"
                onclick="if(history.length > 1) { history.back(); return false; } else { window.top.location.replace('../'); return false; }"
-               class="w-full md:w-auto text-center px-6 py-3 border-2 border-green-600 text-green-600 dark:text-green-400 font-bold rounded-lg hover:bg-green-600 hover:text-white transition whitespace-nowrap">
+               class="w-full md:w-auto text-center px-6 py-3 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-primary hover:text-digilayn-on-primary transition whitespace-nowrap">
                 <i class="fas fa-arrow-left mr-2"></i>Back to Home
             </a>
         </div>
@@ -50,21 +47,21 @@
 
     <main class="max-w-6xl mx-auto px-6 pb-24 space-y-8">
         <!-- Tabs Section -->
-        <div class="flex border-b border-gray-200 dark:border-slate-800 mb-8">
-            <button id="tab-taxis" class="px-6 py-3 font-bold text-lg border-b-4 border-green-500 text-green-600 dark:text-green-400">
+        <div class="flex border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant mb-8">
+            <button id="tab-taxis" class="px-6 py-3 font-bold text-lg border-b-4 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary">
                 <i class="fas fa-taxi mr-2"></i>Taxis
             </button>
-            <button id="tab-buses" class="px-6 py-3 font-bold text-lg border-b-4 border-transparent text-gray-500 hover:text-green-500 transition">
+            <button id="tab-buses" class="px-6 py-3 font-bold text-lg border-b-4 border-transparent text-digilayn-on-surface-variant hover:text-digilayn-primary transition">
                 <i class="fas fa-bus mr-2"></i>Buses
             </button>
         </div>
 
         <!-- News Management -->
-        <div class="card p-8 rounded-2xl bg-white dark:bg-slate-800 shadow-xl">
+        <div class="card p-8 rounded-2xl bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low shadow-xl">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-green-600 dark:text-green-400">Latest News & Updates</h2>
+                <h2 class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary">Latest News & Updates</h2>
                 <button id="add-news-btn"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition text-sm">
+                        class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition text-sm">
                     <i class="fas fa-plus mr-2"></i>Add News
                 </button>
             </div>
@@ -74,11 +71,11 @@
         </div>
 
         <!-- Routes Management -->
-        <div class="card p-8 rounded-2xl bg-white dark:bg-slate-800 shadow-xl">
+        <div class="card p-8 rounded-2xl bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low shadow-xl">
             <div class="flex justify-between items-center mb-6">
-                <h2 id="routes-title" class="text-2xl font-bold text-green-600 dark:text-green-400">Taxi Routes & Fares</h2>
+                <h2 id="routes-title" class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary">Taxi Routes & Fares</h2>
                 <button id="add-route-btn"
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition text-sm">
+                        class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition text-sm">
                     <i class="fas fa-plus mr-2"></i>Add Route
                 </button>
             </div>
@@ -92,23 +89,23 @@
 
     <!-- News Modal -->
     <div id="news-modal"
-         class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-lg w-full shadow-2xl">
-            <h3 id="news-modal-title" class="text-2xl font-bold mb-6 text-green-600">Add News</h3>
+         class="fixed inset-0 bg-digilayn-scrim/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-2xl p-8 max-w-lg w-full shadow-2xl">
+            <h3 id="news-modal-title" class="text-2xl font-bold mb-6 text-digilayn-primary">Add News</h3>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-bold mb-2 opacity-70">News Content</label>
                     <label for="news-content"></label><textarea id="news-content" rows="4"
-                                                                class="w-full p-4 border rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-slate-700 focus:ring-2 focus:ring-green-500 outline-none"
+                                                                class="w-full p-4 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
                                                                 placeholder="e.g., Taxi fares will increase by R2 starting next month."></textarea>
                 </div>
                 <div class="flex justify-end gap-3 pt-4">
                     <button id="close-news-modal"
-                            class="px-6 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition font-bold">
+                            class="px-6 py-2 border rounded-lg hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high transition font-bold">
                         Cancel
                     </button>
                     <button id="save-news-item"
-                            class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-bold">
+                            class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg hover:bg-digilayn-primary transition font-bold">
                         Save News
                     </button>
                 </div>
@@ -118,38 +115,38 @@
 
     <!-- Route Modal -->
     <div id="route-modal"
-         class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h3 id="route-modal-title" class="text-2xl font-bold mb-6 text-green-600">Add Route</h3>
+         class="fixed inset-0 bg-digilayn-scrim/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 id="route-modal-title" class="text-2xl font-bold mb-6 text-digilayn-primary">Add Route</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-bold mb-2 opacity-70">Origin</label>
                     <label for="route-origin"></label><input type="text" id="route-origin"
-                                                             class="w-full p-3 border rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-slate-700 focus:ring-2 focus:ring-green-500 outline-none"
+                                                             class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
                                                              value="Poortjie">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-2 opacity-70">Destination</label>
                     <label for="route-destination"></label><input type="text" id="route-destination"
-                                                                  class="w-full p-3 border rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-slate-700 focus:ring-2 focus:ring-green-500 outline-none"
+                                                                  class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
                                                                   placeholder="e.g., Lenasia">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-2 opacity-70">Fare (Rand)</label>
                     <label for="route-fare"></label><input type="number" id="route-fare"
-                                                           class="w-full p-3 border rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-slate-700 focus:ring-2 focus:ring-green-500 outline-none"
+                                                           class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
                                                            placeholder="e.g., 25">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-2 opacity-70">Operating Hours</label>
                     <label for="route-hours"></label><input type="text" id="route-hours"
-                                                            class="w-full p-3 border rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-slate-700 focus:ring-2 focus:ring-green-500 outline-none"
+                                                            class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
                                                             placeholder="e.g., 6am - 8pm">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-2 opacity-70">Route Type</label>
                     <label for="route-type"></label><select id="route-type"
-                                                            class="w-full p-3 border rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-slate-700 focus:ring-2 focus:ring-green-500 outline-none">
+                                                            class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none">
                         <option value="standard">Standard</option>
                         <option value="morning_only">Morning Only</option>
                         <option value="afternoon_only">Afternoon Only</option>
@@ -157,39 +154,39 @@
                     </select>
                 </div>
                 <div class="flex items-center gap-2 pt-8">
-                    <input type="checkbox" id="route-returns" class="w-5 h-5 accent-green-600">
+                    <input type="checkbox" id="route-returns" class="w-5 h-5 accent-digilayn-primary">
                     <label for="route-returns" class="text-sm font-bold opacity-70">Returns available?</label>
                 </div>
                 <div class="col-span-full">
                     <label class="block text-sm font-bold mb-2 opacity-70">Station/Rank Location Name/Info</label>
                     <label for="route-location"></label><input type="text" id="route-location"
-                                                               class="w-full p-3 border rounded-lg bg-gray-50 dark:bg-slate-900 dark:border-slate-700 focus:ring-2 focus:ring-green-500 outline-none"
+                                                               class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
                                                                placeholder="e.g., Lenasia Main Taxi Rank or Bus Station">
                 </div>
                 <div class="col-span-full">
                     <label class="block text-sm font-bold mb-2 opacity-70">Rank Coordinates (Google Maps Pin)</label>
                     <div class="flex gap-2 mb-2">
                         <label for="route-lat"></label><input type="text" id="route-lat" readonly
-                                                              class="flex-grow p-3 border rounded-lg bg-gray-100 dark:bg-slate-700 dark:border-slate-600 outline-none text-sm"
+                                                              class="flex-grow p-3 border rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high dark:border-digilayn-outline-variant outline-none text-sm"
                                                               placeholder="Latitude">
                         <label for="route-lng"></label><input type="text" id="route-lng" readonly
-                                                              class="flex-grow p-3 border rounded-lg bg-gray-100 dark:bg-slate-700 dark:border-slate-600 outline-none text-sm"
+                                                              class="flex-grow p-3 border rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high dark:border-digilayn-outline-variant outline-none text-sm"
                                                               placeholder="Longitude">
                     </div>
                     <div id="map"
-                         class="w-full h-64 rounded-lg bg-gray-200 dark:bg-slate-700 relative flex items-center justify-center overflow-hidden">
+                         class="w-full h-64 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high relative flex items-center justify-center overflow-hidden">
                         <p class="text-sm opacity-50">Loading Map...</p>
                     </div>
                     <p class="text-xs mt-2 opacity-60">Click on the map to set the rank location pin.</p>
                 </div>
             </div>
-            <div class="flex justify-end gap-3 pt-8 border-t dark:border-slate-700 mt-6">
+            <div class="flex justify-end gap-3 pt-8 border-t dark:border-digilayn-outline-variant mt-6">
                 <button id="close-route-modal"
-                        class="px-6 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition font-bold">
+                        class="px-6 py-2 border rounded-lg hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high transition font-bold">
                     Cancel
                 </button>
                 <button id="save-route-item"
-                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-bold">
+                        class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg hover:bg-digilayn-primary transition font-bold">
                     Save Route
                 </button>
             </div>
@@ -197,7 +194,6 @@
     </div>
 </div>
 
-<script src="../scripts/theme.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -228,13 +224,13 @@
     function switchTab(mode) {
         currentMode = mode;
         if (mode === 'taxis') {
-            tabTaxis.className = 'px-6 py-3 font-bold text-lg border-b-4 border-green-500 text-green-600 dark:text-green-400';
-            tabBuses.className = 'px-6 py-3 font-bold text-lg border-b-4 border-transparent text-gray-500 hover:text-green-500 transition';
+            tabTaxis.className = 'px-6 py-3 font-bold text-lg border-b-4 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary';
+            tabBuses.className = 'px-6 py-3 font-bold text-lg border-b-4 border-transparent text-digilayn-on-surface-variant hover:text-digilayn-primary transition';
             routesTitle.textContent = 'Taxi Routes & Fares';
             addRouteBtn.innerHTML = '<i class="fas fa-plus mr-2"></i>Add Taxi Route';
         } else {
-            tabBuses.className = 'px-6 py-3 font-bold text-lg border-b-4 border-green-500 text-green-600 dark:text-green-400';
-            tabTaxis.className = 'px-6 py-3 font-bold text-lg border-b-4 border-transparent text-gray-500 hover:text-green-500 transition';
+            tabBuses.className = 'px-6 py-3 font-bold text-lg border-b-4 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary';
+            tabTaxis.className = 'px-6 py-3 font-bold text-lg border-b-4 border-transparent text-digilayn-on-surface-variant hover:text-digilayn-primary transition';
             routesTitle.textContent = 'Bus Routes & Fares';
             addRouteBtn.innerHTML = '<i class="fas fa-plus mr-2"></i>Add Bus Route';
         }
@@ -285,9 +281,9 @@
 
     function showStatus(message, isError = false) {
         statusMsg.textContent = message;
-        statusMsg.classList.remove('hidden', 'bg-red-500', 'bg-green-600', 'text-white');
-        statusMsg.classList.add(isError ? 'bg-red-500' : 'bg-green-600');
-        statusMsg.classList.add('text-white');
+        statusMsg.classList.remove('hidden', 'bg-digilayn-error', 'bg-digilayn-primary', 'text-digilayn-on-primary');
+        statusMsg.classList.add(isError ? 'bg-digilayn-error' : 'bg-digilayn-primary');
+        statusMsg.classList.add('text-digilayn-on-primary');
         statusMsg.classList.remove('hidden');
         setTimeout(() => statusMsg.classList.add('hidden'), 5000);
     }
@@ -348,12 +344,12 @@
 
         currentData.news.forEach((item, index) => {
             const div = document.createElement('div');
-            div.className = 'flex justify-between items-center p-4 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-200 dark:border-slate-700';
+            div.className = 'flex justify-between items-center p-4 bg-digilayn-surface dark:bg-digilayn-surface/50 rounded-lg border border-digilayn-outline-variant dark:border-digilayn-outline-variant';
             div.innerHTML = `
                 <p class="text-sm flex-grow pr-4">${item}</p>
                 <div class="flex gap-2">
-                    <button onclick="editNews(${index})" class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"><i class="fas fa-edit"></i></button>
-                    <button onclick="deleteNews(${index})" class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"><i class="fas fa-trash"></i></button>
+                    <button onclick="editNews(${index})" class="p-2 text-digilayn-info hover:bg-digilayn-info-container dark:hover:bg-digilayn-info-container/20 rounded-lg transition"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteNews(${index})" class="p-2 text-digilayn-error hover:bg-digilayn-error-container dark:hover:bg-digilayn-error-container/20 rounded-lg transition"><i class="fas fa-trash"></i></button>
                 </div>
             `;
             newsList.appendChild(div);
@@ -373,24 +369,24 @@
         sortedKeys.forEach(key => {
             const r = routesData[key];
             const div = document.createElement('div');
-            div.className = 'p-5 bg-gray-50 dark:bg-slate-900/50 rounded-xl border border-gray-200 dark:border-slate-700 flex flex-col justify-between';
+            div.className = 'p-5 bg-digilayn-surface dark:bg-digilayn-surface/50 rounded-xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant flex flex-col justify-between';
             div.innerHTML = `
                 <div>
                     <div class="flex justify-between items-start mb-2">
-                        <span class="text-xs font-bold uppercase tracking-wider text-green-600">${r.origin} &rarr;</span>
-                        <span class="font-black text-lg text-green-600">R${r.fare}</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-digilayn-primary">${r.origin} &rarr;</span>
+                        <span class="font-black text-lg text-digilayn-primary">R${r.fare}</span>
                     </div>
                     <h3 class="font-extrabold text-xl mb-1">${r.destination}</h3>
                     <div class="space-y-1 text-xs opacity-70 mb-4">
                         <p><i class="fas fa-clock mr-1"></i> ${r.hours}</p>
                         <p><i class="fas fa-tag mr-1"></i> ${r.type}</p>
-                        ${r.returns ? '<p class="text-green-600 font-semibold"><i class="fas fa-undo mr-1"></i> Return Available</p>' : ''}
+                        ${r.returns ? '<p class="text-digilayn-primary font-semibold"><i class="fas fa-undo mr-1"></i> Return Available</p>' : ''}
                         ${r.location ? `<p class="truncate"><i class="fas fa-map-marker-alt mr-1"></i> ${r.location}</p>` : ''}
                     </div>
                 </div>
-                <div class="flex gap-2 pt-4 border-t border-gray-200 dark:border-slate-700">
-                    <button onclick="editRoute('${key}')" class="flex-1 py-2 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold rounded-lg text-sm hover:bg-blue-100 transition">Edit</button>
-                    <button onclick="deleteRoute('${key}')" class="flex-1 py-2 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-bold rounded-lg text-sm hover:bg-red-100 transition">Delete</button>
+                <div class="flex gap-2 pt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
+                    <button onclick="editRoute('${key}')" class="flex-1 py-2 bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info-container/20 dark:text-digilayn-on-info-container font-bold rounded-lg text-sm hover:bg-digilayn-info-container transition">Edit</button>
+                    <button onclick="deleteRoute('${key}')" class="flex-1 py-2 bg-digilayn-error-container text-digilayn-on-error-container dark:bg-digilayn-error-container/20 dark:text-digilayn-on-error-container font-bold rounded-lg text-sm hover:bg-digilayn-error-container transition">Delete</button>
                 </div>
             `;
             routesList.appendChild(div);
@@ -561,7 +557,7 @@
         };
 
         const key = editingRouteKey || `${origin.toLowerCase().replace(/\s+/g, '_')}_to_${dest.toLowerCase().replace(/\s+/g, '_')}`;
-        
+
         if (currentMode === 'taxis') {
             currentData.routes[key] = routeData;
         } else {

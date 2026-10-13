@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +10,7 @@
     <meta name="author" content="Musa Mgijima">
     <meta name="description" content="Create a new Poortjie Services account.">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
     <script>
         if (window.console && window.console.log) {
             const originalLog = window.console.log;
@@ -19,11 +22,6 @@
             };
         }
     </script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png">
     <link rel="icon" type="image/png" sizes="96x96" href="../favicon/favicon-96x96.png">
@@ -31,22 +29,22 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
     <link rel="manifest" href="../favicon/site.webmanifest">
 </head>
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
 <header class="max-w-6xl mx-auto pt-24 pb-16 px-6 text-center">
     <a href="../"
        onclick="if(history.length > 1) { history.back(); return false; } else { window.top.location.replace('../'); return false; }"
-       class="text-6xl font-extrabold mb-4 tracking-tight text-slate-900 dark:text-white">Poortjie</a>
+       class="text-6xl font-extrabold mb-4 tracking-tight text-digilayn-on-surface dark:text-digilayn-on-primary">Poortjie</a>
 </header>
 
 <main class="max-w-md mx-auto px-6 pb-24">
-    <div class="card flex flex-col p-8 rounded-2xl border-l-4 border-l-green-500">
+    <div class="card flex flex-col p-8 rounded-2xl border-l-4 border-l-digilayn-primary">
         <h2 class="text-2xl font-bold mb-6 text-center">Create Your Account</h2>
         <div id="error-message"
-             class="hidden mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm font-medium border border-red-200"></div>
+             class="hidden mb-4 p-3 rounded-lg bg-digilayn-error-container text-digilayn-on-error-container text-sm font-medium border border-digilayn-error"></div>
 
         <button id="google-register-btn" type="button"
-                class="w-full py-3 px-4 flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 hover:border-green-500 dark:hover:border-green-500 text-gray-700 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50 transition shadow-sm mb-6 cursor-pointer">
+                class="w-full py-3 px-4 flex items-center justify-center gap-3 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border-2 border-digilayn-outline-variant dark:border-digilayn-outline-variant hover:border-digilayn-primary dark:hover:border-digilayn-primary text-digilayn-on-surface-variant dark:text-digilayn-on-surface font-bold rounded-lg hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-high/50 transition shadow-sm mb-6 cursor-pointer">
             <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -57,9 +55,9 @@
         </button>
 
         <div class="flex items-center gap-4 mb-6">
-            <div class="flex-grow border-t border-gray-200 dark:border-slate-700"></div>
-            <span class="text-xs uppercase tracking-wider text-gray-400 font-bold">or with email</span>
-            <div class="flex-grow border-t border-gray-200 dark:border-slate-700"></div>
+            <div class="flex-grow border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant"></div>
+            <span class="text-xs uppercase tracking-wider text-digilayn-on-surface-variant font-bold">or with email</span>
+            <div class="flex-grow border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant"></div>
         </div>
 
         <form id="register-form" novalidate>
@@ -67,11 +65,11 @@
                 <label for="username" class="block mb-1 font-bold text-sm uppercase tracking-wider">Username</label>
                 <div class="relative">
                     <input type="text" id="username" name="username" placeholder="Username"
-                           class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition"
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"
                            required pattern="[a-z0-9]+"
                            title="Username must be lowercase and contain no spaces.">
                     <p id="error-username"
-                       class="absolute right-2 top-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded shadow-sm hidden">
+                       class="absolute right-2 top-2 px-2 py-1 bg-digilayn-error text-digilayn-on-error text-[10px] font-bold rounded shadow-sm hidden">
                         Invalid Format</p>
                 </div>
                 <p class="text-xs opacity-50 mt-1 pl-1">Lowercase letters and numbers only, no
@@ -81,10 +79,10 @@
                 <label for="email" class="block mb-1 font-bold text-sm uppercase tracking-wider">Email</label>
                 <div class="relative">
                     <input type="email" id="email" name="email" placeholder="Email"
-                           class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition"
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"
                            required>
                     <p id="error-email"
-                       class="absolute right-2 top-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded shadow-sm hidden">
+                       class="absolute right-2 top-2 px-2 py-1 bg-digilayn-error text-digilayn-on-error text-[10px] font-bold rounded shadow-sm hidden">
                         Invalid Email</p>
                 </div>
             </div>
@@ -94,11 +92,11 @@
                     3 names)</label>
                 <div class="relative">
                     <input type="text" id="display-name" name="display-name" placeholder="Full Name"
-                           class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition"
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"
                            required pattern="^[A-Za-z]+(\s[A-Za-z]+){0,2}$"
                            title="Please enter your full name (max 3 names).">
                     <p id="error-display-name"
-                       class="absolute right-2 top-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded shadow-sm hidden">
+                       class="absolute right-2 top-2 px-2 py-1 bg-digilayn-error text-digilayn-on-error text-[10px] font-bold rounded shadow-sm hidden">
                         Invalid Format, Check No Space before or after</p>
                 </div>
                 <p class="text-xs opacity-50 mt-1 pl-1">Required. Max 3 names.</p>
@@ -111,10 +109,10 @@
                     <input type="tel" id="phone-number" name="phone-number"
                            placeholder="e.g. 0123456789"
                            maxlength="10" pattern="\d{10}"
-                           class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition"
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"
                            title="Please enter exactly 10 digits">
                     <p id="error-phone-number"
-                       class="absolute right-2 top-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded shadow-sm hidden">
+                       class="absolute right-2 top-2 px-2 py-1 bg-digilayn-error text-digilayn-on-error text-[10px] font-bold rounded shadow-sm hidden">
                         Invalid Format</p>
                 </div>
                 <p class="text-xs opacity-50 mt-1 pl-1">Optional. 10 digits.</p>
@@ -123,10 +121,10 @@
                 <label for="password" class="block mb-1 font-bold text-sm uppercase tracking-wider">Password</label>
                 <div class="relative">
                     <input type="password" id="password" name="password" placeholder="Password"
-                           class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition"
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"
                            minlength="6" required>
                     <p id="error-password"
-                       class="absolute right-2 top-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded shadow-sm hidden">
+                       class="absolute right-2 top-2 px-2 py-1 bg-digilayn-error text-digilayn-on-error text-[10px] font-bold rounded shadow-sm hidden">
                         Too Short</p>
                 </div>
                 <p class="text-xs opacity-50 mt-1 pl-1">Must be 6 or more characters.</p>
@@ -138,27 +136,27 @@
                 <div class="relative">
                     <input type="password" id="confirm-password" name="confirm-password"
                            placeholder="Confirm Password"
-                           class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition"
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"
                            minlength="6" required>
                     <p id="error-confirm-password"
-                       class="absolute right-2 top-2 px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded shadow-sm hidden">
+                       class="absolute right-2 top-2 px-2 py-1 bg-digilayn-error text-digilayn-on-error text-[10px] font-bold rounded shadow-sm hidden">
                         No Match</p>
                 </div>
             </div>
             <div class="form-group mb-6">
                 <label class="flex items-start gap-3 cursor-pointer group">
                     <input type="checkbox" id="policy-confirm" name="policy-confirm" required
-                           class="mt-1 w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500 transition cursor-pointer">
+                           class="mt-1 w-4 h-4 rounded border-digilayn-outline-variant text-digilayn-primary focus:ring-digilayn-primary transition cursor-pointer">
                     <span class="text-xs opacity-80 leading-tight group-hover:opacity-100 transition">
                         I confirm that I understand I am responsible for the data I add, and I retain ownership of my content hosted by Google Firebase.
                     </span>
                 </label>
-                <p id="error-policy-confirm" class="text-[10px] text-red-500 font-bold mt-1 hidden">
+                <p id="error-policy-confirm" class="text-[10px] text-digilayn-error font-bold mt-1 hidden">
                     Please confirm you understand the data policy.</p>
             </div>
             <div class="flex items-center justify-between mb-4">
                 <button type="submit"
-                        class="w-full px-8 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition shadow-md">
+                        class="w-full px-8 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md">
                     Register
                 </button>
             </div>
@@ -169,21 +167,19 @@
                 Policy</a>
             </p>
         </form>
-        <p class="text-center text-sm text-slate-600 dark:text-slate-400 mt-6">
+        <p class="text-center text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mt-6">
             Already have an account? <a href="login"
                                         onclick="window.location.replace('login'); return false;"
-                                        class="text-green-500 hover:text-green-700 font-bold">Login</a>.
+                                        class="text-digilayn-primary hover:text-digilayn-primary font-bold">Login</a>.
         </p>
     </div>
 </main>
 
-<footer class="text-center py-12 border-t border-gray-100 dark:border-slate-800 opacity-50 text-xs">
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-50 text-xs">
     &copy; 2026 Poortjie Services. Empowering poortjie economies.<br><a href="../support"
                                                                         class="hover:underline">Data
     Policy</a>
 </footer>
-
-<script src="../scripts/theme.js"></script>
 
 <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -399,7 +395,7 @@
         document.getElementById('error-policy-confirm').classList.add('hidden');
 
         registerForm.querySelectorAll('input').forEach(input => {
-            input.classList.remove('border-red-500');
+            input.classList.remove('border-digilayn-error');
         });
 
         return {
@@ -431,27 +427,27 @@
         if (!validation.isValid) {
             if (validation.errors.username) {
                 document.getElementById('error-username').classList.remove('hidden');
-                usernameInput.classList.add('border-red-500');
+                usernameInput.classList.add('border-digilayn-error');
             }
             if (validation.errors.email) {
                 document.getElementById('error-email').classList.remove('hidden');
-                registerForm.email.classList.add('border-red-500');
+                registerForm.email.classList.add('border-digilayn-error');
             }
             if (validation.errors.displayName) {
                 document.getElementById('error-display-name').classList.remove('hidden');
-                displayNameInput.classList.add('border-red-500');
+                displayNameInput.classList.add('border-digilayn-error');
             }
             if (validation.errors.phoneNumber) {
                 document.getElementById('error-phone-number').classList.remove('hidden');
-                phoneNumberInput.classList.add('border-red-500');
+                phoneNumberInput.classList.add('border-digilayn-error');
             }
             if (validation.errors.password) {
                 document.getElementById('error-password').classList.remove('hidden');
-                registerForm.password.classList.add('border-red-500');
+                registerForm.password.classList.add('border-digilayn-error');
             }
             if (validation.errors.confirmPassword) {
                 document.getElementById('error-confirm-password').classList.remove('hidden');
-                registerForm['confirm-password'].classList.add('border-red-500');
+                registerForm['confirm-password'].classList.add('border-digilayn-error');
             }
             if (validation.errors.policyConfirm) {
                 document.getElementById('error-policy-confirm').classList.remove('hidden');
@@ -468,7 +464,7 @@
         submitBtn.disabled = true;
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = `<span class="flex items-center justify-center gap-2">
-            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-5 w-5 text-digilayn-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -561,7 +557,7 @@
             googleRegisterBtn.disabled = true;
             const originalContent = googleRegisterBtn.innerHTML;
             googleRegisterBtn.innerHTML = `<span class="flex items-center justify-center gap-2">
-                <svg class="animate-spin h-5 w-5 text-gray-600 dark:text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin h-5 w-5 text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>

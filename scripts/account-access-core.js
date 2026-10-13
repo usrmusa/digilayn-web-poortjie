@@ -30,7 +30,7 @@
         notice = global.document.createElement('div');
         notice.id = 'account-access-error';
         notice.setAttribute('role', 'alert');
-        notice.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:10000;padding:16px;background:#991b1b;color:white;text-align:center;';
+        notice.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:10000;padding:16px;background:var(--digilayn-error);color: var(--digilayn-on-error);text-align:center;';
         global.document.body.prepend(notice);
       }
       notice.textContent = error.message;

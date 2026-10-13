@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +13,6 @@
     <meta name="keywords" content="Poortjie, home decor, furniture, artisans, interior design, Kasi services">
     <meta name="copyright" content="© 2026 Poortjie Services. All rights reserved.">
     <meta name="robots" content="index,follow">
-    <meta name="theme-color" content="#22c55e">
 
     <link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png">
     <link rel="icon" type="image/png" sizes="96x96" href="../favicon/favicon-96x96.png">
@@ -19,11 +20,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
     <script>
-        if (window.console && window.console.log) { const originalLog = window.console.log; window.console.log = function() { if (arguments[0] && typeof arguments[0] === "string" && (arguments[0].includes("cdn.tailwindcss.com should not be used in production") || arguments[0].includes("Tailwind CSS: You should not use the CDN"))) return; originalLog.apply(window.console, arguments); }; } tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
+        if (window.console && window.console.log) { const originalLog = window.console.log; window.console.log = function() { if (arguments[0] && typeof arguments[0] === "string" && (arguments[0].includes("cdn.tailwindcss.com should not be used in production") || arguments[0].includes("Tailwind CSS: You should not use the CDN"))) return; originalLog.apply(window.console, arguments); }; } </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
           integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
@@ -36,20 +35,19 @@
     </style>
     <link rel="manifest" href="../favicon/site.webmanifest">
 </head>
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
-
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
 <header class="max-w-6xl mx-auto pt-20 pb-12 px-6">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-            <div class="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-bold tracking-widest uppercase inline-block">
+            <div class="bg-digilayn-primary text-digilayn-on-primary px-4 py-1 rounded-full text-sm font-bold tracking-widest uppercase inline-block">
                 Home & Decor
             </div>
             <h1 class="text-4xl md:text-6xl font-extrabold mt-2 tracking-tight">Service Providers</h1>
         </div>
         <a href="../"
            onclick="if(history.length > 1) { history.back(); return false; } else { window.top.location.replace('../'); return false; }"
-           class="w-full md:w-auto text-center px-6 py-3 border-2 border-green-600 text-green-600 dark:text-green-400 font-bold rounded-lg hover:bg-green-600 hover:text-white transition whitespace-nowrap">
+           class="w-full md:w-auto text-center px-6 py-3 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-primary hover:text-digilayn-on-primary transition whitespace-nowrap">
             <i class="fas fa-arrow-left mr-2"></i>Back to Home
         </a>
     </div>
@@ -59,12 +57,12 @@
 
     <div class="mb-8 flex flex-col md:flex-row gap-4">
         <div class="relative flex-grow">
-            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-digilayn-on-surface-variant"></i>
             <label for="search-bar"></label><input type="text" id="search-bar" placeholder="Search providers..."
-                                                   class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                                   class="w-full pl-10 pr-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
         </div>
         <label for="sort-list"></label><select id="sort-list"
-                                               class="px-4 py-3 rounded-lg border border-gray-300 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
+                                               class="px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
         <option value="rating">Sort by Rating</option>
         <option value="name">Sort by Name (A-Z)</option>
     </select>
@@ -75,15 +73,14 @@
     </div>
 </main>
 
-<footer class="text-center py-12 border-t border-gray-100 dark:border-slate-800 opacity-50 text-xs">
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-50 text-xs">
     &copy; 2026 Poortjie Services. Empowering poortjie economies.<br><a href="../support" class="hover:underline">Data Policy</a>
 </footer>
 
 <div id="rating-modal"
-     class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
+     class="fixed inset-0 bg-digilayn-scrim/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4">
 </div>
 
-<script src="../scripts/theme.js"></script>
 <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -184,13 +181,13 @@
             const subHeading = (provider.subHeading || "").toLowerCase();
             const description = (provider.description || "").toLowerCase();
             const tags = Array.isArray(provider.tags) ? provider.tags.join(" ").toLowerCase() : (provider.tags || "").toLowerCase();
-            const services = Array.isArray(provider.services) 
+            const services = Array.isArray(provider.services)
                 ? provider.services.map(s => `${s.name || ""} ${s.description || ""}`).join(" ").toLowerCase()
                 : "";
 
-            return name.includes(searchTermLower) || 
-                   subHeading.includes(searchTermLower) || 
-                   description.includes(searchTermLower) || 
+            return name.includes(searchTermLower) ||
+                   subHeading.includes(searchTermLower) ||
+                   description.includes(searchTermLower) ||
                    tags.includes(searchTermLower) ||
                    services.includes(searchTermLower);
         });

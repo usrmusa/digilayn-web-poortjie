@@ -993,10 +993,10 @@
       bookingPoortjieCircle = new google.maps.Circle({
         center: poortjieCenter,
         radius: SERVICE_AREA.radiusMeters,
-        strokeColor: '#0288D1',
+        strokeColor: window.DigilaynTheme.getColor('info'),
         strokeOpacity: 0.8,
         strokeWeight: 2,
-        fillColor: '#0288D1',
+        fillColor: window.DigilaynTheme.getColor('info'),
         fillOpacity: 0.12,
         map: bookingGoogleMap
       });
@@ -1006,7 +1006,7 @@
         map: bookingGoogleMap,
         suppressMarkers: true,
         polylineOptions: {
-          strokeColor: '#0288D1',
+          strokeColor: window.DigilaynTheme.getColor('info'),
           strokeWeight: 5,
           strokeOpacity: 0.9
         }
@@ -1183,7 +1183,7 @@
         map: trackingGoogleMap,
         suppressMarkers: true,
         polylineOptions: {
-          strokeColor: '#0288D1',
+          strokeColor: window.DigilaynTheme.getColor('info'),
           strokeWeight: 5,
           strokeOpacity: 0.9
         }
@@ -3241,6 +3241,18 @@
       }
     });
   }
+
+  // Refresh only existing map overlays; changing theme never requests a new route.
+  global.addEventListener('themeChanged', () => {
+    const color = global.DigilaynTheme.getColor('info');
+    if (bookingPoortjieCircle) bookingPoortjieCircle.setOptions({ strokeColor: color, fillColor: color });
+    if (bookingDirectionsRenderer) bookingDirectionsRenderer.setOptions({
+      polylineOptions: { strokeColor: color, strokeWeight: 5, strokeOpacity: 0.9 }
+    });
+    if (trackingDirectionsRenderer) trackingDirectionsRenderer.setOptions({
+      polylineOptions: { strokeColor: color, strokeWeight: 5, strokeOpacity: 0.9 }
+    });
+  });
 
   // Expose API
   global.LaynRiderBooking = {

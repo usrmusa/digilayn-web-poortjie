@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="../../styles/digilayn-theme.css">
+    <script src="../../scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,8 +16,7 @@
 
   <link rel="icon" type="image/png" href="laynrider.png" />
   <link rel="stylesheet" href="rider.css" />
-  <script src="../../scripts/theme.js"></script>
-</head>
+  </head>
 <body>
 
   <!-- ===================== HEADER ===================== -->
@@ -65,7 +66,7 @@
     <div id="suspended-view" class="suspended-view is-hidden">
       <div class="suspended-icon">⚠️</div>
       <h2 class="suspended-title">Account Suspended</h2>
-      <p style="font-size: 13px; color: var(--text-dim);">Your account has been suspended from requesting rides.</p>
+      <p style="font-size: 13px; color: var(--digilayn-on-surface-variant);">Your account has been suspended from requesting rides.</p>
       <div class="suspended-reason-box">
         <strong>Reason:</strong> <span id="suspended-reason-text">—</span>
       </div>
@@ -84,8 +85,8 @@
         Sign in to Continue
       </a>
 
-      <p style="font-size: 13px; color: var(--text-dim); margin-top: 8px;">
-        Don't have an account? <a href="../../authentication/register" onclick="sessionStorage.setItem('redirectUrl', window.location.href);" style="color: var(--brand); font-weight: 700; text-decoration: none;">Register here</a>
+      <p style="font-size: 13px; color: var(--digilayn-on-surface-variant); margin-top: 8px;">
+        Don't have an account? <a href="../../authentication/register" onclick="sessionStorage.setItem('redirectUrl', window.location.href);" style="color: var(--digilayn-primary); font-weight: 700; text-decoration: none;">Register here</a>
       </p>
     </div>
 
@@ -152,7 +153,7 @@
               <strong id="active-booking-title" style="font-size: 15px;">Active Ride in Progress</strong>
               <span id="active-booking-countdown-pill" class="countdown-badge is-hidden">⏱️ 60s</span>
             </div>
-            <p id="active-booking-status-text" style="font-size: 13px; color: var(--text-dim); margin-top: 2px;">Finding your ride…</p>
+            <p id="active-booking-status-text" style="font-size: 13px; color: var(--digilayn-on-surface-variant); margin-top: 2px;">Finding your ride…</p>
           </div>
         </div>
         <button id="view-active-booking-btn" class="btn btn-sm btn-primary">Track Trip</button>
@@ -238,7 +239,7 @@
           <!-- Selected Pickup Summary with Edit Button -->
           <div class="step-summary-card">
             <div class="step-summary-left">
-              <span class="summary-pin-icon" style="color: var(--success);">🟢</span>
+              <span class="summary-pin-icon" style="color: var(--digilayn-success);">🟢</span>
               <div class="step-summary-content">
                 <span class="step-summary-label">Pickup Location</span>
                 <span id="step2-pickup-summary-text" class="step-summary-text">—</span>
@@ -317,7 +318,7 @@
           <div class="review-route-card">
             <div class="review-route-item">
               <div class="review-route-left">
-                <span class="summary-pin-icon" style="color: var(--success);">🟢</span>
+                <span class="summary-pin-icon" style="color: var(--digilayn-success);">🟢</span>
                 <div>
                   <span class="review-route-label">Pickup</span>
                   <div id="review-pickup-address" class="review-route-val">—</div>
@@ -330,7 +331,7 @@
 
             <div class="review-route-item">
               <div class="review-route-left">
-                <span class="summary-pin-icon" style="color: var(--danger);">🏁</span>
+                <span class="summary-pin-icon" style="color: var(--digilayn-error);">🏁</span>
                 <div>
                   <span class="review-route-label">Destination</span>
                   <div id="review-dropoff-address" class="review-route-val">—</div>
@@ -412,7 +413,7 @@
       <div class="modal-header">
         <div>
           <h3 class="modal-title">Live Ride Tracking</h3>
-          <span id="track-booking-id" style="font-size: 11px; color: var(--text-dim); font-family: monospace;">—</span>
+          <span id="track-booking-id" style="font-size: 11px; color: var(--digilayn-on-surface-variant); font-family: monospace;">—</span>
         </div>
         <button id="active-trip-modal-close" class="modal-close" aria-label="Close">&times;</button>
       </div>
@@ -446,13 +447,13 @@
         <div class="spinner" style="margin: 0 auto; width: 36px; height: 36px;"></div>
         <div>
           <h4 id="pending-section-title" style="font-size: 16px; font-weight: 800;">Finding your ride…</h4>
-          <p id="pending-section-desc" style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">Driver is reviewing your request. Please hold on.</p>
+          <p id="pending-section-desc" style="font-size: 13px; color: var(--digilayn-on-surface-variant); margin-top: 4px;">Driver is reviewing your request. Please hold on.</p>
         </div>
         <div class="countdown-timer-wrap" style="justify-content: center;">
           <span id="pending-countdown-label">⏱️ Request timeout in:</span>
-          <span id="pending-countdown" style="font-size: 15px; font-weight: 900; color: var(--brand);">60s</span>
+          <span id="pending-countdown" style="font-size: 15px; font-weight: 900; color: var(--digilayn-primary);">60s</span>
         </div>
-        <button id="cancel-pending-btn" class="btn btn-ghost btn-sm" style="color: var(--danger); border-color: var(--danger); margin-top: 8px;">
+        <button id="cancel-pending-btn" class="btn btn-ghost btn-sm" style="color: var(--digilayn-error); border-color: var(--digilayn-error); margin-top: 8px;">
           Cancel Request
         </button>
       </div>
@@ -470,14 +471,14 @@
         </div>
 
         <!-- Driver & Vehicle card -->
-        <div style="background: var(--panel-2); border-radius: var(--radius-sm); padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: var(--digilayn-surface-container-high); border-radius: var(--radius-sm); padding: 14px; display: flex; flex-direction: column; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <img id="track-driver-avatar" class="driver-avatar" src="" alt="Driver" />
             <div style="flex: 1;">
               <div id="track-driver-name" style="font-size: 15px; font-weight: 800;">—</div>
-              <div id="track-vehicle-desc" style="font-size: 13px; color: var(--text-dim);">—</div>
+              <div id="track-vehicle-desc" style="font-size: 13px; color: var(--digilayn-on-surface-variant);">—</div>
             </div>
-            <div id="track-vehicle-plate" style="font-size: 12px; font-weight: 700; background: var(--panel); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); font-family: monospace;">—</div>
+            <div id="track-vehicle-plate" style="font-size: 12px; font-weight: 700; background: var(--digilayn-surface-container-low); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--digilayn-outline-variant); font-family: monospace;">—</div>
           </div>
 
           <!-- Contact Buttons -->
@@ -505,11 +506,11 @@
         </div>
 
         <!-- Trip Locations info -->
-        <div style="font-size: 12px; display: flex; flex-direction: column; gap: 6px; color: var(--text-dim);">
+        <div style="font-size: 12px; display: flex; flex-direction: column; gap: 6px; color: var(--digilayn-on-surface-variant);">
           <div>🟢 <strong>Pickup:</strong> <span id="track-pickup-text">—</span></div>
           <div>🏁 <strong>Drop-off:</strong> <span id="track-dropoff-text">—</span></div>
-          <div id="track-fare-text" style="font-weight: 700; color: var(--brand);">💵 Upfront Fare: <span id="track-fare-amount">R —</span> (Pay driver offline: cash/EFT)</div>
-          <div style="font-size: 11.5px; color: var(--text-dim);">📏 Trip Distance: <span id="track-distance-val">—</span></div>
+          <div id="track-fare-text" style="font-weight: 700; color: var(--digilayn-primary);">💵 Upfront Fare: <span id="track-fare-amount">R —</span> (Pay driver offline: cash/EFT)</div>
+          <div style="font-size: 11.5px; color: var(--digilayn-on-surface-variant);">📏 Trip Distance: <span id="track-distance-val">—</span></div>
         </div>
       </div>
 
@@ -517,17 +518,17 @@
       <div id="track-completed-section" class="is-hidden" style="display: flex; flex-direction: column; gap: 16px; text-align: center; padding: 12px 0;">
         <span style="font-size: 40px;">🎉</span>
         <h4 style="font-size: 18px; font-weight: 800;">Trip Completed!</h4>
-        <p style="font-size: 13px; color: var(--text-dim);">Thank you for riding with LaynRider in Poortjie.</p>
+        <p style="font-size: 13px; color: var(--digilayn-on-surface-variant);">Thank you for riding with LaynRider in Poortjie.</p>
 
-        <div style="background: var(--panel-2); border-radius: var(--radius-sm); padding: 14px; text-align: center;">
-          <div style="font-size: 11px; color: var(--text-dim); text-transform: uppercase;">Total Fare Paid</div>
-          <div id="completed-fare-amount" style="font-size: 24px; font-weight: 900; color: var(--brand);">R 0.00</div>
-          <div id="completed-distance-amount" style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">—</div>
+        <div style="background: var(--digilayn-surface-container-high); border-radius: var(--radius-sm); padding: 14px; text-align: center;">
+          <div style="font-size: 11px; color: var(--digilayn-on-surface-variant); text-transform: uppercase;">Total Fare Paid</div>
+          <div id="completed-fare-amount" style="font-size: 24px; font-weight: 900; color: var(--digilayn-primary);">R 0.00</div>
+          <div id="completed-distance-amount" style="font-size: 12px; color: var(--digilayn-on-surface-variant); margin-top: 4px;">—</div>
         </div>
 
         <!-- Rating Form -->
         <div style="display: flex; flex-direction: column; gap: 8px;">
-          <span style="font-size: 12px; font-weight: 700; color: var(--text-dim);">Rate your driver</span>
+          <span style="font-size: 12px; font-weight: 700; color: var(--digilayn-on-surface-variant);">Rate your driver</span>
           <div class="rating-stars-input">
             <button type="button" class="rating-star-btn is-starred" data-star="1">★</button>
             <button type="button" class="rating-star-btn is-starred" data-star="2">★</button>
@@ -544,15 +545,13 @@
       <!-- State 5: CANCELLED / EXPIRED / NO_DRIVER -->
       <div id="track-cancelled-section" class="is-hidden" style="display: flex; flex-direction: column; gap: 14px; text-align: center; padding: 12px 0;">
         <span id="cancelled-icon" style="font-size: 36px;">❌</span>
-        <h4 id="cancelled-title" style="font-size: 16px; font-weight: 800; color: var(--danger);">Ride Request Ended</h4>
-        <p id="cancelled-reason-text" style="font-size: 13px; color: var(--text-dim); line-height: 1.5;">No drivers were available at this time.</p>
+        <h4 id="cancelled-title" style="font-size: 16px; font-weight: 800; color: var(--digilayn-error);">Ride Request Ended</h4>
+        <p id="cancelled-reason-text" style="font-size: 13px; color: var(--digilayn-on-surface-variant); line-height: 1.5;">No drivers were available at this time.</p>
         <button id="cancelled-dismiss-btn" class="btn btn-primary btn-block">Dismiss</button>
       </div>
 
     </div>
   </div>
-
-
 
   <!-- ===================== CONFIRM BOOKING MODAL ===================== -->
   <div id="confirm-booking-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-booking-modal-title">
@@ -602,11 +601,11 @@
           </div>
           <div id="confirm-return-stop-item" class="confirm-meta-item" style="grid-column: span 2;">
             <span class="confirm-meta-label">Expected Stop Duration</span>
-            <span id="confirm-return-stop-text" class="confirm-meta-value" style="color: var(--brand); font-weight: 700;">~15 min stop at destination</span>
+            <span id="confirm-return-stop-text" class="confirm-meta-value" style="color: var(--digilayn-primary); font-weight: 700;">~15 min stop at destination</span>
           </div>
           <div class="confirm-meta-item" style="grid-column: span 2;">
             <span class="confirm-meta-label">Upfront Fare</span>
-            <span id="confirm-fare-text" class="confirm-meta-value" style="font-size: 20px; color: var(--brand); font-weight: 900;">R --</span>
+            <span id="confirm-fare-text" class="confirm-meta-value" style="font-size: 20px; color: var(--digilayn-primary); font-weight: 900;">R --</span>
           </div>
         </div>
 
@@ -654,7 +653,7 @@
         <button id="profile-modal-close" class="modal-close" aria-label="Close">&times;</button>
       </div>
 
-      <p style="font-size: 13px; color: var(--text-dim); margin-top: -6px;">
+      <p style="font-size: 13px; color: var(--digilayn-on-surface-variant); margin-top: -6px;">
         Add the details drivers need to accept your ride. Missing items are highlighted.
       </p>
 

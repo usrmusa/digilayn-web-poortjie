@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +10,7 @@
     <meta name="author" content="Musa Mgijima">
     <meta name="description" content="Manage your Poortjie Services account.">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
     <script>
         if (window.console && window.console.log) {
             const originalLog = window.console.log;
@@ -15,11 +18,6 @@
                 if (arguments[0] && typeof arguments[0] === 'string' && (arguments[0].includes('cdn.tailwindcss.com should not be used in production') || arguments[0].includes('Tailwind CSS: You should not use the CDN'))) return;
                 originalLog.apply(window.console, arguments);
             };
-        }
-    </script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
         }
     </script>
     <link rel="stylesheet" href="../styles/main.css">
@@ -32,24 +30,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <link rel="manifest" href="../favicon/site.webmanifest">
 </head>
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
-<header class="max-w-6xl mx-auto pt-24 pb-16 px-6 text-center text-gray-900 dark:text-gray-100">
+<header class="max-w-6xl mx-auto pt-24 pb-16 px-6 text-center text-digilayn-on-surface dark:text-digilayn-on-surface">
     <a href="../"
        onclick="if(window.top.history.length > 1) { window.top.history.back(); return false; } else { window.top.location.replace('../'); return false; }"
        class="text-6xl font-extrabold mb-4 tracking-tight">Poortjie</a>
 </header>
 
 <main class="max-w-md mx-auto px-6 pb-24">
-    <div class="card flex flex-col p-8 rounded-2xl border-l-4 border-l-green-500">
+    <div class="card flex flex-col p-8 rounded-2xl border-l-4 border-l-digilayn-primary">
         <h2 class="text-2xl font-bold mb-6 text-center">Your Profile</h2>
         <div id="status-message" class="hidden mb-4 p-3 rounded-lg text-sm font-medium border"></div>
 
         <form id="profile-form">
             <div class="flex flex-col items-center mb-6">
                 <div class="relative group cursor-pointer">
-                    <img id="profile-picture" src="https://placehold.co/150" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-green-500 shadow-md transition transform hover:scale-105">
-                    <label for="photo-input" class="absolute bottom-0 right-0 bg-green-600 text-white p-2 rounded-full cursor-pointer hover:bg-green-700 transition shadow-lg">
+                    <img id="profile-picture" src="https://placehold.co/150" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-digilayn-primary shadow-md transition transform hover:scale-105">
+                    <label for="photo-input" class="absolute bottom-0 right-0 bg-digilayn-primary text-digilayn-on-primary p-2 rounded-full cursor-pointer hover:bg-digilayn-primary transition shadow-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </label>
                     <input type="file" id="photo-input" accept="image/*" class="hidden">
@@ -60,20 +58,20 @@
 
             <div class="mb-4">
                 <label class="block text-xs opacity-50 mb-1 pl-1">Username (cannot be changed)</label>
-                <label for="username"></label><input type="text" id="username" disabled class="w-full p-3 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 border-2 border-transparent cursor-not-allowed">
+                <label for="username"></label><input type="text" id="username" disabled class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-2 border-transparent cursor-not-allowed">
             </div>
             <div class="mb-4">
                 <label class="block text-xs opacity-50 mb-1 pl-1">Email (cannot be changed)</label>
-                <label for="email"></label><input type="email" id="email" disabled class="w-full p-3 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 border-2 border-transparent cursor-not-allowed">
+                <label for="email"></label><input type="email" id="email" disabled class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-2 border-transparent cursor-not-allowed">
             </div>
             <div class="mb-4">
                 <label class="block text-xs opacity-50 mb-1 pl-1">Full Name (max 3 names)</label>
-                <input type="text" id="display-name" name="display-name" placeholder="Full Name" class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition" required pattern="^[A-Za-z]+(\s[A-Za-z]+){0,2}$" title="Please enter your full name (max 3 names).">
+                <input type="text" id="display-name" name="display-name" placeholder="Full Name" class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition" required pattern="^[A-Za-z]+(\s[A-Za-z]+){0,2}$" title="Please enter your full name (max 3 names).">
                 <p class="text-[11px] opacity-50 mt-1 pl-1">Required for LaynFleet ride booking.</p>
             </div>
             <div class="mb-4">
                 <label class="block text-xs opacity-50 mb-1 pl-1">Phone Number (10 digits)</label>
-                <input type="tel" id="phone-number" name="phone-number" placeholder="e.g. 0123456789" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition">
+                <input type="tel" id="phone-number" name="phone-number" placeholder="e.g. 0123456789" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
                 <p class="text-[11px] opacity-50 mt-1 pl-1">Optional for general account, but required for LaynFleet ride booking.</p>
             </div>
             <div class="mb-6">
@@ -81,45 +79,45 @@
                     <label class="block text-xs opacity-50">Bio / About</label>
                     <span id="bio-counter" class="text-xs opacity-50">0/100</span>
                 </div>
-                <label for="bio"></label><textarea id="bio" name="bio" rows="3" maxlength="100" placeholder="Tell us about yourself..." class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition"></textarea>
+                <label for="bio"></label><textarea id="bio" name="bio" rows="3" maxlength="100" placeholder="Tell us about yourself..." class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"></textarea>
             </div>
 
-            <div id="admin-toggle-section" class="hidden mb-6 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800">
+            <div id="admin-toggle-section" class="hidden mb-6 p-4 rounded-xl bg-digilayn-info-container dark:bg-digilayn-info-container/20 border border-digilayn-info dark:border-digilayn-info">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-sm font-bold text-blue-900 dark:text-blue-100">Support Listing</h3>
-                        <p class="text-xs text-blue-700 dark:text-blue-300 opacity-80">Appear on the support page</p>
+                        <h3 class="text-sm font-bold text-digilayn-on-info-container dark:text-digilayn-info">Support Listing</h3>
+                        <p class="text-xs text-digilayn-info dark:text-digilayn-info opacity-80">Appear on the support page</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="list-for-support" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <div class="w-11 h-6 bg-digilayn-surface-container-high peer-focus:outline-none rounded-full peer dark:bg-digilayn-surface-container-high peer-checked:after:translate-x-full peer-checked:after:border-digilayn-outline-variant after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-digilayn-surface-container-lowest after:border-digilayn-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-digilayn-outline-variant peer-checked:bg-digilayn-info"></div>
                     </label>
                 </div>
             </div>
 
-            <button type="button" id="save-btn" class="w-full px-8 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition shadow-md mb-4">
+            <button type="button" id="save-btn" class="w-full px-8 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md mb-4">
                 Back
             </button>
         </form>
 
-        <button id="logout-btn" class="w-full px-8 py-3 border-2 border-red-500 text-red-500 font-bold rounded-lg hover:bg-red-500 hover:text-white transition">
+        <button id="logout-btn" class="w-full px-8 py-3 border-2 border-digilayn-error text-digilayn-error font-bold rounded-lg hover:bg-digilayn-error hover:text-digilayn-on-primary transition">
             Logout
         </button>
     </div>
 
     <!-- Password & Security Card (Hidden by default if password linked, shown for forgot-password or unlinked accounts) -->
-    <div id="password-section" class="card hidden flex-col p-8 rounded-2xl border-l-4 border-l-blue-500 mt-6 shadow-sm">
+    <div id="password-section" class="card hidden flex-col p-8 rounded-2xl border-l-4 border-l-digilayn-info mt-6 shadow-sm">
         <div class="flex items-center justify-between mb-4">
             <div>
-                <h3 id="password-section-title" class="text-xl font-bold text-slate-900 dark:text-slate-100">Password & Security</h3>
-                <p id="password-section-subtitle" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Set or change your password to log in with email and password.</p>
+                <h3 id="password-section-title" class="text-xl font-bold text-digilayn-on-surface dark:text-digilayn-on-surface">Password & Security</h3>
+                <p id="password-section-subtitle" class="text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mt-1">Set or change your password to log in with email and password.</p>
             </div>
-            <span id="password-status-badge" class="px-2.5 py-1 text-xs font-bold rounded-full bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-gray-300">
+            <span id="password-status-badge" class="px-2.5 py-1 text-xs font-bold rounded-full bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:bg-digilayn-surface-container-high dark:text-digilayn-on-surface-variant">
                 Checking...
             </span>
         </div>
 
-        <div id="password-alert-banner" class="hidden mb-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 text-xs font-medium border border-blue-200 dark:border-blue-800">
+        <div id="password-alert-banner" class="hidden mb-4 p-3 rounded-lg bg-digilayn-info-container dark:bg-digilayn-info-container/30 text-digilayn-on-info-container dark:text-digilayn-on-info-container text-xs font-medium border border-digilayn-info dark:border-digilayn-info">
             ✨ <strong>Google Verified!</strong> Enter your new password below to link it to your account so you can log in with either Google or your email & password next time.
         </div>
 
@@ -130,8 +128,8 @@
                 <label for="new-password" class="block text-xs font-bold uppercase tracking-wider mb-1 opacity-70">New Password</label>
                 <div class="relative">
                     <input type="password" id="new-password" placeholder="At least 6 characters" minlength="6" required
-                           class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition">
-                    <button type="button" id="toggle-new-password" class="absolute right-3 top-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white text-xs font-bold cursor-pointer">
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                    <button type="button" id="toggle-new-password" class="absolute right-3 top-3 text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-primary text-xs font-bold cursor-pointer">
                         SHOW
                     </button>
                 </div>
@@ -140,11 +138,11 @@
                 <label for="confirm-password" class="block text-xs font-bold uppercase tracking-wider mb-1 opacity-70">Confirm New Password</label>
                 <div class="relative">
                     <input type="password" id="confirm-password" placeholder="Re-enter new password" minlength="6" required
-                           class="w-full p-3 rounded-lg bg-gray-200 dark:bg-slate-800 text-gray-900 dark:text-white border-2 border-transparent focus:border-green-500 focus:outline-none transition">
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
                 </div>
             </div>
             <div class="flex gap-3 pt-2">
-                <button type="submit" id="save-password-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition shadow-md cursor-pointer">
+                <button type="submit" id="save-password-btn" class="w-full py-3 bg-digilayn-info hover:bg-digilayn-info text-digilayn-on-info font-bold rounded-lg transition shadow-md cursor-pointer">
                     Save & Link Password
                 </button>
             </div>
@@ -153,8 +151,8 @@
 </main>
 
 <!-- Image Modal -->
-<div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black bg-opacity-90 transition-opacity duration-300">
-    <button id="close-modal" class="absolute top-6 right-6 text-white hover:text-gray-300 focus:outline-none">
+<div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-digilayn-scrim bg-opacity-90 transition-opacity duration-300">
+    <button id="close-modal" class="absolute top-6 right-6 text-digilayn-on-primary hover:text-digilayn-on-surface-variant focus:outline-none">
         <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
@@ -163,38 +161,36 @@
 </div>
 
 <!-- Crop Modal -->
-<div id="crop-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-black bg-opacity-90 p-4">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl">
-        <div class="p-4 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center">
+<div id="crop-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-digilayn-scrim bg-opacity-90 p-4">
+    <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl">
+        <div class="p-4 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant flex justify-between items-center">
             <h3 class="font-bold text-lg">Crop Profile Picture</h3>
-            <button id="cancel-crop" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition">
+            <button id="cancel-crop" class="text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-primary transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
-        <div class="p-4 max-h-[60vh] flex items-center justify-center bg-gray-50 dark:bg-slate-900">
+        <div class="p-4 max-h-[60vh] flex items-center justify-center bg-digilayn-surface dark:bg-digilayn-surface">
             <img id="crop-image" src="" class="max-w-full" alt="">
         </div>
         <div class="p-4 flex gap-3">
-            <button id="rotate-left" class="flex-1 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition font-bold text-xs uppercase tracking-widest">
+            <button id="rotate-left" class="flex-1 py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high rounded-lg hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-highest transition font-bold text-xs uppercase tracking-widest">
                 <i class="fas fa-undo mr-1"></i> Left
             </button>
-            <button id="rotate-right" class="flex-1 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition font-bold text-xs uppercase tracking-widest">
+            <button id="rotate-right" class="flex-1 py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high rounded-lg hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-highest transition font-bold text-xs uppercase tracking-widest">
                 <i class="fas fa-redo mr-1"></i> Right
             </button>
         </div>
-        <div class="p-4 bg-gray-50 dark:bg-slate-900 flex gap-3">
-            <button id="apply-crop" class="flex-[2] py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition font-bold uppercase tracking-widest shadow-lg shadow-green-500/20">
+        <div class="p-4 bg-digilayn-surface dark:bg-digilayn-surface flex gap-3">
+            <button id="apply-crop" class="flex-[2] py-3 bg-digilayn-primary text-digilayn-on-primary rounded-xl hover:bg-digilayn-primary transition font-bold uppercase tracking-widest shadow-lg shadow-digilayn-primary/20">
                 Apply Crop
             </button>
         </div>
     </div>
 </div>
 
-<footer class="text-center py-12 border-t border-gray-100 dark:border-slate-800 opacity-50 text-xs">
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-50 text-xs">
     &copy; 2026 Poortjie Services. Empowering poortjie economies.<br><a href="../support" class="hover:underline">Data Policy</a>
 </footer>
-
-<script src="../scripts/theme.js"></script>
 
 <!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -240,11 +236,11 @@
 
     function showStatus(message, isError = false) {
         statusMessage.textContent = message;
-        statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-200', 'bg-green-100', 'text-green-700', 'border-green-200');
+        statusMessage.classList.remove('hidden', 'bg-digilayn-error-container', 'text-digilayn-error', 'border-digilayn-error', 'bg-digilayn-primary-container', 'text-digilayn-primary', 'border-digilayn-primary');
         if (isError) {
-            statusMessage.classList.add('bg-red-100', 'text-red-700', 'border-red-200');
+            statusMessage.classList.add('bg-digilayn-error-container', 'text-digilayn-error', 'border-digilayn-error');
         } else {
-            statusMessage.classList.add('bg-green-100', 'text-green-700', 'border-green-200');
+            statusMessage.classList.add('bg-digilayn-primary-container', 'text-digilayn-primary', 'border-digilayn-primary');
         }
         statusMessage.classList.remove('hidden');
         setTimeout(() => {
@@ -580,15 +576,15 @@
 
         if (hasPassword && hasGoogle) {
             passwordStatusBadge.textContent = 'Linked (Google + Password)';
-            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300';
+            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary-container/40 dark:text-digilayn-on-primary-container';
             if (savePasswordBtn) savePasswordBtn.textContent = 'Update Password';
         } else if (hasPassword) {
             passwordStatusBadge.textContent = 'Password Active';
-            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300';
+            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary-container/40 dark:text-digilayn-on-primary-container';
             if (savePasswordBtn) savePasswordBtn.textContent = 'Update Password';
         } else if (hasGoogle) {
             passwordStatusBadge.textContent = 'Google Only (No Password)';
-            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300';
+            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info-container/40 dark:text-digilayn-on-info-container';
             if (savePasswordBtn) savePasswordBtn.textContent = 'Save & Link Password';
         }
     }
@@ -630,11 +626,11 @@
     function showPasswordStatus(message, isError = false) {
         if (!passwordStatusMsg) return;
         passwordStatusMsg.textContent = message;
-        passwordStatusMsg.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'border-red-200', 'bg-green-100', 'text-green-700', 'border-green-200');
+        passwordStatusMsg.classList.remove('hidden', 'bg-digilayn-error-container', 'text-digilayn-error', 'border-digilayn-error', 'bg-digilayn-primary-container', 'text-digilayn-primary', 'border-digilayn-primary');
         if (isError) {
-            passwordStatusMsg.classList.add('bg-red-100', 'text-red-700', 'border-red-200');
+            passwordStatusMsg.classList.add('bg-digilayn-error-container', 'text-digilayn-error', 'border-digilayn-error');
         } else {
-            passwordStatusMsg.classList.add('bg-green-100', 'text-green-700', 'border-green-200');
+            passwordStatusMsg.classList.add('bg-digilayn-primary-container', 'text-digilayn-primary', 'border-digilayn-primary');
         }
         passwordStatusMsg.classList.remove('hidden');
         setTimeout(() => {
@@ -668,7 +664,7 @@
             savePasswordBtn.disabled = true;
             const originalBtnText = savePasswordBtn.textContent;
             savePasswordBtn.innerHTML = `<span class="inline-flex items-center justify-center gap-2">
-                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin h-4 w-4 text-digilayn-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>

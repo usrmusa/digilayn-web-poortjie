@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="styles/digilayn-theme.css">
+    <script src="scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +12,6 @@
           content="Connect with the Poortjie community. Buy and sell electronics, vehicles, property, and clothing. The best local Kasi marketplace.">
     <meta name="keywords"
           content="Poortjie, Marketplace, Buy and Sell, Kasi economy, local trade, South Africa, Township deals">
-    <meta name="theme-color" content="#22c55e">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -33,6 +34,7 @@
     <link rel="manifest" href="favicon/site.webmanifest">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="scripts/digilayn-tailwind.js"></script>
     <script>
         if (window.console && window.console.log) {
             const originalLog = window.console.log;
@@ -41,16 +43,13 @@
                 originalLog.apply(window.console, arguments);
             };
         }
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
+        </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="styles/main.css">
     <style>
         .category-pill.active {
-            background-color: #22c55e;
-            color: white;
+            background-color: var(--digilayn-primary);
+            color: var(--digilayn-on-primary);
         }
         .item-card img {
             aspect-ratio: 1/1;
@@ -69,11 +68,11 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
 <div class="fixed top-5 left-5 z-50">
     <a href="services/market-form" id="sell-item-btn"
-       class="p-3 pr-5 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 transition flex items-center gap-2"
+       class="p-3 pr-5 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition flex items-center gap-2"
        title="Sell Something">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -85,7 +84,7 @@
 <div class="fixed top-5 right-5 z-50 flex gap-3" id="user-controls">
     <div id="hamburger-menu" class="relative">
         <button id="hamburger-btn"
-                class="p-3 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 shadow-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition border border-gray-100 dark:border-slate-700">
+                class="p-3 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant shadow-lg hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high transition border border-digilayn-outline-variant dark:border-digilayn-outline-variant">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                  xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -93,15 +92,15 @@
             </svg>
         </button>
         <div id="menu-items"
-             class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
-            <a href="home" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Services Home</a>
-            <div class="border-t border-gray-100 dark:border-slate-700 my-1"></div>
+             class="hidden absolute right-0 mt-2 w-48 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-md shadow-lg py-1 ring-1 ring-digilayn-shadow ring-opacity-5">
+            <a href="home" class="block px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Services Home</a>
+            <div class="border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant my-1"></div>
             <button id="menu-theme-toggle"
-                    class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-3">
+                    class="w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high flex items-center gap-3">
                 <span id="menu-theme-icon">🌓</span> Mode
             </button>
-            <a href="authentication/profile" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Profile</a>
-            <a href="support" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Support</a>
+            <a href="authentication/profile" class="block px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Profile</a>
+            <a href="support" class="block px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Support</a>
         </div>
     </div>
 </div>
@@ -110,44 +109,44 @@
     <div class="flex flex-col md:flex-row justify-between items-end gap-4">
         <div>
             <h1 class="text-4xl font-extrabold tracking-tight">Marketplace</h1>
-            <p class="text-slate-500 dark:text-slate-400">Buy and sell in Poortjie</p>
+            <p class="text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">Buy and sell in Poortjie</p>
         </div>
         <div class="w-full md:w-96">
             <div class="relative">
-                <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none"
+                <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-digilayn-on-surface-variant" fill="none"
                      stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
                 <label for="market-search" class="sr-only">Search marketplace</label>
                 <input type="text" id="market-search" placeholder="Search marketplace..."
-                       class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm">
+                       class="w-full pl-10 pr-4 py-2 rounded-full border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary shadow-sm">
             </div>
         </div>
     </div>
 
     <!-- Categories -->
     <div class="flex gap-2 mt-8 overflow-x-auto pb-2 no-scrollbar" id="categories-container">
-        <button class="category-pill active whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm font-medium transition" data-category="all">All</button>
-        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm font-medium transition" data-category="Electronics">Electronics</button>
-        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm font-medium transition" data-category="Vehicles">Vehicles</button>
-        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm font-medium transition" data-category="Property">Property</button>
-        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm font-medium transition" data-category="Clothing">Clothing</button>
-        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm font-medium transition" data-category="Home">Home</button>
-        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm font-medium transition" data-category="Other">Other</button>
-        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm font-medium transition hidden" id="my-listings-pill" data-category="my-listings">My Listings</button>
+        <button class="category-pill active whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="all">All</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Electronics">Electronics</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Vehicles">Vehicles</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Property">Property</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Clothing">Clothing</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Home">Home</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Other">Other</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition hidden" id="my-listings-pill" data-category="my-listings">My Listings</button>
     </div>
 </header>
 
 <main class="max-w-6xl mx-auto px-6 pb-24">
     <div id="items-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
         <!-- Skeleton Loading -->
-        <div class="animate-pulse bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm">
-            <div class="bg-gray-200 dark:bg-slate-700 aspect-square"></div>
+        <div class="animate-pulse bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high aspect-square"></div>
             <div class="p-3 space-y-2">
-                <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
-                <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-3/4"></div>
-                <div class="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/3"></div>
+                <div class="h-4 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-1/2"></div>
+                <div class="h-4 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-3/4"></div>
+                <div class="h-3 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-1/3"></div>
             </div>
         </div>
     </div>
@@ -155,18 +154,18 @@
     <div id="no-items" class="hidden text-center py-20">
         <div class="text-6xl mb-4">🛍️</div>
         <h2 class="text-xl font-bold">No items found</h2>
-        <p class="text-slate-500">Try adjusting your search or category.</p>
+        <p class="text-digilayn-on-surface-variant">Try adjusting your search or category.</p>
     </div>
 </main>
 
 <!-- Item Detail Modal -->
-<div id="item-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-0 md:p-4 bg-black/60 backdrop-blur-sm">
-    <div class="bg-white dark:bg-slate-900 rounded-none md:rounded-2xl w-full max-w-4xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto shadow-2xl relative flex flex-col md:flex-row">
-        <button onclick="closeItemModal()" class="absolute top-4 right-4 z-20 p-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur rounded-full shadow-lg text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+<div id="item-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-0 md:p-4 bg-digilayn-scrim/60 backdrop-blur-sm">
+    <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-none md:rounded-2xl w-full max-w-4xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto shadow-2xl relative flex flex-col md:flex-row">
+        <button onclick="closeItemModal()" class="absolute top-4 right-4 z-20 p-2 bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur rounded-full shadow-lg text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface-variant">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
-        <div class="w-full md:w-1/2 bg-black flex flex-col items-center justify-center relative min-h-[300px] md:min-h-[500px]">
+        <div class="w-full md:w-1/2 bg-digilayn-scrim flex flex-col items-center justify-center relative min-h-[300px] md:min-h-[500px]">
             <div id="carousel-viewport" class="w-full h-full flex overflow-x-auto no-scrollbar image-carousel-container">
                 <!-- Images will be injected here -->
             </div>
@@ -174,7 +173,7 @@
             <!-- Indicators -->
             <div id="carousel-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10"></div>
 
-            <button id="modal-share-btn" class="absolute bottom-4 right-4 p-3 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white rounded-full transition shadow-lg z-10" title="Share Item">
+            <button id="modal-share-btn" class="absolute bottom-4 right-4 p-3 bg-digilayn-surface-container-lowest/20 hover:bg-digilayn-surface-container-lowest/40 backdrop-blur-md text-digilayn-on-primary rounded-full transition shadow-lg z-10" title="Share Item">
                 <i class="fas fa-share-nodes"></i>
             </button>
         </div>
@@ -185,28 +184,28 @@
             </div>
 
             <div id="public-actions" class="mt-8 flex gap-3 pb-6 md:pb-0">
-                <button id="modal-whatsapp" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl text-center hover:bg-green-700 transition flex items-center justify-center gap-2">
+                <button id="modal-whatsapp" class="flex-1 bg-digilayn-primary text-digilayn-on-primary font-bold py-3 rounded-xl text-center hover:bg-digilayn-primary transition flex items-center justify-center gap-2">
                     <i class="fab fa-whatsapp text-xl"></i> <span>Message</span>
                 </button>
-                <button id="modal-call" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl text-center hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                <button id="modal-call" class="flex-1 bg-digilayn-info text-digilayn-on-info font-bold py-3 rounded-xl text-center hover:bg-digilayn-info transition flex items-center justify-center gap-2">
                     <i class="fas fa-phone"></i> <span>Call</span>
                 </button>
             </div>
 
             <div id="owner-actions" class="hidden mt-8 flex flex-col gap-3 pb-6 md:pb-0">
                 <div class="flex gap-3">
-                    <button id="toggle-sold-btn" class="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition flex items-center justify-center gap-2">
+                    <button id="toggle-sold-btn" class="flex-1 bg-digilayn-tertiary text-digilayn-on-tertiary font-bold py-3 rounded-xl hover:bg-digilayn-tertiary transition flex items-center justify-center gap-2">
                         <i class="fas fa-check-circle"></i> Mark as Sold
                     </button>
-                    <button id="toggle-stock-btn" class="flex-1 bg-amber-600 text-white font-bold py-3 rounded-xl hover:bg-amber-700 transition flex items-center justify-center gap-2">
+                    <button id="toggle-stock-btn" class="flex-1 bg-digilayn-warning text-digilayn-on-warning font-bold py-3 rounded-xl hover:bg-digilayn-warning transition flex items-center justify-center gap-2">
                         <i class="fas fa-box-open"></i> Out of Stock
                     </button>
                 </div>
                 <div class="flex gap-3">
-                    <button id="edit-item-btn" class="flex-1 bg-green-100 text-green-600 font-bold py-3 rounded-xl hover:bg-green-200 transition flex items-center justify-center gap-2">
+                    <button id="edit-item-btn" class="flex-1 bg-digilayn-primary-container text-digilayn-on-primary-container font-bold py-3 rounded-xl hover:bg-digilayn-primary-container transition flex items-center justify-center gap-2">
                         <i class="fas fa-edit"></i> Edit Listing
                     </button>
-                    <button id="delete-item-btn" class="flex-1 bg-red-100 text-red-600 font-bold py-3 rounded-xl hover:bg-red-200 transition flex items-center justify-center gap-2">
+                    <button id="delete-item-btn" class="flex-1 bg-digilayn-error-container text-digilayn-on-error-container font-bold py-3 rounded-xl hover:bg-digilayn-error-container transition flex items-center justify-center gap-2">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
@@ -216,29 +215,28 @@
 </div>
 
 <!-- Fullscreen Gallery -->
-<div id="gallery-fullscreen" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-black">
-    <button onclick="closeFullscreen()" class="absolute top-6 right-6 z-20 p-3 bg-white/10 hover:bg-white/20 backdrop-blur rounded-full text-white transition">
+<div id="gallery-fullscreen" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-digilayn-scrim">
+    <button onclick="closeFullscreen()" class="absolute top-6 right-6 z-20 p-3 bg-digilayn-surface-container-lowest/10 hover:bg-digilayn-surface-container-lowest/20 backdrop-blur rounded-full text-digilayn-on-primary transition">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
     <img id="fullscreen-img" src="" class="max-w-full max-h-full object-contain" alt="">
 </div>
 
 <!-- Login Alert Modal -->
-<div id="login-alert-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-    <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center">
-        <div class="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+<div id="login-alert-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm">
+    <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center">
+        <div class="w-16 h-16 bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
             <i class="fas fa-user-lock"></i>
         </div>
         <h3 class="text-xl font-bold mb-2">Login Required</h3>
         <p class="opacity-70 mb-6">You need to be logged in to contact sellers or post items.</p>
         <div class="flex gap-3">
-            <button onclick="document.getElementById('login-alert-modal').classList.add('hidden')" class="flex-1 py-3 border border-gray-200 dark:border-slate-700 rounded-xl font-bold hover:bg-gray-50 dark:hover:bg-slate-700 transition">Cancel</button>
-            <button onclick="window.location.href='authentication/login'" class="flex-1 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-lg">Login Now</button>
+            <button onclick="document.getElementById('login-alert-modal').classList.add('hidden')" class="flex-1 py-3 border border-digilayn-outline-variant dark:border-digilayn-outline-variant rounded-xl font-bold hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-high transition">Cancel</button>
+            <button onclick="window.location.href='authentication/login'" class="flex-1 py-3 bg-digilayn-primary text-digilayn-on-primary rounded-xl font-bold hover:bg-digilayn-primary transition shadow-lg">Login Now</button>
         </div>
     </div>
 </div>
 
-<script src="scripts/theme.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -297,27 +295,27 @@
             let opacity = 'opacity-100';
 
             if (item.status === 'out of stock') {
-                statusBadge = '<div class="absolute top-2 right-2 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm">OUT OF STOCK</div>';
+                statusBadge = '<div class="absolute top-2 right-2 bg-digilayn-warning text-digilayn-on-warning text-[10px] font-black px-2 py-0.5 rounded shadow-sm">OUT OF STOCK</div>';
             } else if (item.status === 'sold') {
-                statusBadge = '<div class="absolute top-2 right-2 bg-purple-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm">SOLD</div>';
+                statusBadge = '<div class="absolute top-2 right-2 bg-digilayn-tertiary text-digilayn-on-tertiary text-[10px] font-black px-2 py-0.5 rounded shadow-sm">SOLD</div>';
                 opacity = 'opacity-60';
             }
 
             return `
-                <div class="item-card group bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer border border-gray-100 dark:border-slate-700 ${opacity}" onclick="openItemModal('${item.id}')">
+                <div class="item-card group bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-xl overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer border border-digilayn-outline-variant dark:border-digilayn-outline-variant ${opacity}" onclick="openItemModal('${item.id}')">
                     <div class="relative aspect-square overflow-hidden">
                         <img src="${item.images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/400?text=No+Image'}"
                              alt="${item.title}"
                              class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute top-2 left-2 bg-black/50 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                        <div class="absolute top-2 left-2 bg-digilayn-scrim/50 backdrop-blur-md text-digilayn-inverse-on-surface text-[10px] font-bold px-2 py-0.5 rounded">
                             ${item.category}
                         </div>
                         ${statusBadge}
                     </div>
                     <div class="p-3">
-                        <h3 class="font-bold text-lg text-green-600 dark:text-green-400">R${item.price}</h3>
+                        <h3 class="font-bold text-lg text-digilayn-primary dark:text-digilayn-primary">R${item.price}</h3>
                         <h4 class="text-sm font-medium line-clamp-2 mb-1">${item.title}</h4>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <p class="text-[10px] text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant flex items-center gap-1">
                             <i class="fas fa-map-marker-alt"></i> ${item.location || 'Poortjie'}
                         </p>
                     </div>
@@ -448,14 +446,14 @@
         // Render Carousel
         const images = item.images && item.images.length > 0 ? item.images : ['https://via.placeholder.com/400?text=No+Image'];
         carouselViewport.innerHTML = images.map(img => `
-            <div class="image-carousel-item w-full h-full flex-shrink-0 flex items-center justify-center bg-black cursor-zoom-in" onclick="openFullscreen('${img}')">
+            <div class="image-carousel-item w-full h-full flex-shrink-0 flex items-center justify-center bg-digilayn-scrim cursor-zoom-in" onclick="openFullscreen('${img}')">
                 <img src="${img}" class="w-full h-full object-contain">
             </div>
         `).join('');
 
         // Render Indicators
         carouselIndicators.innerHTML = images.map((_, idx) => `
-            <div class="w-2 h-2 rounded-full bg-white/30 transition-all duration-300 ${idx === 0 ? 'bg-white w-4' : ''}" data-idx="${idx}"></div>
+            <div class="w-2 h-2 rounded-full bg-digilayn-surface-container-lowest/30 transition-all duration-300 ${idx === 0 ? 'bg-digilayn-surface-container-lowest w-4' : ''}" data-idx="${idx}"></div>
         `).join('');
 
         // Carousel Scroll Listener
@@ -463,50 +461,50 @@
             const width = carouselViewport.offsetWidth;
             const idx = Math.round(carouselViewport.scrollLeft / width);
             Array.from(carouselIndicators.children).forEach((dot, i) => {
-                dot.classList.toggle('bg-white', i === idx);
+                dot.classList.toggle('bg-digilayn-surface-container-lowest', i === idx);
                 dot.classList.toggle('w-4', i === idx);
-                dot.classList.toggle('bg-white/30', i !== idx);
+                dot.classList.toggle('bg-digilayn-surface-container-lowest/30', i !== idx);
             });
         };
 
         let statusTag = '';
-        if (item.status === 'out of stock') statusTag = '<span class="ml-2 bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded font-black">OUT OF STOCK</span>';
-        if (item.status === 'sold') statusTag = '<span class="ml-2 bg-purple-600 text-white text-[10px] px-2 py-0.5 rounded font-black">SOLD</span>';
+        if (item.status === 'out of stock') statusTag = '<span class="ml-2 bg-digilayn-warning text-digilayn-on-warning text-[10px] px-2 py-0.5 rounded font-black">OUT OF STOCK</span>';
+        if (item.status === 'sold') statusTag = '<span class="ml-2 bg-digilayn-tertiary text-digilayn-on-tertiary text-[10px] px-2 py-0.5 rounded font-black">SOLD</span>';
 
         modalContent.innerHTML = `
             <div class="mb-6">
                 <div class="flex items-center mb-1">
-                    <span class="text-xs font-bold uppercase tracking-widest text-green-600 dark:text-green-400">${item.category}</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-digilayn-primary dark:text-digilayn-primary">${item.category}</span>
                     ${statusTag}
                 </div>
-                <h2 class="text-3xl font-black mt-1 leading-tight text-gray-900 dark:text-white">${item.title}</h2>
-                <h3 class="text-2xl font-bold text-green-600 dark:text-green-400 mt-2">R${item.price}</h3>
+                <h2 class="text-3xl font-black mt-1 leading-tight text-digilayn-on-surface dark:text-digilayn-on-primary">${item.title}</h2>
+                <h3 class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary mt-2">R${item.price}</h3>
             </div>
 
             <div class="space-y-6">
-                <div class="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-700/50">
-                    <h4 class="text-[10px] font-black uppercase opacity-40 tracking-widest mb-2 text-gray-900 dark:text-white">Item Description</h4>
-                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">${item.description || 'No description provided.'}</p>
+                <div class="p-4 bg-digilayn-surface dark:bg-digilayn-surface-container-low/50 rounded-2xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant/50">
+                    <h4 class="text-[10px] font-black uppercase opacity-40 tracking-widest mb-2 text-digilayn-on-surface dark:text-digilayn-on-primary">Item Description</h4>
+                    <p class="text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant leading-relaxed whitespace-pre-wrap">${item.description || 'No description provided.'}</p>
                 </div>
 
-                <div class="flex items-center gap-4 py-4 px-2 border-y border-gray-100 dark:border-slate-800">
-                    <div class="w-14 h-14 bg-gray-200 rounded-full overflow-hidden border-2 border-green-500 shadow-sm">
+                <div class="flex items-center gap-4 py-4 px-2 border-y border-digilayn-outline-variant dark:border-digilayn-outline-variant">
+                    <div class="w-14 h-14 bg-digilayn-surface-container-high rounded-full overflow-hidden border-2 border-digilayn-primary shadow-sm">
                         <img src="${item.sellerPhoto || 'https://via.placeholder.com/100'}" class="w-full h-full object-cover">
                     </div>
-                    <div class="flex-1 text-gray-900 dark:text-white">
+                    <div class="flex-1 text-digilayn-on-surface dark:text-digilayn-on-primary">
                         <p class="text-[10px] font-black uppercase opacity-40 tracking-widest mb-0.5">Contact Seller</p>
                         <p class="font-bold text-lg">${item.sellerName || 'Local Seller'}</p>
                         <p class="text-xs opacity-50 flex items-center gap-1">
-                            <i class="fas fa-map-marker-alt text-green-500"></i> ${item.location || 'Poortjie'}
+                            <i class="fas fa-map-marker-alt text-digilayn-primary"></i> ${item.location || 'Poortjie'}
                         </p>
                     </div>
                 </div>
 
                 <div class="flex justify-between items-center px-2">
-                    <p class="text-[10px] font-black uppercase opacity-30 tracking-widest flex items-center gap-1 text-gray-900 dark:text-white">
+                    <p class="text-[10px] font-black uppercase opacity-30 tracking-widest flex items-center gap-1 text-digilayn-on-surface dark:text-digilayn-on-primary">
                         <i class="fas fa-clock"></i> Posted ${item.createdAt ? formatRelativeTime(item.createdAt.toDate()) : 'recently'}
                     </p>
-                    <p class="text-[10px] font-black uppercase opacity-30 tracking-widest text-gray-900 dark:text-white">
+                    <p class="text-[10px] font-black uppercase opacity-30 tracking-widest text-digilayn-on-surface dark:text-digilayn-on-primary">
                         ID: ${id.substring(0,8)}
                     </p>
                 </div>

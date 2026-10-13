@@ -16,67 +16,67 @@ class TimeSchedule extends HTMLElement {
     render() {
         const style = `
       <style>
-        :host { 
-          font-family: inherit; 
-          display: block; 
+        :host {
+          font-family: inherit;
+          display: block;
           background: transparent;
         }
-        .day-row { 
-          display: flex; 
-          align-items: center; 
+        .day-row {
+          display: flex;
+          align-items: center;
           justify-content: space-between;
-          padding: 8px 0; 
-          border-bottom: 1px solid rgba(0,0,0,0.05);
+          padding: 8px 0;
+          border-bottom: 1px solid rgb(var(--digilayn-shadow-rgb) / 0.05);
           color: inherit;
         }
         :host-context(.dark) .day-row {
-          border-bottom: 1px solid rgba(255,255,255,0.1);
+          border-bottom: 1px solid rgb(var(--digilayn-surface-container-lowest-rgb) / 0.1);
         }
         .day-row:last-child { border-bottom: none; }
         .day-row.closed { opacity: 0.6; }
-        
-        .label-group { 
-          display: flex; 
-          align-items: center; 
-          gap: 12px; 
+
+        .label-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
           width: 130px;
         }
-        
-        .time-group { 
-          display: flex; 
-          align-items: center; 
-          gap: 8px; 
+
+        .time-group {
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
 
-        input[type="checkbox"] { 
-          width: 16px; 
-          height: 16px; 
+        input[type="checkbox"] {
+          width: 16px;
+          height: 16px;
           cursor: pointer;
-          accent-color: #16a34a;
+          accent-color: var(--digilayn-primary);
         }
-        input[type="time"] { 
-          padding: 4px; 
-          border: 1px solid #ddd; 
-          border-radius: 4px; 
+        input[type="time"] {
+          padding: 4px;
+          border: 1px solid var(--digilayn-outline-variant);
+          border-radius: 4px;
           font-size: 0.85rem;
-          background: #fff;
-          color: #000;
+          background: var(--digilayn-surface-container-lowest);
+          color: var(--digilayn-on-surface);
         }
         :host-context(.dark) input[type="time"] {
-          background: #0f172a;
-          color: #fff;
-          border-color: #334155;
+          background: var(--digilayn-surface);
+          color: var(--digilayn-on-surface);
+          border-color: var(--digilayn-outline-variant);
         }
         input:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .status-label { 
-          font-size: 0.75rem; 
-          font-weight: bold; 
-          color: #ef4444; 
-          width: 50px; 
-          text-align: right; 
+
+        .status-label {
+          font-size: 0.75rem;
+          font-weight: bold;
+          color: var(--digilayn-error);
+          width: 50px;
+          text-align: right;
         }
-        .status-label.open { color: #16a34a; }
+        .status-label.open { color: var(--digilayn-primary); }
       </style>
     `;
 
@@ -159,7 +159,7 @@ class TimeSchedule extends HTMLElement {
                 checkbox.checked = isOpen;
                 start.value = item.openingTime || '08:00';
                 end.value = item.closingTime || '17:00';
-                
+
                 // Update UI state
                 start.disabled = !isOpen;
                 end.disabled = !isOpen;

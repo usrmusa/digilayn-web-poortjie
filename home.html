@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html data-theme-default="light" lang="en">
 <head>
+    <link rel="stylesheet" href="styles/digilayn-theme.css">
+    <script src="scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +14,6 @@
           content="Poortjie, Kasi services, transport, school transport, graphic design, web development, South Africa">
     <meta name="copyright" content="© 2026 Poortjie Services. All rights reserved.">
     <meta name="robots" content="index,follow">
-    <meta name="theme-color" content="#22c55e">
     <link rel="icon" type="image/png" sizes="48x48" href="favicon/favicon-48x48.png">
     <link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png">
     <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg">
@@ -20,14 +21,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="manifest" href="favicon/site.webmanifest">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="scripts/digilayn-tailwind.js"></script>
     <script>
         console.log(
             "%cDigilayn",
-            "color: #22c55e; font-size: 40px; font-weight: bold; text-shadow: 2px 2px 0 #0f172a;"
+            `color: ${window.DigilaynTheme.getColor("primary")}; font-size: 40px; font-weight: bold; text-shadow: 2px 2px 0 ${window.DigilaynTheme.getColor("surface")};`
         );
         console.log(
             "%cWebsite developed by Musa Mgijima",
-            "color: #64748b; font-size: 16px; font-style: italic;"
+            `color: ${window.DigilaynTheme.getColor("on-surface-variant")}; font-size: 16px; font-style: italic;`
         );
         if (window.console && window.console.log) {
             const originalLog = window.console.log;
@@ -42,24 +44,19 @@
             };
         }
     </script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
     <style>
-        #loader-overlay { background-color: #ffffff; }
-        .dark #loader-overlay { background-color: #0f172a; }
+        #loader-overlay { background-color: var(--digilayn-surface-container-lowest); }
+        .dark #loader-overlay { background-color: var(--digilayn-surface); }
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/spotlight.css">
 </head>
-<body class="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 <div class="fixed top-5 left-5 z-50" id="business-form-control">
     <a href="services/business-form" id="add-business-btn"
-       class="p-3 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 transition flex items-center justify-center"
+       class="p-3 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition flex items-center justify-center"
        title="Add Your Business">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -69,7 +66,7 @@
 <div class="fixed top-5 right-5 z-50 flex gap-3" id="user-controls">
     <div id="hamburger-menu" class="relative">
         <button id="hamburger-btn"
-                class="p-3 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 transition">
+                class="p-3 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                  xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -77,48 +74,48 @@
             </svg>
         </button>
         <div id="menu-items"
-             class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+             class="hidden absolute right-0 mt-2 w-48 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-md shadow-lg py-1 ring-1 ring-digilayn-shadow ring-opacity-5">
             <a href="market"
-               class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Marketplace</a>
+               class="block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Marketplace</a>
             <button id="menu-theme-toggle"
-                    class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center gap-3">
+                    class="w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high flex items-center gap-3">
                 <span id="menu-theme-icon">🌓</span> Mode
             </button>
             <a id="admin-link" href="manage/business"
-               class="hidden block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Business
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Business
                 Admin</a>
             <a id="home-admin-link" href="manage/home-manager"
-               class="hidden block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Home
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Home
                 Manager</a>
             <a id="news-admin-link" href="manage/news-writer"
-               class="hidden block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Post
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Post
                 News/Alert</a>
             <a id="taxi-admin-link" href="manage/public transport"
-               class="hidden block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Public Transport Admin</a>
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Public Transport Admin</a>
             <a href="support"
-               class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Support</a>
+               class="block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Support</a>
             <a id="profile-link" href="authentication/profile"
-               class="hidden block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Profile</a>
-            <div id="auth-divider" class="hidden border-t border-gray-100 dark:border-slate-700 my-1"></div>
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Profile</a>
+            <div id="auth-divider" class="hidden border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant my-1"></div>
             <a id="login-link" href="authentication/login"
                onclick="sessionStorage.setItem('redirectUrl', window.location.href); window.location.href = 'authentication/login'; return false;"
-               class="hidden block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">Login</a>
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Login</a>
             <button id="logout-btn"
-                    class="hidden w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
+                    class="hidden w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">
                 Logout
             </button>
         </div>
     </div>
 </div>
 <header class="max-w-6xl mx-auto pt-24 pb-8 px-4 sm:px-6 text-center">
-    <div id="loader-overlay" class="fixed inset-0 bg-white dark:bg-slate-900 z-[60] flex items-center justify-center transition-opacity duration-500">
+    <div id="loader-overlay" class="fixed inset-0 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface z-[60] flex items-center justify-center transition-opacity duration-500">
         <div class="flex flex-col items-center">
-            <div class="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mb-4"></div>
+            <div class="w-12 h-12 border-4 border-digilayn-primary border-t-digilayn-primary rounded-full animate-spin mb-4"></div>
             <p class="text-sm font-medium opacity-50">Loading Poortjie...</p>
         </div>
     </div>
     <div class="mb-4 flex justify-center">
-        <div class="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-bold tracking-widest uppercase">
+        <div class="bg-digilayn-primary text-digilayn-on-primary px-4 py-1 rounded-full text-sm font-bold tracking-widest uppercase">
             services
         </div>
     </div>
@@ -158,17 +155,17 @@
     </div>
     <div id="news-slider-container" class="max-w-2xl mx-auto mb-8 hidden">
         <div id="news-slider"
-             class="bg-green-50 dark:bg-slate-800/50 border border-green-100 dark:border-slate-700 rounded-2xl p-6 relative group overflow-hidden">
+             class="bg-digilayn-primary-container dark:bg-digilayn-surface-container-low/50 border border-digilayn-primary dark:border-digilayn-outline-variant rounded-2xl p-6 relative group overflow-hidden">
             <div id="news-content-area" class="transition-opacity duration-500">
                 <div class="animate-pulse flex flex-col items-center">
-                    <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-3/4 mb-2"></div>
-                    <div class="h-3 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
+                    <div class="h-4 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-3/4 mb-2"></div>
+                    <div class="h-3 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-1/2"></div>
                 </div>
             </div>
-            <button id="prev-news" class="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/40 dark:bg-slate-900/20 dark:hover:bg-slate-900/40 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none" aria-label="Previous news">
+            <button id="prev-news" class="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-digilayn-surface-container-lowest/20 hover:bg-digilayn-surface-container-lowest/40 dark:bg-digilayn-surface/20 dark:hover:bg-digilayn-surface/40 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none" aria-label="Previous news">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </button>
-            <button id="next-news" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/40 dark:bg-slate-900/20 dark:hover:bg-slate-900/40 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none" aria-label="Next news">
+            <button id="next-news" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-digilayn-surface-container-lowest/20 hover:bg-digilayn-surface-container-lowest/40 dark:bg-digilayn-surface/20 dark:hover:bg-digilayn-surface/40 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none" aria-label="Next news">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </button>
             <div class="flex justify-center gap-2 mt-4" id="slider-dots"></div>
@@ -180,41 +177,41 @@
     </p>
     <div class="flex flex-wrap justify-center gap-4 mt-8">
         <a href="#services"
-           class="px-8 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition shadow-md">Explore
+           class="px-8 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md">Explore
             Services</a>
         <a href="market"
-           class="px-8 py-3 bg-white dark:bg-slate-800 text-green-600 dark:text-green-400 font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition shadow-md border border-green-100 dark:border-slate-700">Marketplace</a>
+           class="px-8 py-3 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-high transition shadow-md border border-digilayn-primary dark:border-digilayn-outline-variant">Marketplace</a>
         <a href="services/public%20transport"
-           class="px-8 py-3 border-2 border-green-600 text-green-600 dark:text-green-400 font-bold rounded-lg hover:bg-green-600 hover:text-white transition">Public Transport Info</a>
+           class="px-8 py-3 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-primary hover:text-digilayn-on-primary transition">Public Transport Info</a>
     </div>
 </header>
 <main class="max-w-6xl mx-auto px-6 pb-24" id="services">
     <div id="services-grid" class="grid md:grid-cols-3 gap-8">
     </div>
-    <section class="mt-24 card p-10 rounded-3xl bg-gradient-to-br from-green-50 to-transparent dark:from-green-900/10">
+    <section class="mt-24 card p-10 rounded-3xl bg-gradient-to-br from-digilayn-primary-container to-transparent dark:from-digilayn-primary-container/10">
         <div class="max-w-3xl">
             <h2 class="text-3xl font-bold mb-4">Built for the community, by the community.</h2>
             <p class="text-lg opacity-80 mb-6">
                 Poortjie Services is all about lifting our local businesses. We make sure every hustle in the hood has a professional home online, without any of the complicated talk or heavy costs.
             </p>
             <div class="flex gap-4">
-                <span class="text-[10px] font-bold px-2 py-1 border border-green-500/30 rounded text-green-500 uppercase tracking-widest">Mobile First</span>
-                <span class="text-[10px] font-bold px-2 py-1 border border-green-500/30 rounded text-green-500 uppercase tracking-widest">Kasi Focused</span>
+                <span class="text-[10px] font-bold px-2 py-1 border border-digilayn-primary/30 rounded text-digilayn-primary uppercase tracking-widest">Mobile First</span>
+                <span class="text-[10px] font-bold px-2 py-1 border border-digilayn-primary/30 rounded text-digilayn-primary uppercase tracking-widest">Kasi Focused</span>
             </div>
         </div>
     </section>
-    <div id="business-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl relative">
-            <button onclick="closeBusinessModal()" class="sticky top-4 float-right mr-4 z-10 p-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur rounded-full shadow-lg text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+    <div id="business-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm">
+        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <button onclick="closeBusinessModal()" class="sticky top-4 float-right mr-4 z-10 p-2 bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur rounded-full shadow-lg text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface-variant">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
             <div id="business-modal-content" class="p-1">
             </div>
         </div>
     </div>
-    <div id="rating-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"></div>
+    <div id="rating-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm"></div>
 </main>
-<footer class="text-center py-12 border-t border-gray-100 dark:border-slate-800 opacity-50 text-xs">
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-50 text-xs">
     &copy; 2026 <a href="./" onclick="window.top.location.replace('./'); return false;"
                    class="hover:underline">Poortjie Services</a>. Empowering poortjie economies.
     <div class="mt-2 flex justify-center gap-4">
@@ -234,7 +231,6 @@
 <script src="scripts/core/case-mapper.js" defer></script>
 <script src="scripts/models/user-model.js" defer></script>
 <script src="scripts/viewmodels/auth-store.js" defer></script>
-<script src="scripts/theme.js" defer></script>
 <script src="https://unpkg.com/dexie/dist/dexie.js" defer></script>
 <script src="scripts/card-renderer.js" defer></script>
 <script src="scripts/rating.js" defer></script>
@@ -316,8 +312,8 @@
         const grid = document.getElementById('services-grid');
         grid.innerHTML = servicesData.map(service => {
             const isTransport = service.isTransport || (service.category && (
-                service.category.toLowerCase() === 'transport' || 
-                service.category.toLowerCase().includes('layn rider') || 
+                service.category.toLowerCase() === 'transport' ||
+                service.category.toLowerCase().includes('layn rider') ||
                 service.category.toLowerCase().includes('laynrider')
             ));
 
@@ -325,13 +321,13 @@
                 return `
                 <section class="space-y-6">
                     <h2 class="text-2xl font-bold flex items-center gap-3">
-                        <span class="w-8 h-1 bg-green-500"></span> ${service.category || 'Transport'}
+                        <span class="w-8 h-1 bg-digilayn-primary"></span> ${service.category || 'Transport'}
                     </h2>
-                    <div class="card flex flex-col p-6 rounded-2xl border-l-4 border-l-green-500">
+                    <div class="card flex flex-col p-6 rounded-2xl border-l-4 border-l-digilayn-primary">
                         <div class="flex-grow">
                             <div class="flex items-center justify-between mb-2">
                                 <h3 class="text-xl font-bold">${service.title || 'Layn Rider'}</h3>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 uppercase tracking-wider">Fast & Local</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary-container/40 dark:text-digilayn-on-primary-container uppercase tracking-wider">Fast & Local</span>
                             </div>
                             <p class="text-sm opacity-70 mb-4">${service.description || 'Request a ride from verified local Poortjie drivers instantly. Safe, fast, and affordable township transport.'}</p>
                             <ul class="space-y-2 text-sm font-medium">
@@ -344,7 +340,7 @@
                             </ul>
                         </div>
                         <div class="mt-6 flex flex-col gap-2">
-                            <a href="laynfleet/laynrider/" onclick="handleBookRideClick(event); return false;" class="block text-center py-2.5 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition cursor-pointer shadow">Book a Ride</a>
+                            <a href="laynfleet/laynrider/" onclick="handleBookRideClick(event); return false;" class="block text-center py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition cursor-pointer shadow">Book a Ride</a>
                         </div>
                     </div>
                 </section>`;
@@ -353,9 +349,9 @@
             return `
             <section class="space-y-6">
                 <h2 class="text-2xl font-bold flex items-center gap-3">
-                    <span class="w-8 h-1 bg-green-500"></span> ${service.category}
+                    <span class="w-8 h-1 bg-digilayn-primary"></span> ${service.category}
                 </h2>
-                <div class="card flex flex-col p-6 rounded-2xl border-l-4 border-l-green-500">
+                <div class="card flex flex-col p-6 rounded-2xl border-l-4 border-l-digilayn-primary">
                     <div class="flex-grow">
                         <h3 class="text-xl font-bold mb-2">${service.title}</h3>
                         <p class="text-sm opacity-70 mb-4">${service.description}</p>
@@ -364,8 +360,8 @@
                         </ul>
                     </div>
                     <div class="mt-6 flex flex-col gap-2">
-                        <a href="${service.url}" class="block text-center py-2.5 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition">${service.btnText}</a>
-                        ${service.extraBtn ? `<a href="${service.extraBtn.url}" onclick="window.top.location.replace('${service.extraBtn.url}'); return false;" class="block text-center py-2.5 border-2 border-green-600 text-green-600 dark:text-green-400 rounded-lg font-bold hover:bg-green-600 hover:text-white transition">${service.extraBtn.text}</a>` : ''}
+                        <a href="${service.url}" class="block text-center py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition">${service.btnText}</a>
+                        ${service.extraBtn ? `<a href="${service.extraBtn.url}" onclick="window.top.location.replace('${service.extraBtn.url}'); return false;" class="block text-center py-2.5 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary rounded-lg font-bold hover:bg-digilayn-primary hover:text-digilayn-on-primary transition">${service.extraBtn.text}</a>` : ''}
                     </div>
                 </div>
             </section>`;
@@ -467,13 +463,13 @@
         function renderAlerts() {
             const container = document.getElementById('alert-container');
             container.innerHTML = alertUpdates.map(alert => `
-                <div class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-2xl p-4 flex items-start gap-4 text-left animate-bounce-subtle mb-2">
-                    <div class="bg-red-500 text-white p-2 rounded-full flex-shrink-0 mt-1">
+                <div class="bg-digilayn-error-container dark:bg-digilayn-error-container/20 border border-digilayn-error dark:border-digilayn-error rounded-2xl p-4 flex items-start gap-4 text-left animate-bounce-subtle mb-2">
+                    <div class="bg-digilayn-error text-digilayn-on-error p-2 rounded-full flex-shrink-0 mt-1">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
                     <div>
-                        <h3 class="font-black text-red-900 dark:text-red-400 uppercase text-xs tracking-wider">Emergency Alert</h3>
-                        <h2 class="text-lg font-bold text-slate-900 dark:text-white">${alert.title}</h2>
+                        <h3 class="font-black text-digilayn-on-error-container dark:text-digilayn-error uppercase text-xs tracking-wider">Emergency Alert</h3>
+                        <h2 class="text-lg font-bold text-digilayn-on-surface dark:text-digilayn-on-primary">${alert.title}</h2>
                         <p class="text-sm opacity-80 leading-tight mt-1">${alert.content}</p>
                     </div>
                 </div>
@@ -520,18 +516,18 @@
             contentArea.style.opacity = '0';
             setTimeout(() => {
                 let typeLabel = '';
-                let typeColor = 'bg-green-500';
+                let typeColor = 'bg-digilayn-primary';
                 let actionButton = '';
                 if (news.type === 'event') {
                     typeLabel = '📅 EVENT';
-                    typeColor = 'bg-blue-500';
+                    typeColor = 'bg-digilayn-info';
                 } else if (news.type === 'promo') {
                     typeLabel = '🎁 PROMO';
-                    typeColor = 'bg-purple-500';
+                    typeColor = 'bg-digilayn-tertiary';
                     if (news.promoBusiness) {
                         actionButton = `
-                            <button onclick="showPromoBusiness('${news.promoBusiness.id}', '${news.promoBusiness.collection}')" 
-                                    class="mt-4 px-6 py-2 ${typeColor} text-white font-bold rounded-full hover:scale-105 transition-transform shadow-md text-sm uppercase tracking-wider">
+                            <button onclick="showPromoBusiness('${news.promoBusiness.id}', '${news.promoBusiness.collection}')"
+                                    class="mt-4 px-6 py-2 ${typeColor} text-digilayn-on-primary font-bold rounded-full hover:scale-105 transition-transform shadow-md text-sm uppercase tracking-wider">
                                 View Promo
                             </button>`;
                     }
@@ -539,15 +535,15 @@
                 if (news.externalLink && news.externalLink.url) {
                     const btnName = news.externalLink.name || 'View More';
                     actionButton = `
-                        <button onclick="window.open('${news.externalLink.url}', '_blank')" 
-                                class="mt-4 px-6 py-2 bg-green-600 text-white font-bold rounded-full hover:scale-105 transition-transform shadow-md text-sm uppercase tracking-wider">
+                        <button onclick="window.open('${news.externalLink.url}', '_blank')"
+                                class="mt-4 px-6 py-2 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-full hover:scale-105 transition-transform shadow-md text-sm uppercase tracking-wider">
                             ${btnName}
                         </button>`;
                 }
                 contentArea.innerHTML = `
                     <div class="flex flex-col items-center">
-                        ${typeLabel ? `<span class="${typeColor} text-[10px] text-white font-black px-2 py-0.5 rounded mb-2">${typeLabel}</span>` : ''}
-                        <h2 class="text-2xl md:text-3xl font-black mb-2 text-center text-slate-900 dark:text-white leading-tight">${news.title}</h2>
+                        ${typeLabel ? `<span class="${typeColor} text-[10px] text-digilayn-on-primary font-black px-2 py-0.5 rounded mb-2">${typeLabel}</span>` : ''}
+                        <h2 class="text-2xl md:text-3xl font-black mb-2 text-center text-digilayn-on-surface dark:text-digilayn-on-primary leading-tight">${news.title}</h2>
                         <p class="text-lg opacity-80 text-center max-w-lg leading-relaxed">${news.content}</p>
                         ${actionButton}
                     </div>
@@ -555,7 +551,7 @@
                 contentArea.style.opacity = '1';
                 if (newsUpdates.length > 1) {
                     dotsArea.innerHTML = newsUpdates.map((_, i) => `
-                        <div onclick="goToNews(${i})" class="cursor-pointer w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentNewsIndex ? 'bg-green-600 w-4' : 'bg-gray-300 dark:bg-slate-600'}"></div>
+                        <div onclick="goToNews(${i})" class="cursor-pointer w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentNewsIndex ? 'bg-digilayn-primary w-4' : 'bg-digilayn-surface-container-highest dark:bg-digilayn-surface-container-highest'}"></div>
                     `).join('');
                 } else {
                     dotsArea.innerHTML = '';
@@ -572,7 +568,7 @@
             const content = document.getElementById('business-modal-content');
             content.innerHTML = `
                 <div class="p-12 text-center">
-                    <div class="w-10 h-10 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4"></div>
+                    <div class="w-10 h-10 border-4 border-digilayn-primary border-t-digilayn-primary rounded-full animate-spin mx-auto mb-4"></div>
                     <p class="opacity-50">Opening business profile...</p>
                 </div>
             `;
@@ -590,7 +586,7 @@
                 }
             } catch (error) {
                 console.error("Error fetching business:", error);
-                content.innerHTML = '<p class="p-8 text-center text-red-500">Error loading business profile.</p>';
+                content.innerHTML = '<p class="p-8 text-center text-digilayn-error">Error loading business profile.</p>';
             }
         };
         window.closeBusinessModal = () => {
@@ -642,7 +638,7 @@
                     newAlertUpdates.sort(sortFn);
                     const finalNews = newNewsUpdates.slice(0, 5);
                     const finalAlerts = newAlertUpdates.slice(0, 2);
-                    if (JSON.stringify(finalNews) !== JSON.stringify(newsUpdates) || 
+                    if (JSON.stringify(finalNews) !== JSON.stringify(newsUpdates) ||
                         JSON.stringify(finalAlerts) !== JSON.stringify(alertUpdates)) {
                         newsUpdates = finalNews;
                         alertUpdates = finalAlerts;
