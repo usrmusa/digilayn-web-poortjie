@@ -68,3 +68,8 @@ node_modules/
 # dataconnect generated files
 .dataconnect
 /.idea/inspectionProfiles/Project_Default.xml
+
+# Local editor, macOS and workspace steering files
+.idea/
+.DS_Store
+/AGENTS.md
