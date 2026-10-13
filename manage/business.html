@@ -26,6 +26,7 @@
     <link rel="icon" type="image/svg+xml" href="../favicon/favicon.svg">
     <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
     <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
 </head>
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
@@ -51,7 +52,7 @@
                 <div class="flex flex-wrap gap-4 items-center justify-between">
                     <!-- Filter Chips -->
                     <div id="filter-chips" class="flex flex-wrap gap-2">
-                        <button onclick="setFilter('all')" class="filter-chip px-4 py-1 rounded-full text-sm font-semibold border transition bg-digilayn-primary text-digilayn-on-primary border-digilayn-primary" data-filter="all">All <span id="count-all" class="ml-1 opacity-70"></span></button>
+                        <button onclick="setFilter('all')" class="filter-chip px-4 py-1 rounded-full text-sm font-semibold border transition bg-digilayn-primary text-digilayn-on-primary border-digilayn-primary digilayn-button" data-filter="all">All <span id="count-all" class="ml-1 opacity-70"></span></button>
                         <button onclick="setFilter('pending')" class="filter-chip px-4 py-1 rounded-full text-sm font-semibold border transition bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-digilayn-outline-variant dark:border-digilayn-outline-variant" data-filter="pending">Pending <span id="count-pending" class="ml-1 opacity-70"></span></button>
                         <button onclick="setFilter('approved')" class="filter-chip px-4 py-1 rounded-full text-sm font-semibold border transition bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-digilayn-outline-variant dark:border-digilayn-outline-variant" data-filter="approved">Approved <span id="count-approved" class="ml-1 opacity-70"></span></button>
                         <button onclick="setFilter('rejected')" class="filter-chip px-4 py-1 rounded-full text-sm font-semibold border transition bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-digilayn-outline-variant dark:border-digilayn-outline-variant" data-filter="rejected">Rejected <span id="count-rejected" class="ml-1 opacity-70"></span></button>
@@ -61,7 +62,7 @@
                     <!-- Sort -->
                     <div class="flex items-center gap-2">
                         <label for="sort-apps" class="text-sm opacity-70">Sort by:</label>
-                        <select id="sort-apps" onchange="filterAndSort()" class="px-3 py-2 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary text-sm">
+                        <select id="sort-apps" onchange="filterAndSort()" class="px-3 py-2 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary text-sm">
                             <option value="newest">Newest First</option>
                             <option value="owner">Owner Name (A-Z)</option>
                             <option value="business">Business Name (A-Z)</option>
@@ -72,7 +73,7 @@
 
                 <div class="relative">
                     <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-digilayn-on-surface-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <label for="search-apps"></label><input type="text" id="search-apps" oninput="filterAndSort()" placeholder="Search by business, owner, or email..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
+                    <label for="search-apps"></label><input type="text" id="search-apps" oninput="filterAndSort()" placeholder="Search by business, owner, or email..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
                 </div>
             </div>
 
@@ -322,7 +323,7 @@
                 { label: 'Photos', key: 'photos' }
             ];
 
-            let diffHtml = '<div class="mt-4 p-3 bg-digilayn-info-container dark:bg-digilayn-info-container/20 rounded-lg border border-digilayn-info dark:border-digilayn-info/30 text-xs">';
+            let diffHtml = '<div class="mt-4 p-3 bg-digilayn-info-container dark:bg-digilayn-info/10 rounded-lg border border-digilayn-info dark:border-digilayn-info/30 text-xs">';
             diffHtml += '<p class="font-bold uppercase text-digilayn-info dark:text-digilayn-info mb-2">Data Differences (Live vs Application)</p>';
             diffHtml += '<div class="space-y-1">';
 
@@ -403,14 +404,14 @@
                 diffHtml += `
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 py-1 border-b border-digilayn-info/50 dark:border-digilayn-info/30 last:border-0">
                         <span class="font-bold">Photos:</span>
-                        <div class="opacity-50 grayscale">${renderPhotosList(oldPhotos)}</div>
+                        <div class="opacity-70 grayscale">${renderPhotosList(oldPhotos)}</div>
                         <div>${renderPhotosList(newPhotos)}</div>
                     </div>
                 `;
             }
 
             if (!hasChanges) {
-                diffHtml += '<p class="opacity-60 italic">No significant field changes detected.</p>';
+                diffHtml += '<p class="opacity-70 italic">No significant field changes detected.</p>';
             }
 
             diffHtml += '</div></div>';
@@ -418,7 +419,7 @@
         };
 
         if (applications.length === 0) {
-            applicationsList.innerHTML = '<p class="text-center py-8 opacity-60">No matching applications found.</p>';
+            applicationsList.innerHTML = '<p class="text-center py-8 opacity-70">No matching applications found.</p>';
             return;
         }
 
@@ -457,7 +458,7 @@
                             <h4 class="text-lg font-bold">${app.businessName || 'Untitled Business'}</h4>
                             ${getStatusBadge(app.status)}
                             ${app.rating ? `
-                                <div class="flex items-center gap-1 bg-digilayn-warning text-digilayn-on-warning-container px-2 py-0.5 rounded text-[10px] font-bold">
+                                <div class="flex items-center gap-1 bg-digilayn-warning text-digilayn-on-warning px-2 py-0.5 rounded text-[10px] font-bold">
                                     <i class="fas fa-star text-[8px]"></i> ${app.rating.toFixed(1)}
                                 </div>
                             ` : ''}
@@ -493,7 +494,7 @@
 
                             ${isPending && alreadyExists ? renderDiff(existingData, app) : ''}
                             ${app.approvedBy ? `
-                            <div class="mt-4 p-3 bg-digilayn-primary-container dark:bg-digilayn-primary-container/20 rounded-lg border border-digilayn-primary dark:border-digilayn-primary/30">
+                            <div class="mt-4 p-3 bg-digilayn-primary-container dark:bg-digilayn-primary/10 rounded-lg border border-digilayn-primary dark:border-digilayn-primary/30">
                                 <p class="text-xs font-bold uppercase text-digilayn-primary dark:text-digilayn-primary mb-1">Approval Info</p>
                                 <div class="flex flex-col sm:flex-row gap-x-8 gap-y-1 text-xs">
                                     <p><span class="font-semibold">Approved By:</span> <span class="user-name" data-uid="${app.approvedBy}">${app.approvedBy}</span></p>
@@ -502,7 +503,7 @@
                             </div>
                             ` : ''}
                             ${app.rejectedBy ? `
-                            <div class="mt-4 p-3 bg-digilayn-error-container dark:bg-digilayn-error-container/20 rounded-lg border border-digilayn-error dark:border-digilayn-error/30">
+                            <div class="mt-4 p-3 bg-digilayn-error-container dark:bg-digilayn-error/10 rounded-lg border border-digilayn-error dark:border-digilayn-error/30">
                                 <p class="text-xs font-bold uppercase text-digilayn-error dark:text-digilayn-error mb-1">Rejection Info</p>
                                 <div class="flex flex-col sm:flex-row gap-x-8 gap-y-1 text-xs">
                                     <p><span class="font-semibold">Rejected By:</span> <span class="user-name" data-uid="${app.rejectedBy}">${app.rejectedBy}</span></p>
@@ -535,17 +536,17 @@
                         ` : ''}
                     </div>
                     <div class="flex flex-wrap gap-2 shrink-0">
-                        <button onclick="toggleDetails('${app.id}')" class="text-xs font-bold uppercase tracking-wider opacity-60 hover:opacity-100 transition px-3 py-1 border border-digilayn-outline-variant dark:border-digilayn-outline-variant rounded-lg">Show Details</button>
+                        <button onclick="toggleDetails('${app.id}')" class="text-xs font-bold uppercase tracking-wider opacity-70 hover:opacity-100 transition px-3 py-1 border border-digilayn-outline-variant dark:border-digilayn-outline-variant rounded-lg">Show Details</button>
                         ${isPending ? `
-                        <button onclick="approveApplication('${app.id}')" class="bg-digilayn-primary text-digilayn-on-primary px-5 py-2 rounded-lg font-bold hover:bg-digilayn-primary transition shadow-sm">${alreadyExists ? 'Approve Update' : 'Approve'}</button>
-                        <button onclick="requestUpdate('${app.id}')" class="bg-digilayn-info text-digilayn-on-info px-5 py-2 rounded-lg font-bold hover:bg-digilayn-info transition shadow-sm">Update</button>
-                        ${!alreadyExists ? `<button onclick="rejectApplication('${app.id}')" class="bg-digilayn-error text-digilayn-on-error px-5 py-2 rounded-lg font-bold hover:bg-digilayn-error transition shadow-sm">Reject</button>` : ''}
+                        <button onclick="approveApplication('${app.id}')" class="bg-digilayn-primary text-digilayn-on-primary px-5 py-2 rounded-lg font-bold hover:bg-digilayn-primary transition shadow-sm digilayn-button">${alreadyExists ? 'Approve Update' : 'Approve'}</button>
+                        <button onclick="requestUpdate('${app.id}')" class="bg-digilayn-info text-digilayn-on-info px-5 py-2 rounded-lg font-bold hover:bg-digilayn-info transition shadow-sm digilayn-button">Update</button>
+                        ${!alreadyExists ? `<button onclick="rejectApplication('${app.id}')" class="bg-digilayn-error text-digilayn-on-error px-5 py-2 rounded-lg font-bold hover:bg-digilayn-error transition shadow-sm digilayn-button">Reject</button>` : ''}
                         ` : ''}
                         ${isSuperUser && app.status === 'approved' ? `
-                        <button onclick="disableListing('${app.id}')" class="bg-digilayn-surface-container-highest text-digilayn-on-primary px-5 py-2 rounded-lg font-bold hover:bg-digilayn-surface-container-high transition shadow-sm">Disable</button>
+                        <button onclick="disableListing('${app.id}')" class="bg-digilayn-surface-container-highest text-digilayn-on-surface px-5 py-2 rounded-lg font-bold hover:bg-digilayn-surface-container-high transition shadow-sm">Disable</button>
                         ` : ''}
                         ${isSuperUser ? `
-                        <button onclick="brutalDelete('${app.id}', '${app.businessType}')" class="bg-digilayn-error text-digilayn-on-error px-5 py-2 rounded-lg font-bold hover:bg-digilayn-error-container transition shadow-sm">
+                        <button onclick="brutalDelete('${app.id}', '${app.businessType}')" class="bg-digilayn-error text-digilayn-on-error px-5 py-2 rounded-lg font-bold hover:bg-digilayn-error-container transition shadow-sm digilayn-button">
                             <i class="fas fa-trash-alt mr-1"></i> Delete
                         </button>
                         ` : ''}

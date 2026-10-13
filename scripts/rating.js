@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Unlike
                 icon.className = 'far fa-heart';
                 btn.classList.remove('text-digilayn-error');
-                btn.classList.add('opacity-60');
+                btn.classList.add('opacity-70');
                 countSpan.textContent = Math.max(0, count - 1);
 
                 await serviceRef.update({
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Like
                 icon.className = 'fas fa-heart text-digilayn-error';
                 btn.classList.add('text-digilayn-error');
-                btn.classList.remove('opacity-60');
+                btn.classList.remove('opacity-70');
                 countSpan.textContent = count + 1;
 
                 await serviceRef.update({
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         ${canEdit ? `<button class="edit-my-comment-btn text-xs text-digilayn-info hover:underline ml-1" data-comment="${c.comment || ''}">Edit</button>` : ''}
                     </div>
-                    <button class="like-comment-btn flex items-center gap-1 text-xs transition-colors hover:text-digilayn-error ${isLiked ? 'text-digilayn-error' : 'opacity-60'}"
+                    <button class="like-comment-btn flex items-center gap-1 text-xs transition-colors hover:text-digilayn-error ${isLiked ? 'text-digilayn-error' : 'opacity-70'}"
                             data-comment-uid="${c.userId}"
                             data-service-id="${serviceId}"
                             data-service-key="${serviceKey}">

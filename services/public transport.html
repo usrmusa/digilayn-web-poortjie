@@ -40,7 +40,7 @@
             overflow: hidden;
             white-space: nowrap;
             background: var(--digilayn-error);
-            color: var(--digilayn-on-primary);
+            color: var(--digilayn-on-error);
             padding: 10px 0;
             font-weight: bold;
             text-transform: uppercase;
@@ -66,6 +66,7 @@
         }
     </style>
     <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
 </head>
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
@@ -130,7 +131,7 @@
     </div>
 </main>
 
-<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-50 text-xs">
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-70 text-xs">
     &copy; 2026 Poortjie Services. Empowering poortjie economies.<br><a href="../support" class="hover:underline">Data Policy</a>
 </footer>
 
@@ -197,17 +198,17 @@
                     if (allData.routes) {
                         renderRoutes(allData.routes);
                     } else {
-                        routesGrid.innerHTML = '<p class="col-span-full text-center py-12 opacity-60">No taxi routes found.</p>';
+                        routesGrid.innerHTML = '<p class="col-span-full text-center py-12 opacity-70">No taxi routes found.</p>';
                     }
                 } else {
                     if (allData.busRoutes) {
                         renderRoutes(allData.busRoutes);
                     } else {
-                        routesGrid.innerHTML = '<p class="col-span-full text-center py-12 opacity-60">No bus routes found.</p>';
+                        routesGrid.innerHTML = '<p class="col-span-full text-center py-12 opacity-70">No bus routes found.</p>';
                     }
                 }
             } else {
-                routesGrid.innerHTML = '<p class="col-span-full text-center py-12 opacity-60">No public transport data found.</p>';
+                routesGrid.innerHTML = '<p class="col-span-full text-center py-12 opacity-70">No public transport data found.</p>';
                 renderNoNews();
             }
         } catch (error) {
@@ -223,7 +224,7 @@
         newsContainer.innerHTML = `
             <div class="p-8 border-2 border-dashed border-digilayn-outline-variant dark:border-digilayn-outline-variant rounded-2xl text-center">
                 <i class="fas fa-newspaper text-3xl text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mb-3 block"></i>
-                <p class="text-sm opacity-60">If there are any news or updates (like fare raises), they will appear here. Currently, everything is running smoothly!</p>
+                <p class="text-sm opacity-70">If there are any news or updates (like fare raises), they will appear here. Currently, everything is running smoothly!</p>
             </div>
         `;
         newsSection.classList.remove('hidden');
@@ -249,7 +250,7 @@
                     </div>
                     <div>
                         <p class="text-lg font-bold text-digilayn-on-surface dark:text-digilayn-on-surface leading-tight">${item}</p>
-                        <p class="text-xs mt-2 opacity-50 font-bold uppercase tracking-widest">Confirmed Official Update</p>
+                        <p class="text-xs mt-2 opacity-70 font-bold uppercase tracking-widest">Confirmed Official Update</p>
                     </div>
                 </div>
             `;
@@ -284,10 +285,10 @@
                 <div class="flex justify-between items-start mb-4">
                     <h3 class="text-xl font-bold">
                         ${route.origin}
-                        <i class="fas ${route.returns ? 'fa-exchange-alt' : 'fa-arrow-right'} text-xs mx-1 opacity-50"></i>
+                        <i class="fas ${route.returns ? 'fa-exchange-alt' : 'fa-arrow-right'} text-xs mx-1 opacity-70"></i>
                         ${route.destination}
                     </h3>
-                    <span class="bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container px-3 py-1 rounded-full text-sm font-bold">R${route.fare}</span>
+                    <span class="bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary px-3 py-1 rounded-full text-sm font-bold">R${route.fare}</span>
                 </div>
                 <div class="space-y-3 mb-6 flex-grow">
                     <div class="flex items-center gap-3 text-sm">
@@ -308,7 +309,7 @@
                     ` : ''}
                 </div>
                 ${route.returns ? `
-                <button ${rankAction} class="w-full py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-primary hover:text-digilayn-on-primary transition rounded-lg font-bold text-sm">
+                <button ${rankAction} class="w-full py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low hover:bg-digilayn-primary hover:text-digilayn-on-surface transition rounded-lg font-bold text-sm">
                     Go to ${route.destination} rank
                 </button>
                 ` : ''}

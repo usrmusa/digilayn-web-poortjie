@@ -8,14 +8,14 @@ async function renderServiceCard(provider, serviceKey, sortOption = 'most-liked'
                 <h3 class="text-xl font-bold">{{businessName}}</h3>
                 <h4 class="text-md opacity-80">{{subHeading}}</h4>
             </div>
-            <div class="flex items-center gap-1 text-sm font-bold text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning-container/50 px-2 py-1 rounded-full shrink-0">
+            <div class="flex items-center gap-1 text-sm font-bold text-digilayn-on-warning-container bg-digilayn-warning-container dark:bg-digilayn-warning/10 px-2 py-1 rounded-full shrink-0">
                 <span>{{rating}}</span>
                 <i class="fas fa-star text-xs"></i>
             </div>
         </div>
         <p class="text-sm opacity-70 mb-4">{{description}}</p>
 
-        <div class="{{servicesVisibility}} mb-4 bg-digilayn-primary-container/50 dark:bg-digilayn-primary-container/10 p-3 rounded-xl border border-digilayn-primary dark:border-digilayn-primary/30">
+        <div class="{{servicesVisibility}} mb-4 bg-digilayn-primary-container/50 dark:bg-digilayn-primary/10 p-3 rounded-xl border border-digilayn-primary dark:border-digilayn-primary/30">
             <p class="text-xs font-bold uppercase tracking-wider text-digilayn-primary dark:text-digilayn-primary mb-2 flex items-center gap-2">
                 <i class="fas fa-tags text-[10px]"></i>
                 Services & Pricing
@@ -41,15 +41,15 @@ async function renderServiceCard(provider, serviceKey, sortOption = 'most-liked'
     </div>
 
     <div class="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
-        <a href="tel:{{phone}}" class="flex-1 text-center py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition">Call</a>
-        <button class="flex-1 text-center py-2 bg-digilayn-info text-digilayn-on-info rounded-lg font-bold hover:bg-digilayn-info transition rate-service" data-service-id="{{serviceId}}" data-service-key="{{serviceKey}}">Rate</button>
+        <a href="tel:{{phone}}" class="flex-1 text-center py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition digilayn-button">Call</a>
+        <button class="flex-1 text-center py-2 bg-digilayn-info text-digilayn-on-info rounded-lg font-bold hover:bg-digilayn-info transition rate-service digilayn-button" data-service-id="{{serviceId}}" data-service-key="{{serviceKey}}">Rate</button>
     </div>
 
     <div class="mt-4 pt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
         <div class="flex justify-between items-center mb-2">
-            <p class="text-xs font-bold uppercase tracking-wider opacity-50">Recent Comments</p>
+            <p class="text-xs font-bold uppercase tracking-wider opacity-70">Recent Comments</p>
             <div class="flex items-center gap-2">
-                <select class="comment-sort-select text-[10px] bg-transparent border-none opacity-50 hover:opacity-100 focus:ring-0 cursor-pointer outline-none p-0" data-service-id="{{serviceId}}" data-service-key="{{serviceKey}}">
+                <select class="comment-sort-select text-[10px] bg-transparent border-none opacity-70 hover:opacity-100 focus:ring-0 cursor-pointer outline-none p-0" data-service-id="{{serviceId}}" data-service-key="{{serviceKey}}">
                     <option value="most-liked">Most Liked</option>
                     <option value="least-liked">Least Liked</option>
                 </select>
@@ -60,7 +60,7 @@ async function renderServiceCard(provider, serviceKey, sortOption = 'most-liked'
                 {{comments}}
             </div>
             <div class="show-more-comments hidden absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-digilayn-surface-container-lowest dark:from-digilayn-surface-container-low to-transparent flex items-end justify-center pb-1 cursor-pointer transition-opacity hover:opacity-80">
-                <i class="fas fa-chevron-down text-xs opacity-50"></i>
+                <i class="fas fa-chevron-down text-xs opacity-70"></i>
             </div>
         </div>
     </div>
@@ -111,7 +111,7 @@ async function renderServiceCard(provider, serviceKey, sortOption = 'most-liked'
             return `
             <div class="flex justify-between items-center text-xs py-1.5 border-b border-digilayn-primary/50 dark:border-digilayn-primary/20 last:border-0">
                 <span class="font-medium opacity-90">${s.name}</span>
-                <span class="font-bold text-digilayn-on-primary-container dark:text-digilayn-on-primary-container bg-digilayn-primary-container dark:bg-digilayn-primary-container/40 px-2 py-0.5 rounded-md">${priceDisplay}</span>
+                <span class="font-bold text-digilayn-on-primary-container dark:text-digilayn-primary bg-digilayn-primary-container dark:bg-digilayn-primary/10 px-2 py-0.5 rounded-md">${priceDisplay}</span>
             </div>
         `;
         }).join('');
@@ -156,7 +156,7 @@ async function renderServiceCard(provider, serviceKey, sortOption = 'most-liked'
                     <div class="p-3 bg-digilayn-surface dark:bg-digilayn-surface-container-high/50 rounded-lg text-sm opacity-95 border-l-2 border-digilayn-primary group relative ${hiddenClass}">
                         <div class="flex justify-between items-start mb-1">
                              <p class="italic">"${r.comment}"</p>
-                             <button class="like-comment-btn flex items-center gap-1 text-xs transition-colors hover:text-digilayn-error ${isLiked ? 'text-digilayn-error' : 'opacity-60'}"
+                             <button class="like-comment-btn flex items-center gap-1 text-xs transition-colors hover:text-digilayn-error ${isLiked ? 'text-digilayn-error' : 'opacity-70'}"
                                      data-comment-uid="${r.userId}"
                                      data-service-id="${provider.id}"
                                      data-service-key="${serviceKey}">
@@ -167,10 +167,10 @@ async function renderServiceCard(provider, serviceKey, sortOption = 'most-liked'
                     </div>
                 `;}).join('');
             } else {
-                commentsHtml = `<p class="text-xs opacity-50 italic">No comments yet.</p>`;
+                commentsHtml = `<p class="text-xs opacity-70 italic">No comments yet.</p>`;
             }
         } else {
-            commentsHtml = `<p class="text-xs opacity-50 italic">No comments yet.</p>`;
+            commentsHtml = `<p class="text-xs opacity-70 italic">No comments yet.</p>`;
         }
 
         // Process Social Links
@@ -233,7 +233,7 @@ async function renderServiceCard(provider, serviceKey, sortOption = 'most-liked'
                 const isExpanded = showMoreBtn.querySelector('i').classList.contains('fa-chevron-up');
 
                 extraComments.forEach(c => c.classList.toggle('hidden'));
-                showMoreBtn.querySelector('i').className = isExpanded ? 'fas fa-chevron-down text-xs opacity-50' : 'fas fa-chevron-up text-xs opacity-50';
+                showMoreBtn.querySelector('i').className = isExpanded ? 'fas fa-chevron-down text-xs opacity-70' : 'fas fa-chevron-up text-xs opacity-70';
 
                 if (!isExpanded) {
                     showMoreBtn.classList.remove('absolute', 'bottom-0', 'h-12', 'bg-gradient-to-t');

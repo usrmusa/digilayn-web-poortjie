@@ -27,6 +27,7 @@
     </script>
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
 </head>
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
@@ -61,7 +62,7 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary">Latest News & Updates</h2>
                 <button id="add-news-btn"
-                        class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition text-sm">
+                        class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition text-sm digilayn-button">
                     <i class="fas fa-plus mr-2"></i>Add News
                 </button>
             </div>
@@ -75,7 +76,7 @@
             <div class="flex justify-between items-center mb-6">
                 <h2 id="routes-title" class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary">Taxi Routes & Fares</h2>
                 <button id="add-route-btn"
-                        class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition text-sm">
+                        class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition text-sm digilayn-button">
                     <i class="fas fa-plus mr-2"></i>Add Route
                 </button>
             </div>
@@ -105,7 +106,7 @@
                         Cancel
                     </button>
                     <button id="save-news-item"
-                            class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg hover:bg-digilayn-primary transition font-bold">
+                            class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg hover:bg-digilayn-primary transition font-bold digilayn-button">
                         Save News
                     </button>
                 </div>
@@ -175,9 +176,9 @@
                     </div>
                     <div id="map"
                          class="w-full h-64 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high relative flex items-center justify-center overflow-hidden">
-                        <p class="text-sm opacity-50">Loading Map...</p>
+                        <p class="text-sm opacity-70">Loading Map...</p>
                     </div>
-                    <p class="text-xs mt-2 opacity-60">Click on the map to set the rank location pin.</p>
+                    <p class="text-xs mt-2 opacity-70">Click on the map to set the rank location pin.</p>
                 </div>
             </div>
             <div class="flex justify-end gap-3 pt-8 border-t dark:border-digilayn-outline-variant mt-6">
@@ -186,7 +187,7 @@
                     Cancel
                 </button>
                 <button id="save-route-item"
-                        class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg hover:bg-digilayn-primary transition font-bold">
+                        class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg hover:bg-digilayn-primary transition font-bold digilayn-button">
                     Save Route
                 </button>
             </div>
@@ -340,7 +341,7 @@
 
     function renderNews() {
         newsList.innerHTML = currentData.news.length === 0 ?
-            '<p class="text-center py-4 opacity-50 italic text-sm">No news added yet.</p>' : '';
+            '<p class="text-center py-4 opacity-70 italic text-sm">No news added yet.</p>' : '';
 
         currentData.news.forEach((item, index) => {
             const div = document.createElement('div');
@@ -359,7 +360,7 @@
     function renderRoutes() {
         const routesData = currentMode === 'taxis' ? currentData.routes : (currentData.busRoutes || {});
         routesList.innerHTML = Object.keys(routesData).length === 0 ?
-            `<p class="col-span-full text-center py-8 opacity-50 italic text-sm">No ${currentMode} routes added yet.</p>` : '';
+            `<p class="col-span-full text-center py-8 opacity-70 italic text-sm">No ${currentMode} routes added yet.</p>` : '';
 
         // Sort by destination
         const sortedKeys = Object.keys(routesData).sort((a, b) =>
@@ -385,8 +386,8 @@
                     </div>
                 </div>
                 <div class="flex gap-2 pt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
-                    <button onclick="editRoute('${key}')" class="flex-1 py-2 bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info-container/20 dark:text-digilayn-on-info-container font-bold rounded-lg text-sm hover:bg-digilayn-info-container transition">Edit</button>
-                    <button onclick="deleteRoute('${key}')" class="flex-1 py-2 bg-digilayn-error-container text-digilayn-on-error-container dark:bg-digilayn-error-container/20 dark:text-digilayn-on-error-container font-bold rounded-lg text-sm hover:bg-digilayn-error-container transition">Delete</button>
+                    <button onclick="editRoute('${key}')" class="flex-1 py-2 bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info/10 dark:text-digilayn-info font-bold rounded-lg text-sm hover:bg-digilayn-info-container transition">Edit</button>
+                    <button onclick="deleteRoute('${key}')" class="flex-1 py-2 bg-digilayn-error-container text-digilayn-on-error-container dark:bg-digilayn-error/10 dark:text-digilayn-error font-bold rounded-lg text-sm hover:bg-digilayn-error-container transition">Delete</button>
                 </div>
             `;
             routesList.appendChild(div);

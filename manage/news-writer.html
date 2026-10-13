@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
 </head>
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
@@ -50,19 +51,19 @@
                 <div>
                     <label for="news-title" class="block text-sm font-bold mb-2">Title / Headline</label>
                     <input type="text" id="news-title" required placeholder="e.g., Road Closure Alert"
-                           class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
+                           class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
                 </div>
 
                 <div>
                     <label for="news-content" class="block text-sm font-bold mb-2">Message Content</label>
                     <textarea id="news-content" required rows="4" placeholder="Describe the news or alert in detail..."
-                              class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary"></textarea>
+                              class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary"></textarea>
                 </div>
 
                 <div>
                     <label for="news-type" class="block text-sm font-bold mb-2">Type</label>
                     <select id="news-type"
-                            class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
+                            class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
                         <option value="news">General News</option>
                         <option value="alert">Emergency Alert</option>
                         <option value="event">Upcoming Event</option>
@@ -73,10 +74,10 @@
                 <div id="business-select-container" class="hidden">
                     <label class="block text-sm font-bold mb-2">Target Business for Promotion</label>
                     <div class="flex gap-2">
-                        <div id="selected-business-display" class="flex-grow px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary min-h-[50px] flex items-center italic opacity-60">
+                        <div id="selected-business-display" class="flex-grow px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface min-h-[50px] flex items-center italic opacity-70">
                             No business selected
                         </div>
-                        <button type="button" onclick="openBusinessPicker()" class="px-4 py-2 bg-digilayn-info text-digilayn-on-info font-bold rounded-lg hover:bg-digilayn-info transition">
+                        <button type="button" onclick="openBusinessPicker()" class="px-4 py-2 bg-digilayn-info text-digilayn-on-info font-bold rounded-lg hover:bg-digilayn-info transition digilayn-button">
                             Select
                         </button>
                     </div>
@@ -87,12 +88,12 @@
                     <div>
                         <label for="link-name" class="block text-sm font-bold mb-2">Link Button Name (Optional)</label>
                         <input type="text" id="link-name" placeholder="e.g., View More, Register Now"
-                               class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
+                               class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
                     </div>
                     <div>
                         <label for="external-url" class="block text-sm font-bold mb-2">External URL (Optional)</label>
                         <input type="url" id="external-url" placeholder="https://example.com"
-                               class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
+                               class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
                     </div>
                 </div>
 
@@ -100,19 +101,19 @@
                     <div>
                         <label for="news-show-from" class="block text-sm font-bold mb-2">Show From (Optional)</label>
                         <input type="datetime-local" id="news-show-from"
-                               class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
-                        <p class="text-[10px] opacity-50 mt-1">Leave blank to show immediately.</p>
+                               class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
+                        <p class="text-[10px] opacity-70 mt-1">Leave blank to show immediately.</p>
                     </div>
                     <div>
                         <label for="news-expiry" class="block text-sm font-bold mb-2">Expires (Required, Max 7 days)</label>
                         <input type="datetime-local" id="news-expiry" required
-                               class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
-                        <p class="text-[10px] opacity-50 mt-1">Default is tonight at midnight. Max 7 days from now.</p>
+                               class="w-full px-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary">
+                        <p class="text-[10px] opacity-70 mt-1">Default is tonight at midnight. Max 7 days from now.</p>
                     </div>
                 </div>
 
                 <button type="submit" id="submit-btn"
-                        class="w-full py-4 bg-digilayn-primary text-digilayn-on-primary font-extrabold rounded-xl hover:bg-digilayn-primary transition shadow-lg flex items-center justify-center gap-2">
+                        class="w-full py-4 bg-digilayn-primary text-digilayn-on-primary font-extrabold rounded-xl hover:bg-digilayn-primary transition shadow-lg flex items-center justify-center gap-2 digilayn-button">
                     <span>Post News Update</span>
                 </button>
             </form>
@@ -121,7 +122,7 @@
         <div class="mt-12">
             <h2 class="text-2xl font-bold mb-6">Recent Posts</h2>
             <div id="recent-news" class="space-y-4">
-                <p class="text-center opacity-50 py-8">Loading recent posts...</p>
+                <p class="text-center opacity-70 py-8">Loading recent posts...</p>
             </div>
         </div>
     </main>
@@ -161,9 +162,9 @@
             <div class="relative">
                 <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-digilayn-on-surface-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 <label for="biz-search"></label><input type="text" id="biz-search" placeholder="Search by name or category..." oninput="filterBusinesses()"
-                                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-info">
+                                                       class="w-full pl-10 pr-4 py-3 rounded-lg border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-info">
             </div>
-            <div class="flex justify-between items-center text-xs opacity-60">
+            <div class="flex justify-between items-center text-xs opacity-70">
                 <span id="biz-count">Loading businesses...</span>
                 <button onclick="loadBusinessesForPromo(true)" class="text-digilayn-info hover:underline">Refresh List</button>
             </div>
@@ -209,7 +210,7 @@
     function selectBusiness(id, collection, name) {
         document.getElementById('business-id').value = JSON.stringify({id, collection});
         document.getElementById('selected-business-display').textContent = `${name} (${collection})`;
-        document.getElementById('selected-business-display').classList.remove('italic', 'opacity-60');
+        document.getElementById('selected-business-display').classList.remove('italic', 'opacity-70');
 
         // Auto-fill title and content
         const biz = allBusinessesForPromo.find(b => b.id === id && b.collection === collection);
@@ -237,7 +238,7 @@
         countDisplay.textContent = `${list.length} businesses found`;
 
         if (list.length === 0) {
-            container.innerHTML = '<p class="text-center opacity-50 py-12">No businesses found matching your search.</p>';
+            container.innerHTML = '<p class="text-center opacity-70 py-12">No businesses found matching your search.</p>';
             return;
         }
 
@@ -247,7 +248,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h4 class="font-bold group-hover:text-digilayn-info dark:group-hover:text-digilayn-info transition-colors">${biz.name}</h4>
-                        <p class="text-xs opacity-60 uppercase tracking-widest">${biz.collection}</p>
+                        <p class="text-xs opacity-70 uppercase tracking-widest">${biz.collection}</p>
                     </div>
                     <i class="fas fa-chevron-right text-digilayn-on-surface-variant group-hover:text-digilayn-info transition-colors"></i>
                 </div>
@@ -264,7 +265,7 @@
         container.innerHTML = `
             <div class="flex flex-col items-center py-12">
                 <div class="w-8 h-8 border-4 border-digilayn-info border-t-digilayn-info rounded-full animate-spin mb-4"></div>
-                <p class="opacity-50">Fetching businesses...</p>
+                <p class="opacity-70">Fetching businesses...</p>
             </div>
         `;
         countDisplay.textContent = 'Loading...';
@@ -441,7 +442,7 @@
             businessSelectContainer.classList.add('hidden');
             document.getElementById('external-link-container').classList.remove('hidden');
             document.getElementById('selected-business-display').textContent = 'No business selected';
-            document.getElementById('selected-business-display').classList.add('italic', 'opacity-60');
+            document.getElementById('selected-business-display').classList.add('italic', 'opacity-70');
             setExpiryDefault();
             alert('News posted successfully!');
         } catch (error) {
@@ -460,7 +461,7 @@
             .onSnapshot(snapshot => {
                 const container = document.getElementById('recent-news');
                 if (snapshot.empty) {
-                    container.innerHTML = '<p class="text-center opacity-50 py-8">No posts yet.</p>';
+                    container.innerHTML = '<p class="text-center opacity-70 py-8">No posts yet.</p>';
                     return;
                 }
 
@@ -476,13 +477,13 @@
 
                     const isExpired = data.expiry && data.expiry.toDate() < new Date();
                     const isFuture = data.showFrom && data.showFrom.toDate() > new Date();
-                    const statusBadge = isExpired ? '<span class="text-[10px] bg-digilayn-surface-container-highest text-digilayn-on-primary px-1 rounded ml-2">EXPIRED</span>' : (isFuture ? '<span class="text-[10px] bg-digilayn-info text-digilayn-on-info px-1 rounded ml-2">SCHEDULED</span>' : '');
+                    const statusBadge = isExpired ? '<span class="text-[10px] bg-digilayn-surface-container-highest text-digilayn-on-surface px-1 rounded ml-2">EXPIRED</span>' : (isFuture ? '<span class="text-[10px] bg-digilayn-info text-digilayn-on-info px-1 rounded ml-2">SCHEDULED</span>' : '');
 
                     let scheduleInfo = '';
                     if (data.showFrom || data.expiry) {
                         const fromStr = data.showFrom ? data.showFrom.toDate().toLocaleString() : 'Now';
                         const toStr = data.expiry ? data.expiry.toDate().toLocaleString() : 'Forever';
-                        scheduleInfo = `<p class="text-[10px] opacity-50 mt-1">Visible: ${fromStr} - ${toStr}</p>`;
+                        scheduleInfo = `<p class="text-[10px] opacity-70 mt-1">Visible: ${fromStr} - ${toStr}</p>`;
                     }
 
                     const canDelete = isSuperUser || (data.authorId === AccountAccess.currentUser.uid);
@@ -493,12 +494,12 @@
                     ` : '';
 
                     return `
-                        <div onclick="showContent('${doc.id}')" class="p-4 card rounded-xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant flex justify-between items-center cursor-pointer hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-low/50 transition-colors ${isExpired ? 'opacity-50' : ''} ${isFuture ? 'border-digilayn-info dark:border-digilayn-info' : ''}">
+                        <div onclick="showContent('${doc.id}')" class="p-4 card rounded-xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant flex justify-between items-center cursor-pointer hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-low/50 transition-colors ${isExpired ? 'opacity-70' : ''} ${isFuture ? 'border-digilayn-info dark:border-digilayn-info' : ''}">
                             <div>
                                 <h3 class="font-bold">${data.title}${statusBadge}</h3>
-                                <p class="text-xs opacity-60">${dateStr} • ${data.type}</p>
+                                <p class="text-xs opacity-70">${dateStr} • ${data.type}</p>
                                 ${scheduleInfo}
-                                <p class="text-[10px] opacity-40 mt-1">Added by: ${data.authorName || 'Unknown'}</p>
+                                <p class="text-[10px] opacity-70 mt-1">Added by: ${data.authorName || 'Unknown'}</p>
                             </div>
                             ${deleteBtn}
                         </div>

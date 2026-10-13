@@ -32,6 +32,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
     <script src="../scripts/loader.js"></script>
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
 </head>
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
@@ -50,7 +51,7 @@
             <div class="form-group">
                 <label for="item-title" class="block mb-1 font-bold text-sm uppercase tracking-wider">What are you selling?</label>
                 <input type="text" id="item-title" name="title" maxlength="50" placeholder="e.g. iPhone 12 Pro"
-                       class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                       class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
                 <p id="title-error" class="text-digilayn-error text-[10px] font-bold mt-1 hidden">Item title is required</p>
             </div>
 
@@ -58,13 +59,13 @@
                 <div class="form-group">
                     <label for="item-price" class="block mb-1 font-bold text-sm uppercase tracking-wider">Price (R)</label>
                     <input type="number" id="item-price" name="price" placeholder="0"
-                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
                     <p id="price-error" class="text-digilayn-error text-[10px] font-bold mt-1 hidden">Please enter a valid price</p>
                 </div>
                 <div class="form-group">
                     <label for="item-category" class="block mb-1 font-bold text-sm uppercase tracking-wider">Category</label>
                     <select id="item-category" name="category"
-                            class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                            class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
                         <option value="" disabled selected>Select a category</option>
                         <option value="Electronics">Electronics</option>
                         <option value="Vehicles">Vehicles</option>
@@ -81,8 +82,8 @@
                 <label for="item-description" class="block mb-1 font-bold text-sm uppercase tracking-wider">Description</label>
                 <div class="relative">
                     <textarea id="item-description" name="description" rows="4" maxlength="500" placeholder="Describe the condition, features, etc."
-                              class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"></textarea>
-                    <div id="description-counter" class="absolute right-2 bottom-2 text-[10px] opacity-40 font-mono text-digilayn-on-surface dark:text-digilayn-on-primary">
+                              class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"></textarea>
+                    <div id="description-counter" class="absolute right-2 bottom-2 text-[10px] opacity-70 font-mono text-digilayn-on-surface dark:text-digilayn-on-surface">
                         0/500
                     </div>
                 </div>
@@ -95,7 +96,7 @@
                     <!-- Photo slots will be rendered here -->
                 </div>
                 <p id="photos-error" class="text-digilayn-error text-[10px] font-bold mt-1 hidden">At least one photo is required</p>
-                <p class="text-[10px] mt-2 opacity-50 italic">Upload and crop your photos. Flexible cropping enabled.</p>
+                <p class="text-[10px] mt-2 opacity-70 italic">Upload and crop your photos. Flexible cropping enabled.</p>
                 <input type="hidden" id="item-photos" name="photos">
             </div>
 
@@ -103,7 +104,7 @@
                 <label for="address" class="block mb-1 font-bold text-sm uppercase tracking-wider">Pick-up Location</label>
                 <div class="relative">
                     <input type="text" id="address" name="address" placeholder="Poortjie" value="Poortjie" readonly
-                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition cursor-pointer">
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition cursor-pointer">
                     <div class="absolute right-3 top-1/2 -translate-y-1/2 text-digilayn-primary">
                         <i class="fa-solid fa-map-location-dot"></i>
                     </div>
@@ -114,7 +115,7 @@
             </div>
 
             <div class="pt-4">
-                <button type="submit" id="submit-btn" class="w-full bg-digilayn-primary text-digilayn-on-primary font-bold py-4 rounded-xl hover:bg-digilayn-primary transition shadow-lg flex items-center justify-center gap-2">
+                <button type="submit" id="submit-btn" class="w-full bg-digilayn-primary text-digilayn-on-primary font-bold py-4 rounded-xl hover:bg-digilayn-primary transition shadow-lg flex items-center justify-center gap-2 digilayn-button">
                     <i class="fas fa-plus-circle"></i> <span id="submit-btn-text">Post Item</span>
                 </button>
             </div>
@@ -126,26 +127,26 @@
 <div id="address-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm">
     <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant">
         <div class="p-6 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant flex justify-between items-center">
-            <h3 class="text-xl font-bold text-digilayn-on-surface dark:text-digilayn-on-primary">Pin Location</h3>
+            <h3 class="text-xl font-bold text-digilayn-on-surface dark:text-digilayn-on-surface">Pin Location</h3>
             <button type="button" id="close-address-modal" class="text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant transition">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
         </div>
         <div class="p-6 space-y-4">
             <div class="form-group">
-                <label for="modal-address" class="block mb-1 font-bold text-xs uppercase tracking-wider opacity-70 text-digilayn-on-surface dark:text-digilayn-on-primary">Type your address</label>
+                <label for="modal-address" class="block mb-1 font-bold text-xs uppercase tracking-wider opacity-70 text-digilayn-on-surface dark:text-digilayn-on-surface">Type your address</label>
                 <input type="text" id="modal-address" placeholder="Start typing your address..."
-                       class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                       class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
             </div>
 
             <div class="space-y-2">
-                <h4 class="font-bold text-sm uppercase tracking-wider opacity-70 text-digilayn-on-surface dark:text-digilayn-on-primary text-center">Drag pin to exact spot</h4>
+                <h4 class="font-bold text-sm uppercase tracking-wider opacity-70 text-digilayn-on-surface dark:text-digilayn-on-surface text-center">Drag pin to exact spot</h4>
                 <div id="map" class="w-full h-64 rounded-xl border-2 border-digilayn-outline-variant dark:border-digilayn-outline-variant"></div>
                 <p class="text-[10px] text-digilayn-on-surface-variant italic text-center">Must be within 5km of Poortjie</p>
             </div>
         </div>
         <div class="p-6 bg-digilayn-surface dark:bg-digilayn-surface-container-low/50">
-            <button type="button" id="confirm-address" class="w-full py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition">
+            <button type="button" id="confirm-address" class="w-full py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition digilayn-button">
                 Confirm Location
             </button>
         </div>
@@ -155,7 +156,7 @@
 <!-- Crop Modal -->
 <div id="crop-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-digilayn-scrim bg-opacity-90 p-4">
     <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl">
-        <div class="p-4 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant flex justify-between items-center text-digilayn-on-surface dark:text-digilayn-on-primary">
+        <div class="p-4 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant flex justify-between items-center text-digilayn-on-surface dark:text-digilayn-on-surface">
             <h3 class="font-bold text-lg">Crop Photo</h3>
             <button id="cancel-crop" class="text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -165,15 +166,15 @@
             <img id="crop-image" src="" class="max-w-full" alt="">
         </div>
         <div class="p-4 flex gap-3">
-            <button id="rotate-left" class="flex-1 py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high rounded-lg hover:bg-digilayn-surface-container-high transition font-bold text-xs uppercase tracking-widest text-digilayn-on-surface dark:text-digilayn-on-primary">
+            <button id="rotate-left" class="flex-1 py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high rounded-lg hover:bg-digilayn-surface-container-high transition font-bold text-xs uppercase tracking-widest text-digilayn-on-surface dark:text-digilayn-on-surface">
                 <i class="fas fa-undo mr-1"></i> Left
             </button>
-            <button id="rotate-right" class="flex-1 py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high rounded-lg hover:bg-digilayn-surface-container-high transition font-bold text-xs uppercase tracking-widest text-digilayn-on-surface dark:text-digilayn-on-primary">
+            <button id="rotate-right" class="flex-1 py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high rounded-lg hover:bg-digilayn-surface-container-high transition font-bold text-xs uppercase tracking-widest text-digilayn-on-surface dark:text-digilayn-on-surface">
                 <i class="fas fa-redo mr-1"></i> Right
             </button>
         </div>
         <div class="p-4 bg-digilayn-surface dark:bg-digilayn-surface flex gap-3">
-            <button id="apply-crop" class="flex-[2] py-3 bg-digilayn-primary text-digilayn-on-primary rounded-xl hover:bg-digilayn-primary transition font-bold uppercase tracking-widest shadow-lg">
+            <button id="apply-crop" class="flex-[2] py-3 bg-digilayn-primary text-digilayn-on-primary rounded-xl hover:bg-digilayn-primary transition font-bold uppercase tracking-widest shadow-lg digilayn-button">
                 Upload Photo
             </button>
         </div>
@@ -241,7 +242,7 @@
             if (uploadedPhotos[i]) {
                 slot.innerHTML = `
                     <img src="${uploadedPhotos[i]}" class="w-full h-full object-cover">
-                    <button type="button" onclick="removePhoto(${i})" class="absolute top-1 right-1 bg-digilayn-error text-digilayn-on-error w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-lg">
+                    <button type="button" onclick="removePhoto(${i})" class="absolute top-1 right-1 bg-digilayn-error text-digilayn-on-error w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-lg digilayn-button">
                         <i class="fas fa-times"></i>
                     </button>
                 `;

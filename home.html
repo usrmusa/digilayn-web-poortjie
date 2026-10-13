@@ -52,11 +52,12 @@
     </style>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/spotlight.css">
+    <link rel="stylesheet" href="styles/digilayn-components.css">
 </head>
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 <div class="fixed top-5 left-5 z-50" id="business-form-control">
     <a href="services/business-form" id="add-business-btn"
-       class="p-3 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition flex items-center justify-center"
+       class="p-3 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition flex items-center justify-center digilayn-button"
        title="Add Your Business">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -66,7 +67,7 @@
 <div class="fixed top-5 right-5 z-50 flex gap-3" id="user-controls">
     <div id="hamburger-menu" class="relative">
         <button id="hamburger-btn"
-                class="p-3 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition">
+                class="p-3 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition digilayn-button">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                  xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -111,7 +112,7 @@
     <div id="loader-overlay" class="fixed inset-0 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface z-[60] flex items-center justify-center transition-opacity duration-500">
         <div class="flex flex-col items-center">
             <div class="w-12 h-12 border-4 border-digilayn-primary border-t-digilayn-primary rounded-full animate-spin mb-4"></div>
-            <p class="text-sm font-medium opacity-50">Loading Poortjie...</p>
+            <p class="text-sm font-medium opacity-70">Loading Poortjie...</p>
         </div>
     </div>
     <div class="mb-4 flex justify-center">
@@ -177,7 +178,7 @@
     </p>
     <div class="flex flex-wrap justify-center gap-4 mt-8">
         <a href="#services"
-           class="px-8 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md">Explore
+           class="px-8 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md digilayn-button">Explore
             Services</a>
         <a href="market"
            class="px-8 py-3 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-high transition shadow-md border border-digilayn-primary dark:border-digilayn-outline-variant">Marketplace</a>
@@ -211,7 +212,7 @@
     </div>
     <div id="rating-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm"></div>
 </main>
-<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-50 text-xs">
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-70 text-xs">
     &copy; 2026 <a href="./" onclick="window.top.location.replace('./'); return false;"
                    class="hover:underline">Poortjie Services</a>. Empowering poortjie economies.
     <div class="mt-2 flex justify-center gap-4">
@@ -327,7 +328,7 @@
                         <div class="flex-grow">
                             <div class="flex items-center justify-between mb-2">
                                 <h3 class="text-xl font-bold">${service.title || 'Layn Rider'}</h3>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary-container/40 dark:text-digilayn-on-primary-container uppercase tracking-wider">Fast & Local</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/10 dark:text-digilayn-primary uppercase tracking-wider">Fast & Local</span>
                             </div>
                             <p class="text-sm opacity-70 mb-4">${service.description || 'Request a ride from verified local Poortjie drivers instantly. Safe, fast, and affordable township transport.'}</p>
                             <ul class="space-y-2 text-sm font-medium">
@@ -340,7 +341,7 @@
                             </ul>
                         </div>
                         <div class="mt-6 flex flex-col gap-2">
-                            <a href="laynfleet/laynrider/" onclick="handleBookRideClick(event); return false;" class="block text-center py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition cursor-pointer shadow">Book a Ride</a>
+                            <a href="laynfleet/laynrider/" onclick="handleBookRideClick(event); return false;" class="block text-center py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition cursor-pointer shadow digilayn-button">Book a Ride</a>
                         </div>
                     </div>
                 </section>`;
@@ -360,7 +361,7 @@
                         </ul>
                     </div>
                     <div class="mt-6 flex flex-col gap-2">
-                        <a href="${service.url}" class="block text-center py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition">${service.btnText}</a>
+                        <a href="${service.url}" class="block text-center py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition digilayn-button">${service.btnText}</a>
                         ${service.extraBtn ? `<a href="${service.extraBtn.url}" onclick="window.top.location.replace('${service.extraBtn.url}'); return false;" class="block text-center py-2.5 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary rounded-lg font-bold hover:bg-digilayn-primary hover:text-digilayn-on-primary transition">${service.extraBtn.text}</a>` : ''}
                     </div>
                 </div>
@@ -463,13 +464,13 @@
         function renderAlerts() {
             const container = document.getElementById('alert-container');
             container.innerHTML = alertUpdates.map(alert => `
-                <div class="bg-digilayn-error-container dark:bg-digilayn-error-container/20 border border-digilayn-error dark:border-digilayn-error rounded-2xl p-4 flex items-start gap-4 text-left animate-bounce-subtle mb-2">
+                <div class="bg-digilayn-error-container dark:bg-digilayn-error/10 border border-digilayn-error dark:border-digilayn-error rounded-2xl p-4 flex items-start gap-4 text-left animate-bounce-subtle mb-2">
                     <div class="bg-digilayn-error text-digilayn-on-error p-2 rounded-full flex-shrink-0 mt-1">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
                     <div>
                         <h3 class="font-black text-digilayn-on-error-container dark:text-digilayn-error uppercase text-xs tracking-wider">Emergency Alert</h3>
-                        <h2 class="text-lg font-bold text-digilayn-on-surface dark:text-digilayn-on-primary">${alert.title}</h2>
+                        <h2 class="text-lg font-bold text-digilayn-on-surface dark:text-digilayn-on-surface">${alert.title}</h2>
                         <p class="text-sm opacity-80 leading-tight mt-1">${alert.content}</p>
                     </div>
                 </div>
@@ -536,14 +537,14 @@
                     const btnName = news.externalLink.name || 'View More';
                     actionButton = `
                         <button onclick="window.open('${news.externalLink.url}', '_blank')"
-                                class="mt-4 px-6 py-2 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-full hover:scale-105 transition-transform shadow-md text-sm uppercase tracking-wider">
+                                class="mt-4 px-6 py-2 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-full hover:scale-105 transition-transform shadow-md text-sm uppercase tracking-wider digilayn-button">
                             ${btnName}
                         </button>`;
                 }
                 contentArea.innerHTML = `
                     <div class="flex flex-col items-center">
                         ${typeLabel ? `<span class="${typeColor} text-[10px] text-digilayn-on-primary font-black px-2 py-0.5 rounded mb-2">${typeLabel}</span>` : ''}
-                        <h2 class="text-2xl md:text-3xl font-black mb-2 text-center text-digilayn-on-surface dark:text-digilayn-on-primary leading-tight">${news.title}</h2>
+                        <h2 class="text-2xl md:text-3xl font-black mb-2 text-center text-digilayn-on-surface dark:text-digilayn-on-surface leading-tight">${news.title}</h2>
                         <p class="text-lg opacity-80 text-center max-w-lg leading-relaxed">${news.content}</p>
                         ${actionButton}
                     </div>
@@ -569,7 +570,7 @@
             content.innerHTML = `
                 <div class="p-12 text-center">
                     <div class="w-10 h-10 border-4 border-digilayn-primary border-t-digilayn-primary rounded-full animate-spin mx-auto mb-4"></div>
-                    <p class="opacity-50">Opening business profile...</p>
+                    <p class="opacity-70">Opening business profile...</p>
                 </div>
             `;
             modal.classList.remove('hidden');
@@ -582,7 +583,7 @@
                     content.innerHTML = '';
                     content.appendChild(card);
                 } else {
-                    content.innerHTML = '<p class="p-8 text-center opacity-50">Business not found.</p>';
+                    content.innerHTML = '<p class="p-8 text-center opacity-70">Business not found.</p>';
                 }
             } catch (error) {
                 console.error("Error fetching business:", error);

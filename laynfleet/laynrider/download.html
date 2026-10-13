@@ -19,7 +19,7 @@
     /* Specialized styles for the Download & Sideload Page */
     .dl-hero {
       text-align: center;
-      padding: 32px 16px 20px;
+      padding: 40px 16px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -30,10 +30,10 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--digilayn-success-container);
+      background: var(--digilayn-primary-soft);
       color: var(--digilayn-primary);
-      border: 1px solid rgb(var(--digilayn-primary-rgb) / 0.3);
-      padding: 4px 12px;
+      border: 1px solid rgb(var(--digilayn-primary-rgb) / 0.2);
+      padding: 6px 14px;
       border-radius: var(--radius-pill);
       font-size: 12px;
       font-weight: 700;
@@ -41,11 +41,11 @@
     }
 
     .dl-hero-title {
-      font-size: 32px;
-      font-weight: 900;
+      font-size: clamp(28px, 4.2vw, 44px);
+      font-weight: 800;
       letter-spacing: -0.6px;
       line-height: 1.15;
-      max-width: 680px;
+      max-width: 760px;
     }
 
     .dl-hero-title span {
@@ -59,47 +59,11 @@
       line-height: 1.5;
     }
 
-    /* Store Review Notice Alert */
-    .store-notice-card {
-      background: var(--digilayn-warning-container);
-      border: 1px solid var(--digilayn-warning);
-      border-radius: 16px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      max-width: 780px;
-      margin: 0 auto 10px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .store-notice-icon {
-      font-size: 24px;
-      line-height: 1;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .store-notice-content {
-      flex: 1;
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--digilayn-on-surface);
-    }
-
-    .store-notice-content strong {
-      display: block;
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--digilayn-warning);
-      margin-bottom: 2px;
-    }
-
     /* App Cards Grid */
     .apps-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 24px;
+      gap: 20px;
       max-width: 960px;
       margin: 0 auto;
       width: 100%;
@@ -119,28 +83,25 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 8px 24px rgb(var(--digilayn-shadow-rgb) / 0.08);
       position: relative;
       overflow: hidden;
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
     .app-card:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-md);
-      border-color: var(--digilayn-primary);
+      box-shadow: 0 12px 28px rgb(var(--digilayn-shadow-rgb) / 0.12);
+      border-color: var(--digilayn-outline);
     }
 
     .app-card-featured-tag {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      background: var(--digilayn-warning-container);
-      color: var(--digilayn-warning);
-      border: 1px solid var(--digilayn-warning);
+      align-self: flex-start;
+      background: var(--digilayn-primary-soft);
+      color: var(--digilayn-primary);
+      border: 1px solid rgb(var(--digilayn-primary-rgb) / 0.2);
       font-size: 11px;
       font-weight: 800;
-      padding: 3px 8px;
+      padding: 5px 10px;
       border-radius: var(--radius-pill);
       text-transform: uppercase;
       letter-spacing: 0.3px;
@@ -163,7 +124,7 @@
       justify-content: center;
       font-size: 32px;
       flex-shrink: 0;
-      box-shadow: var(--shadow-sm);
+      box-shadow: none;
     }
 
     .app-card-info h2 {
@@ -215,12 +176,13 @@
       justify-content: center;
       gap: 10px;
       width: 100%;
+      min-height: 60px;
       padding: 14px 20px;
       border-radius: 14px;
       font-size: 15px;
       font-weight: 800;
       text-decoration: none;
-      transition: all 0.15s ease;
+      transition: background-color 0.18s ease, border-color 0.18s ease;
       cursor: pointer;
       border: none;
       position: relative;
@@ -237,7 +199,7 @@
       bottom: 0;
       height: 4px;
       width: 0%;
-      background: rgb(var(--digilayn-surface-container-lowest-rgb) / 0.9);
+      background: currentColor;
       border-radius: 2px;
       pointer-events: none;
       transition: width 0.12s ease-out;
@@ -275,34 +237,37 @@
       color: var(--digilayn-primary);
     }
 
-    .app-download-btn.primary {
-      background: var(--digilayn-primary);
-      color: var(--digilayn-on-surface);
-      box-shadow: 0 4px 14px rgb(var(--digilayn-primary-rgb) / 0.35);
-    }
-
-    .app-download-btn.primary:hover {
-      background: var(--digilayn-primary);
-      transform: scale(1.01);
-    }
-
-    .app-download-btn.secondary {
-      background: var(--digilayn-surface-container-high);
-      color: var(--digilayn-on-surface);
-      border: 1px solid var(--digilayn-outline-variant);
-    }
-
-    .app-download-btn.secondary:hover {
-      background: var(--digilayn-surface-container-highest);
-      border-color: var(--digilayn-primary);
-    }
-
     .app-meta-text {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--digilayn-on-surface-variant);
       text-align: center;
       margin-top: -10px;
-      font-family: monospace;
+      line-height: 1.6;
+    }
+
+    .store-button-icon {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .store-button-label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      line-height: 1.2;
+    }
+
+    .store-button-label small {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .04em;
+    }
+
+    .store-button-label strong {
+      font-size: 18px;
+      font-weight: 700;
     }
 
     /* Sideloading Instructions */
@@ -368,7 +333,7 @@
       height: 28px;
       border-radius: 50%;
       background: var(--digilayn-primary);
-      color: var(--digilayn-on-surface);
+      color: var(--digilayn-on-primary);
       font-weight: 800;
       font-size: 13px;
       display: flex;
@@ -465,6 +430,7 @@
       margin-top: 2px;
     }
   </style>
+    <link rel="stylesheet" href="../../styles/digilayn-components.css">
 </head>
 <body>
 
@@ -526,7 +492,8 @@
         </div>
 
         <a href="https://play.google.com/store/apps/details?id=com.digilayn.laynrider" class="app-download-btn primary" data-apk="laynrider-sideload.apk" data-apk-name="laynrider-sideload.apk" data-name="LaynRider">
-          <span>📥</span>Play Store
+          <svg class="store-button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5v17L20 12Z" fill="currentColor"/></svg>
+          <span class="store-button-label"><small>Get it on</small> <strong>Google Play</strong></span>
           <span class="press-progress" aria-hidden="true"></span>
         </a>
         <div class="app-meta-text">
@@ -567,18 +534,19 @@
       </article>
 
       <!-- CARD 2: LAYNDRIVER DRIVER & OPERATOR APP -->
-      <article class="app-card" style="border-color: var(--digilayn-warning);">
-        <span class="app-card-featured-tag" style="background: rgb(var(--digilayn-info-rgb) / 0.12); color: var(--digilayn-info); border-color: rgb(var(--digilayn-info-rgb) / 0.3);">Driver App</span>
+      <article class="app-card">
+        <span class="app-card-featured-tag">Driver App</span>
         <div class="app-card-head">
-          <div class="app-card-icon" style="background: var(--digilayn-warning-container);">🚗</div>
+          <div class="app-card-icon">🚗</div>
           <div class="app-card-info">
             <h2>LaynDriver</h2>
             <p>Earn on your terms in Poortjie</p>
           </div>
         </div>
 
-        <a href="https://play.google.com/apps/testing/com.digilayn.layndriver" class="app-download-btn primary" style="background: var(--digilayn-surface-container-low);" data-apk="../layndriver/layndriver-sideload.apk" data-apk-name="layndriver-sideload.apk" data-name="LaynDriver">
-          <span>📥</span> Open LaynDriver Closed Testing
+        <a href="https://play.google.com/apps/testing/com.digilayn.layndriver" class="app-download-btn secondary" data-apk="../layndriver/layndriver-sideload.apk" data-apk-name="layndriver-sideload.apk" data-name="LaynDriver">
+          <svg class="store-button-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5v17L20 12Z" fill="currentColor"/></svg>
+          <span class="store-button-label"><small>Approved testers</small> <strong>LaynDriver Closed Testing</strong></span>
           <span class="press-progress" aria-hidden="true"></span>
         </a>
         <div class="app-meta-text">
@@ -630,7 +598,7 @@
         <div class="step-card">
           <div class="step-num">1</div>
           <h4>Open Google Play</h4>
-          <p>Tap <strong>Play Store</strong> above on your Android phone, or hold down the button to download the APK directly.</p>
+          <p>Tap <strong>Google Play</strong> above on your Android phone, or hold down the button to download the APK directly.</p>
         </div>
         <div class="step-card">
           <div class="step-num">2</div>

@@ -47,6 +47,7 @@
             justify-content: space-around;
         }
     </style>
+    <link rel="stylesheet" href="styles/digilayn-components.css">
 </head>
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface h-screen flex flex-col">
 
@@ -60,14 +61,14 @@
         <h2 class="text-xl font-bold">Anonymous</h2>
         <div class="w-10"></div>
     </div>
-    <p class="text-sm opacity-60">say your peace</p>
+    <p class="text-sm opacity-70">say your peace</p>
 </header>
 
 <main class="flex-grow w-full max-w-4xl mx-auto px-4 pb-4 flex flex-col overflow-hidden">
     <div id="chat-messages" class="flex-grow overflow-y-auto space-y-8 p-4 custom-scrollbar">
         <div id="loading-spinner" class="flex justify-center items-center h-full">
             <svg class="animate-spin h-8 w-8 text-digilayn-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <circle class="opacity-70" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
         </div>
@@ -89,10 +90,10 @@
         <form id="chat-form" class="flex gap-2 items-end">
             <div class="flex-grow">
                 <label for="message-input"></label><textarea id="message-input" rows="1" placeholder="Type a message..."
-                                                             class="w-full p-3 rounded-2xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-primary border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition resize-none max-h-32"></textarea>
+                                                             class="w-full p-3 rounded-2xl bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition resize-none max-h-32"></textarea>
             </div>
             <button type="submit" id="send-btn"
-                    class="p-3 bg-digilayn-primary text-digilayn-on-primary rounded-full hover:bg-digilayn-primary transition shadow-md disabled:opacity-50">
+                    class="p-3 bg-digilayn-primary text-digilayn-on-primary rounded-full hover:bg-digilayn-primary transition shadow-md disabled:opacity-50 digilayn-button">
                 <svg class="w-6 h-6 transform rotate-90" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
                 </svg>
@@ -212,13 +213,13 @@
             replyHtml = `
                 <div onclick="scrollToMessage('${msg.replyTo.msgId}')" class="bg-digilayn-scrim/5 dark:bg-digilayn-surface-container-lowest/5 p-2 rounded-lg mb-1 text-xs border-l-2 border-digilayn-primary max-w-full cursor-pointer hover:bg-digilayn-scrim/10 transition">
                     <p class="font-bold opacity-70">${msg.replyTo.userName}</p>
-                    <p class="truncate opacity-60">${msg.replyTo.text}</p>
+                    <p class="truncate opacity-70">${msg.replyTo.text}</p>
                 </div>
             `;
         }
 
         messageDiv.innerHTML = `
-            ${!isMine ? `<span class="text-[10px] font-bold opacity-40 mb-1 ml-2 uppercase tracking-tighter">${senderMaskName}</span>` : ''}
+            ${!isMine ? `<span class="text-[10px] font-bold opacity-70 mb-1 ml-2 uppercase tracking-tighter">${senderMaskName}</span>` : ''}
             <div class="relative max-w-[85%] sm:max-w-[70%]">
                 <div class="absolute -top-10 ${isMine ? 'right-0' : 'left-0'} hidden group-hover:flex flex-row bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-full shadow-xl p-1.5 gap-2 z-20 border border-digilayn-outline-variant dark:border-digilayn-outline-variant emoji-menu">
                     <button onclick="setReply('${msgId}', '${msg.userId}', '${msg.text.replace(/'/g, "\\'").replace(/\n/g, " ")}')" class="p-1 px-2 hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high rounded-full border-r dark:border-digilayn-outline-variant">
@@ -234,7 +235,7 @@
                 <div class="${isMine ? 'bg-digilayn-primary text-digilayn-on-primary rounded-2xl rounded-tr-none' : 'bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-low rounded-2xl rounded-tl-none'} p-3 shadow-sm">
                     ${replyHtml}
                     <p class="text-sm whitespace-pre-wrap break-words">${msg.text}</p>
-                    <div class="flex items-center justify-end gap-2 mt-1 opacity-40 text-[9px]">
+                    <div class="flex items-center justify-end gap-2 mt-1 opacity-70 text-[9px]">
                         <span>${timeDisplay}</span>
                     </div>
                 </div>

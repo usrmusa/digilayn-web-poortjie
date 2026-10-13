@@ -67,12 +67,13 @@
             flex: 0 0 100%;
         }
     </style>
+    <link rel="stylesheet" href="styles/digilayn-components.css">
 </head>
 <body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
 
 <div class="fixed top-5 left-5 z-50">
     <a href="services/market-form" id="sell-item-btn"
-       class="p-3 pr-5 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition flex items-center gap-2"
+       class="p-3 pr-5 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition flex items-center gap-2 digilayn-button"
        title="Sell Something">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -120,7 +121,7 @@
                 </svg>
                 <label for="market-search" class="sr-only">Search marketplace</label>
                 <input type="text" id="market-search" placeholder="Search marketplace..."
-                       class="w-full pl-10 pr-4 py-2 rounded-full border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-primary focus:outline-none focus:ring-2 focus:ring-digilayn-primary shadow-sm">
+                       class="w-full pl-10 pr-4 py-2 rounded-full border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary shadow-sm">
             </div>
         </div>
     </div>
@@ -184,20 +185,20 @@
             </div>
 
             <div id="public-actions" class="mt-8 flex gap-3 pb-6 md:pb-0">
-                <button id="modal-whatsapp" class="flex-1 bg-digilayn-primary text-digilayn-on-primary font-bold py-3 rounded-xl text-center hover:bg-digilayn-primary transition flex items-center justify-center gap-2">
+                <button id="modal-whatsapp" class="flex-1 bg-digilayn-primary text-digilayn-on-primary font-bold py-3 rounded-xl text-center hover:bg-digilayn-primary transition flex items-center justify-center gap-2 digilayn-button">
                     <i class="fab fa-whatsapp text-xl"></i> <span>Message</span>
                 </button>
-                <button id="modal-call" class="flex-1 bg-digilayn-info text-digilayn-on-info font-bold py-3 rounded-xl text-center hover:bg-digilayn-info transition flex items-center justify-center gap-2">
+                <button id="modal-call" class="flex-1 bg-digilayn-info text-digilayn-on-info font-bold py-3 rounded-xl text-center hover:bg-digilayn-info transition flex items-center justify-center gap-2 digilayn-button">
                     <i class="fas fa-phone"></i> <span>Call</span>
                 </button>
             </div>
 
             <div id="owner-actions" class="hidden mt-8 flex flex-col gap-3 pb-6 md:pb-0">
                 <div class="flex gap-3">
-                    <button id="toggle-sold-btn" class="flex-1 bg-digilayn-tertiary text-digilayn-on-tertiary font-bold py-3 rounded-xl hover:bg-digilayn-tertiary transition flex items-center justify-center gap-2">
+                    <button id="toggle-sold-btn" class="flex-1 bg-digilayn-tertiary text-digilayn-on-tertiary font-bold py-3 rounded-xl hover:bg-digilayn-tertiary transition flex items-center justify-center gap-2 digilayn-button">
                         <i class="fas fa-check-circle"></i> Mark as Sold
                     </button>
-                    <button id="toggle-stock-btn" class="flex-1 bg-digilayn-warning text-digilayn-on-warning font-bold py-3 rounded-xl hover:bg-digilayn-warning transition flex items-center justify-center gap-2">
+                    <button id="toggle-stock-btn" class="flex-1 bg-digilayn-warning text-digilayn-on-warning font-bold py-3 rounded-xl hover:bg-digilayn-warning transition flex items-center justify-center gap-2 digilayn-button">
                         <i class="fas fa-box-open"></i> Out of Stock
                     </button>
                 </div>
@@ -225,14 +226,14 @@
 <!-- Login Alert Modal -->
 <div id="login-alert-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm">
     <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center">
-        <div class="w-16 h-16 bg-digilayn-primary-container dark:bg-digilayn-primary-container/30 text-digilayn-on-primary-container dark:text-digilayn-on-primary-container rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+        <div class="w-16 h-16 bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
             <i class="fas fa-user-lock"></i>
         </div>
         <h3 class="text-xl font-bold mb-2">Login Required</h3>
         <p class="opacity-70 mb-6">You need to be logged in to contact sellers or post items.</p>
         <div class="flex gap-3">
             <button onclick="document.getElementById('login-alert-modal').classList.add('hidden')" class="flex-1 py-3 border border-digilayn-outline-variant dark:border-digilayn-outline-variant rounded-xl font-bold hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-high transition">Cancel</button>
-            <button onclick="window.location.href='authentication/login'" class="flex-1 py-3 bg-digilayn-primary text-digilayn-on-primary rounded-xl font-bold hover:bg-digilayn-primary transition shadow-lg">Login Now</button>
+            <button onclick="window.location.href='authentication/login'" class="flex-1 py-3 bg-digilayn-primary text-digilayn-on-primary rounded-xl font-bold hover:bg-digilayn-primary transition shadow-lg digilayn-button">Login Now</button>
         </div>
     </div>
 </div>
@@ -298,7 +299,7 @@
                 statusBadge = '<div class="absolute top-2 right-2 bg-digilayn-warning text-digilayn-on-warning text-[10px] font-black px-2 py-0.5 rounded shadow-sm">OUT OF STOCK</div>';
             } else if (item.status === 'sold') {
                 statusBadge = '<div class="absolute top-2 right-2 bg-digilayn-tertiary text-digilayn-on-tertiary text-[10px] font-black px-2 py-0.5 rounded shadow-sm">SOLD</div>';
-                opacity = 'opacity-60';
+                opacity = 'opacity-70';
             }
 
             return `
@@ -377,7 +378,7 @@
                 filterItems();
             }, error => {
                 console.error("Error fetching market items:", error);
-                itemsGrid.innerHTML = '<p class="col-span-full text-center py-10 opacity-50">Error loading items.</p>';
+                itemsGrid.innerHTML = '<p class="col-span-full text-center py-10 opacity-70">Error loading items.</p>';
             });
     }
 
@@ -477,13 +478,13 @@
                     <span class="text-xs font-bold uppercase tracking-widest text-digilayn-primary dark:text-digilayn-primary">${item.category}</span>
                     ${statusTag}
                 </div>
-                <h2 class="text-3xl font-black mt-1 leading-tight text-digilayn-on-surface dark:text-digilayn-on-primary">${item.title}</h2>
+                <h2 class="text-3xl font-black mt-1 leading-tight text-digilayn-on-surface dark:text-digilayn-on-surface">${item.title}</h2>
                 <h3 class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary mt-2">R${item.price}</h3>
             </div>
 
             <div class="space-y-6">
                 <div class="p-4 bg-digilayn-surface dark:bg-digilayn-surface-container-low/50 rounded-2xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant/50">
-                    <h4 class="text-[10px] font-black uppercase opacity-40 tracking-widest mb-2 text-digilayn-on-surface dark:text-digilayn-on-primary">Item Description</h4>
+                    <h4 class="text-[10px] font-black uppercase opacity-70 tracking-widest mb-2 text-digilayn-on-surface dark:text-digilayn-on-surface">Item Description</h4>
                     <p class="text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant leading-relaxed whitespace-pre-wrap">${item.description || 'No description provided.'}</p>
                 </div>
 
@@ -491,20 +492,20 @@
                     <div class="w-14 h-14 bg-digilayn-surface-container-high rounded-full overflow-hidden border-2 border-digilayn-primary shadow-sm">
                         <img src="${item.sellerPhoto || 'https://via.placeholder.com/100'}" class="w-full h-full object-cover">
                     </div>
-                    <div class="flex-1 text-digilayn-on-surface dark:text-digilayn-on-primary">
-                        <p class="text-[10px] font-black uppercase opacity-40 tracking-widest mb-0.5">Contact Seller</p>
+                    <div class="flex-1 text-digilayn-on-surface dark:text-digilayn-on-surface">
+                        <p class="text-[10px] font-black uppercase opacity-70 tracking-widest mb-0.5">Contact Seller</p>
                         <p class="font-bold text-lg">${item.sellerName || 'Local Seller'}</p>
-                        <p class="text-xs opacity-50 flex items-center gap-1">
+                        <p class="text-xs opacity-70 flex items-center gap-1">
                             <i class="fas fa-map-marker-alt text-digilayn-primary"></i> ${item.location || 'Poortjie'}
                         </p>
                     </div>
                 </div>
 
                 <div class="flex justify-between items-center px-2">
-                    <p class="text-[10px] font-black uppercase opacity-30 tracking-widest flex items-center gap-1 text-digilayn-on-surface dark:text-digilayn-on-primary">
+                    <p class="text-[10px] font-black uppercase opacity-70 tracking-widest flex items-center gap-1 text-digilayn-on-surface dark:text-digilayn-on-surface">
                         <i class="fas fa-clock"></i> Posted ${item.createdAt ? formatRelativeTime(item.createdAt.toDate()) : 'recently'}
                     </p>
-                    <p class="text-[10px] font-black uppercase opacity-30 tracking-widest text-digilayn-on-surface dark:text-digilayn-on-primary">
+                    <p class="text-[10px] font-black uppercase opacity-70 tracking-widest text-digilayn-on-surface dark:text-digilayn-on-surface">
                         ID: ${id.substring(0,8)}
                     </p>
                 </div>
@@ -562,9 +563,9 @@
             modalWhatsApp.onclick = () => handleContact('whatsapp');
 
             if (item.status === 'sold') {
-                publicActions.classList.add('opacity-50', 'pointer-events-none');
+                publicActions.classList.add('opacity-70', 'pointer-events-none');
             } else {
-                publicActions.classList.remove('opacity-50', 'pointer-events-none');
+                publicActions.classList.remove('opacity-70', 'pointer-events-none');
             }
         }
 
