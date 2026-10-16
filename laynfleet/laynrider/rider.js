@@ -27,7 +27,7 @@
   const RTDB_LOCATIONS = `laynfleet/${fleetEnvironment}/driverLocations`;
   const HEARTBEAT_FRESHNESS_WINDOW_MS = global.HEARTBEAT_FRESHNESS_WINDOW_MS || 60000;
   const SERVICE_AREA = global.SERVICE_AREA || {
-    center: { lat: -26.57537, lng: 27.68133 },
+    center: { lat: -26.458127, lng: 27.768157 },
     radiusMeters: 175933
   };
   const POORTJIE_LOCAL_AREA = global.POORTJIE_LOCAL_AREA || {
