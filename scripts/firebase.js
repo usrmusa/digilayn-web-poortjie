@@ -48,7 +48,6 @@ if (typeof window !== 'undefined') {
     laynfleetDoc: 'main',
     drivers: 'drivers',
     riders: 'riders',
-    bookings: 'bookings',
     ratings: 'ratings',
     reviewLikes: 'reviewLikes',
     adminActions: 'adminActions',

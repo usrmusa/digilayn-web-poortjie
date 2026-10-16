@@ -47,7 +47,11 @@
 
   // Collections
   const driversCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection(FS.drivers);
-  const bookingsCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection(FS.bookings);
+  function quickRequestsFor(riderUid) {
+    if (!riderUid) throw new Error('Sign in required.');
+    return db.collection(FS.laynfleet).doc(fleetEnvironment)
+      .collection('quickRequests').doc(riderUid).collection('requests');
+  }
   const ratingsCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection(FS.ratings);
   const reviewLikesCol = db.collection(FS.laynfleet).doc(fleetEnvironment).collection(FS.reviewLikes);
   const usersCol = db.collection(FS.users);
@@ -112,7 +116,6 @@
   // User cache for driver identities & reviews
   const userCache = new Map();
   const driverReviewsCache = new Map();
-  const driverTripsCache = new Map();
 
   // DOM Elements - App Views
   const bootView = document.getElementById('boot-view');
@@ -851,41 +854,6 @@
     } catch (e) {
       console.warn('Failed to load driver doc for:', uid, e);
       return {};
-    }
-  }
-
-  /**
-   * Fetch a driver's real completed trips count from Firestore bookings collection.
-   * Reads completed trips without writing driver statistics from the browser.
-   * STRICT: Real count from bookings (status == 'COMPLETED').
-   */
-  async function getDriverTripsCount(driverUid) {
-    if (!driverUid) return 0;
-    if (driverTripsCache.has(driverUid)) {
-      return driverTripsCache.get(driverUid);
-    }
-    try {
-      const snap = await bookingsCol
-        .where('driverId', '==', driverUid)
-        .get();
-
-      const completedCount = snap.docs.filter((d) => {
-        const b = d.data() || {};
-        return b.status === 'COMPLETED';
-      }).length;
-
-      const driverDoc = await getDriverRecord(driverUid);
-      const docCount = typeof driverDoc.tripsCount === 'number' ? driverDoc.tripsCount : 0;
-      const realTrips = Math.max(completedCount, docCount);
-
-      driverTripsCache.set(driverUid, realTrips);
-      return realTrips;
-    } catch (e) {
-      console.warn('Failed to count trips for driver:', driverUid, e);
-      const driverDoc = await getDriverRecord(driverUid);
-      const docCount = typeof driverDoc.tripsCount === 'number' ? driverDoc.tripsCount : 0;
-      driverTripsCache.set(driverUid, docCount);
-      return docCount;
     }
   }
 
@@ -2054,7 +2022,7 @@
         isReturnTrip: isReturn,
         returnWaitMinutes: isReturn ? (bookingState.returnWaitMinutes || 15) : null,
       });
-      const saved = await bookingsCol.doc(result.bookingId).get({ source: 'server' });
+      const saved = await quickRequestsFor(currentUser.uid).doc(result.bookingId).get({ source: 'server' });
       if (!saved.exists || saved.data().riderId !== currentUser.uid) throw new Error('Your booking could not be loaded.');
       currentBookingDoc = { id: saved.id, ...saved.data() };
       riderApi.finishBookingRequest();
@@ -2100,8 +2068,7 @@
       activeBookingUnsub = null;
     }
 
-    activeBookingUnsub = bookingsCol
-      .where('riderId', '==', riderUid)
+    activeBookingUnsub = quickRequestsFor(riderUid)
       .onSnapshot(async (snap) => {
         if (!snap.empty) {
           const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -2730,8 +2697,6 @@
               review: comment,
             });
             driverReviewsCache.delete(driverUid);
-            driverTripsCache.delete(driverUid);
-            await getDriverTripsCount(driverUid);
           } else {
             const existingDoc = existing.docs[0];
             const existingData = existingDoc.data();
