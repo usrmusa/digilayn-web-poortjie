@@ -65,7 +65,7 @@
             <div class="form-group mb-4">
                 <label for="username" class="block mb-1 font-bold text-sm uppercase tracking-wider">Username</label>
                 <div class="relative">
-                    <input type="text" id="username" name="username" placeholder="Username"
+                    <input type="text" id="username" name="username" maxlength="30" placeholder="Username"
                            class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"
                            required pattern="[a-z0-9]+"
                            title="Username must be lowercase and contain no spaces.">
@@ -94,7 +94,7 @@
                 <div class="relative">
                     <input type="text" id="display-name" name="display-name" placeholder="Full Name"
                            class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"
-                           required pattern="^[A-Za-z]+(\s[A-Za-z]+){0,2}$"
+                           required
                            title="Please enter your full name (max 3 names).">
                     <p id="error-display-name"
                        class="absolute right-2 top-2 px-2 py-1 bg-digilayn-error text-digilayn-on-error text-[10px] font-bold rounded shadow-sm hidden">
@@ -188,6 +188,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="../scripts/account-access-core.js"></script>
 <script src="../scripts/account-access-compat.js"></script>
+<script src="../scripts/shared-profile-repository.js"></script>
+<script src="../scripts/build-target.js"></script>
 <script src="../scripts/firebase.js"></script>
 <script src="../scripts/core/observable.js"></script>
 <script src="../scripts/core/case-mapper.js"></script>
@@ -205,7 +207,7 @@
     const policyConfirmInput = document.getElementById('policy-confirm');
 
     usernameInput.addEventListener('input', (e) => {
-        let value = e.target.value.toLowerCase().replace(/\s/g, '');
+        let value = e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 30);
         if (e.target.value !== value) {
             e.target.value = value;
         }
@@ -213,7 +215,7 @@
 
     usernameInput.addEventListener('paste', (e) => {
         setTimeout(() => {
-            let value = usernameInput.value.toLowerCase().replace(/\s/g, '');
+            let value = usernameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 30);
             if (usernameInput.value !== value) {
                 usernameInput.value = value;
             }
@@ -221,7 +223,7 @@
     });
 
     phoneNumberInput.addEventListener('keypress', (e) => {
-        if (!/\d/.test(e.key)) {
+        if (!/\p{Nd}/u.test(e.key)) {
             e.preventDefault();
         }
     });
@@ -365,7 +367,7 @@
             case 'auth/network-request-failed':
                 return 'Network error. Please check your internet connection.';
             default:
-                if (errorCode === 'Username already taken') return 'This username is already taken. Please choose another one.';
+                if (errorCode === 'Username already taken' || errorCode === 'auth/username-taken') return 'This username is already taken. Please choose another one.';
                 return 'An unexpected error occurred. Please try again.';
         }
     };
@@ -378,10 +380,10 @@
         const password = registerForm.password.value;
         const confirmPassword = registerForm['confirm-password'].value;
 
-        const isUsernameValid = /^[a-z0-9]+$/.test(username);
+        const isUsernameValid = /^[a-z0-9]{3,30}$/.test(username);
         const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        const isDisplayNameValid = /^[A-Za-z]+(\s[A-Za-z]+){0,2}$/.test(displayName);
-        const isPhoneValid = phoneNumber === '' || /^\d{10}$/.test(phoneNumber);
+        const isDisplayNameValid = displayName.length <= 64 && displayName.trim().split(/\s+/u).filter(Boolean).length >= 1 && displayName.trim().split(/\s+/u).filter(Boolean).length <= 3;
+        const isPhoneValid = phoneNumber === '' || /^\p{Nd}{10}$/u.test(phoneNumber);
         const isPasswordValid = password.length >= 6;
         const passwordsMatch = password === confirmPassword && password !== '';
         const isPolicyConfirmed = policyConfirmInput.checked;
@@ -402,7 +404,7 @@
         return {
             isValid: isUsernameValid && isEmailValid && isDisplayNameValid && isPhoneValid && isPasswordValid && passwordsMatch && isPolicyConfirmed,
             errors: {
-                username: isUsernameValid ? null : 'Username must be lowercase and contain no spaces.',
+                username: isUsernameValid ? null : 'Username must contain 3–30 lowercase letters or digits.',
                 email: isEmailValid ? null : 'Please enter a valid email address.',
                 displayName: isDisplayNameValid ? null : 'Full name (max 3 names).',
                 phoneNumber: isPhoneValid ? null : 'Phone number must be 10 digits.',
@@ -475,36 +477,10 @@
         AccountAccess.signIn(async () => {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
-                const usernameRef = db.collection('usernames').doc(username);
-                const userRef = db.collection('users').doc(user.uid);
-
                 try {
-                    await db.runTransaction(async (transaction) => {
-                        const usernameDoc = await transaction.get(usernameRef);
-                        if (usernameDoc.exists) {
-                            throw new Error('Username already taken');
-                        }
-
-                        transaction.set(usernameRef, {
-                            userId: user.uid,
-                            lockedUntil: null
-                        });
-
-                        transaction.set(userRef, {
-                            userId: user.uid,
-                            username: username,
-                            displayName: displayName,
-                            email: email,
-                            emailVerified: false,
-                            phone: phone || '',
-                            photoUrl: null,
-                            registeredWith: 'com.digilayn.web',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                            devices: {}
-                        });
-                    });
+                    await window.sharedProfileRepository.save(user.uid, {
+                        email, username, displayName, ...(phone ? { phone } : {})
+                    }, true);
 
                     await user.updateProfile({ displayName: displayName }).catch(() => {});
 

@@ -1,6 +1,9 @@
 (function (global) {
   'use strict';
 
+  // CommonJS consumers load the same explicit build configuration as browser pages.
+  if (typeof module !== 'undefined' && module.exports) require('../../scripts/build-target.js');
+
   class RiderApi {
     constructor(auth, storage = global.localStorage, fetchRequest = global.fetch.bind(global), cryptoApi = global.crypto) {
       this.auth = auth;
@@ -14,6 +17,11 @@
     sessionKey(uid) { return `laynrider-v2-session:${uid}`; }
 
     async send(method, path, body, session) {
+      const target = global.DigilaynBuild;
+      if (!target || !['local', 'live'].includes(target.target) || target.isLocal !== (target.target === 'local')) {
+        throw new Error('A valid website build target is required.');
+      }
+      if (target.isLocal) throw new Error('Local ride API is not configured.');
       const user = this.auth.currentUser;
       if (!user || user.uid !== session.uid) throw new Error('Sign in to continue.');
       const token = await user.getIdToken();

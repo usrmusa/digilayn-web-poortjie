@@ -17,6 +17,13 @@ const firebaseConfig = {
   databaseURL: "https://digilayn-projects-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
+// The build output is the sole service-target decision. Missing config fails closed.
+const buildTarget = window.DigilaynBuild;
+if (!buildTarget || !['local', 'live'].includes(buildTarget.target) ||
+    buildTarget.isLocal !== (buildTarget.target === 'local')) {
+  throw new Error('A valid website build target is required.');
+}
+
 // Initialize Firebase once globally
 if (typeof firebase !== 'undefined' && !firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -26,7 +33,16 @@ const db = typeof firebase !== 'undefined' && typeof firebase.firestore === 'fun
 const auth = typeof firebase !== 'undefined' && typeof firebase.auth === 'function' ? firebase.auth() : null;
 const storage = typeof firebase !== 'undefined' && typeof firebase.storage === 'function' ? firebase.storage() : null;
 const functions = typeof firebase !== 'undefined' && typeof firebase.functions === 'function' ? firebase.app().functions('us-central1') : null;
-const rtdb = typeof firebase !== 'undefined' && typeof firebase.database === 'function' ? firebase.database() : null;
+// RTDB has not been rebuilt locally. Do not instantiate its live SDK in local builds.
+const realtimeDatabase = !buildTarget.isLocal && typeof firebase !== 'undefined' && typeof firebase.database === 'function' ? firebase.database() : null;
+
+// Configure every available service before persistence, account listeners, or page code.
+if (buildTarget.isLocal) {
+  if (auth) auth.useEmulator('http://127.0.0.1:9099');
+  if (db) db.useEmulator('127.0.0.1', 8080);
+  if (storage) storage.useEmulator('127.0.0.1', 9199);
+  if (functions) functions.useEmulator('127.0.0.1', 5001);
+}
 
 // Expose globally on window for unified access
 if (typeof window !== 'undefined') {
@@ -36,7 +52,13 @@ if (typeof window !== 'undefined') {
   window.auth = auth;
   window.storage = storage;
   window.functions = functions;
-  window.rtdb = rtdb;
+  Object.defineProperty(window, 'rtdb', {
+    configurable: true,
+    get() {
+      if (buildTarget.isLocal) throw new Error('Local Realtime Database is not configured.');
+      return realtimeDatabase;
+    }
+  });
 
   // Cloud Functions dispatch region
   window.FUNCTIONS_REGION = 'us-central1';
@@ -91,3 +113,13 @@ if (typeof window !== 'undefined' && location.protocol !== 'file:' && db && type
 
 
 if (auth && db) window.installAccountAccess();
+
+if (auth && db) {
+  let profileRepository;
+  Object.defineProperty(window, 'sharedProfileRepository', {
+    get() {
+      if (!profileRepository) profileRepository = new window.SharedProfileRepository(db, auth, () => firebase.firestore.FieldValue.serverTimestamp());
+      return profileRepository;
+    }
+  });
+}

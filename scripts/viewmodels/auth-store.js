@@ -86,41 +86,7 @@
                     error.code = 'auth/account-unverified';
                     throw error;
                 }
-                let baseUsername = (authUser.email ? authUser.email.split('@')[0] : (authUser.displayName || 'user'))
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]/g, '');
-                if (!baseUsername) baseUsername = 'user' + Math.floor(1000 + Math.random() * 9000);
-
-                let finalUsername = baseUsername;
-                try {
-                    const usernameDoc = await firebase.firestore().collection('usernames').doc(finalUsername).get();
-                    if (usernameDoc.exists) {
-                        finalUsername = `${baseUsername}${Math.floor(100 + Math.random() * 900)}`;
-                    }
-                    await firebase.firestore().collection('usernames').doc(finalUsername).set({
-                        userId: authUser.uid,
-                        lockedUntil: null
-                    }, { merge: true });
-                } catch (e) {
-                    console.warn('AuthStore: error reserving username', e);
-                }
-
-                const newDocData = {
-                    userId: authUser.uid,
-                    username: finalUsername,
-                    displayName: authUser.displayName || finalUsername,
-                    email: authUser.email || '',
-                    emailVerified: authUser.emailVerified || false,
-                    phone: authUser.phoneNumber || '',
-                    photoUrl: authUser.photoURL || null,
-                    registeredWith: 'com.digilayn.web',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                    devices: {}
-                };
-                await userRef.set(newDocData, { merge: true });
-                return newDocData;
+                return window.sharedProfileRepository.ensureIdentity(authUser);
             } else {
                 if (doc.data().suspended === true) {
                     const error = new Error(AccountAccessCore.messages['auth/account-suspended']);
@@ -128,11 +94,7 @@
                     await firebase.auth().signOut();
                     throw error;
                 }
-                await userRef.set({
-                    lastActive: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }).catch(() => {});
-                return doc.data();
+                return window.sharedProfileRepository.ensureIdentity(authUser);
             }
         } catch (err) {
             console.warn('AuthStore: failed ensuring user doc', err);

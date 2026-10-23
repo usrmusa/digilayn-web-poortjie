@@ -58,29 +58,29 @@
             </div>
 
             <div class="mb-4">
-                <label class="block text-xs opacity-70 mb-1 pl-1">Username (cannot be changed)</label>
-                <label for="username"></label><input type="text" id="username" disabled class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-2 border-transparent cursor-not-allowed">
+                <label class="block text-xs opacity-70 mb-1 pl-1">Username</label>
+                <label for="username"></label><input type="text" id="username" maxlength="30" class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-2 border-transparent focus:border-digilayn-primary">
             </div>
             <div class="mb-4">
                 <label class="block text-xs opacity-70 mb-1 pl-1">Email (cannot be changed)</label>
-                <label for="email"></label><input type="email" id="email" disabled class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-2 border-transparent cursor-not-allowed">
+                <label for="email"></label><input type="email" id="email" disabled class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-2 border-transparent focus:border-digilayn-primary">
             </div>
             <div class="mb-4">
                 <label class="block text-xs opacity-70 mb-1 pl-1">Full Name (max 3 names)</label>
-                <input type="text" id="display-name" name="display-name" placeholder="Full Name" class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition" required pattern="^[A-Za-z]+(\s[A-Za-z]+){0,2}$" title="Please enter your full name (max 3 names).">
+                <input type="text" id="display-name" maxlength="64" name="display-name" placeholder="Full Name" class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition" required title="Please enter your full name (max 3 names).">
                 <p class="text-[11px] opacity-70 mt-1 pl-1">Required for LaynFleet ride booking.</p>
             </div>
             <div class="mb-4">
                 <label class="block text-xs opacity-70 mb-1 pl-1">Phone Number (10 digits)</label>
-                <input type="tel" id="phone-number" name="phone-number" placeholder="e.g. 0123456789" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                <input type="tel" id="phone-number" maxlength="10" name="phone-number" placeholder="e.g. 0123456789" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
                 <p class="text-[11px] opacity-70 mt-1 pl-1">Optional for general account, but required for LaynFleet ride booking.</p>
             </div>
             <div class="mb-6">
                 <div class="flex justify-between items-center mb-1 pl-1">
                     <label class="block text-xs opacity-70">Bio / About</label>
-                    <span id="bio-counter" class="text-xs opacity-70">0/100</span>
+                    <span id="bio-counter" class="text-xs opacity-70">0/128</span>
                 </div>
-                <label for="bio"></label><textarea id="bio" name="bio" rows="3" maxlength="100" placeholder="Tell us about yourself..." class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"></textarea>
+                <label for="bio"></label><textarea id="bio" name="bio" rows="3" maxlength="128" placeholder="Tell us about yourself..." class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"></textarea>
             </div>
 
             <div id="admin-toggle-section" class="hidden mb-6 p-4 rounded-xl bg-digilayn-info-container dark:bg-digilayn-info/10 border border-digilayn-info dark:border-digilayn-info">
@@ -201,6 +201,8 @@
 
 <script src="../scripts/account-access-core.js"></script>
 <script src="../scripts/account-access-compat.js"></script>
+<script src="../scripts/shared-profile-repository.js"></script>
+<script src="../scripts/build-target.js"></script>
 <script src="../scripts/firebase.js"></script>
 <script src="../scripts/image-upload.js"></script>
 
@@ -234,6 +236,7 @@
 
     const DEFAULT_AVATAR = "https://placehold.co/150";
     let initialData = {};
+    let profileLoaded = false;
 
     function showStatus(message, isError = false) {
         statusMessage.textContent = message;
@@ -250,10 +253,12 @@
     }
 
     function checkChanges() {
+        if (!profileLoaded) { saveBtn.disabled = true; return; }
         const currentData = {
+            username: usernameInput.value,
             displayName: displayNameInput.value.trim(),
             phone: phoneNumberInput.value.trim(),
-            bio: bioInput.value.trim(),
+            bio: bioInput.value,
             photoUrl: photoUrlInput.value,
             listForSupport: listForSupportToggle.checked
         };
@@ -261,6 +266,7 @@
         const hasChanged =
             currentData.displayName !== initialData.displayName ||
             currentData.phone !== initialData.phone ||
+            currentData.username !== initialData.username ||
             currentData.bio !== initialData.bio ||
             currentData.photoUrl !== initialData.photoUrl ||
             currentData.listForSupport !== initialData.listForSupport;
@@ -288,18 +294,18 @@
         }
     });
 
-    [displayNameInput, phoneNumberInput, bioInput, listForSupportToggle].forEach(input => {
+    [usernameInput, displayNameInput, phoneNumberInput, bioInput, listForSupportToggle].forEach(input => {
         const eventName = input.type === 'checkbox' ? 'change' : 'input';
         input.addEventListener(eventName, () => {
             if (input === bioInput) {
-                bioCounter.textContent = `${input.value.length}/100`;
+                bioCounter.textContent = `${input.value.length}/128`;
             }
             checkChanges();
         });
     });
 
     phoneNumberInput.addEventListener('keypress', (e) => {
-        if (!/\d/.test(e.key)) {
+        if (!/\p{Nd}/u.test(e.key)) {
             e.preventDefault();
         }
     });
@@ -327,31 +333,28 @@
         profilePicture.src = DEFAULT_AVATAR;
     });
 
+    usernameInput.addEventListener('input', () => {
+        usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 30);
+    });
+
     // Load profile
     AccountAccess.observe(user => {
         if (user) {
+            profileLoaded = false;
             emailInput.value = user.email || '';
-            const defaultUsername = user.email ? user.email.split('@')[0] : '';
-            usernameInput.value = defaultUsername;
-
-            // Immediately set from Auth record if present (prevents blank field flash)
-            if (user.displayName) {
-                displayNameInput.value = user.displayName;
-            }
-            if (user.photoURL) {
-                photoUrlInput.value = user.photoURL;
-                profilePicture.src = user.photoURL;
-            }
+            usernameInput.value = '';
+            saveBtn.disabled = true;
 
             firebase.firestore().collection('users').doc(user.uid).get({ source: 'server' }).then(doc => {
                 if (AccountAccess.currentUser?.uid !== user.uid) return;
-                const userData = doc.exists ? (doc.data() || {}) : {};
-
-                const resolvedDisplayName = userData.displayName || user.displayName || '';
-                const resolvedPhone = userData.phone || user.phoneNumber || '';
-                const resolvedBio = userData.bio || '';
-                const resolvedPhotoUrl = userData.photoUrl || user.photoURL || '';
-                const resolvedUsername = userData.username || defaultUsername;
+                if (!doc.exists) throw new Error('Shared account is missing.');
+                const userData = doc.data();
+                const stored = field => SharedProfileRepository.optionalString(userData, field);
+                const resolvedDisplayName = stored('displayName');
+                const resolvedPhone = stored('phone');
+                const resolvedBio = stored('bio');
+                const resolvedPhotoUrl = stored('photoUrl');
+                const resolvedUsername = stored('username');
 
                 usernameInput.value = resolvedUsername;
                 displayNameInput.value = resolvedDisplayName;
@@ -366,13 +369,15 @@
                 }
 
                 initialData = {
-                    displayName: displayNameInput.value.trim(),
+                    username: usernameInput.value,
+            displayName: displayNameInput.value.trim(),
                     phone: phoneNumberInput.value.trim(),
-                    bio: bioInput.value.trim(),
+                    bio: bioInput.value,
                     photoUrl: photoUrlInput.value,
                     listForSupport: listForSupportToggle.checked
                 };
-                bioCounter.textContent = `${bioInput.value.length}/100`;
+                bioCounter.textContent = `${bioInput.value.length}/128`;
+                profileLoaded = true;
                 checkChanges();
             }).catch(error => {
                 console.error("Error fetching user data:", error);
@@ -443,7 +448,7 @@
 
             const storageRef = firebase.storage().ref();
             const time = Date.now();
-            const fileRef = storageRef.child(`user-photos/${user.uid}/profile-${time}.jpg`);
+            const fileRef = storageRef.child(`users/${user.uid}/profile/${time}.jpg`);
 
             await ImageUpload.upload(fileRef, blob, reportProgress, {
                 contentType: "image/jpeg",
@@ -451,9 +456,12 @@
             });
 
             const url = await fileRef.getDownloadURL();
+            await window.sharedProfileRepository.save(user.uid, { photoUrl: url });
+            initialData.photoUrl = url;
 
             profilePicture.src = url;
             photoUrlInput.value = url;
+            checkChanges();
 
             cropModal.classList.add('hidden');
             cropper.destroy();
@@ -494,32 +502,30 @@
         saveBtn.disabled = true;
         saveBtn.textContent = 'Saving...';
 
-        const newDisplayName = displayNameInput.value.trim();
+        const newDisplayName = displayNameInput.value;
         const newPhoneNumber = phoneNumberInput.value.trim();
-        const newBio = bioInput.value.trim();
+        const newBio = bioInput.value;
         const newPhotoUrl = photoUrlInput.value;
         const newListForSupport = listForSupportToggle.checked;
 
-        firebase.firestore().collection('users').doc(user.uid).set({
-            displayName: newDisplayName,
-            phone: newPhoneNumber,
-            bio: newBio,
-            photoUrl: newPhotoUrl,
-            username: usernameInput.value || '',
-            roles: {
-                poortjie: {
-                    listForSupport: newListForSupport
-                }
-            },
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true }).then(() => {
+        const candidates = {
+            displayName: newDisplayName, phone: newPhoneNumber, bio: newBio,
+            photoUrl: newPhotoUrl, username: usernameInput.value
+        };
+        const updates = Object.fromEntries(Object.entries(candidates).filter(([key, value]) => value !== initialData[key]));
+        if (newListForSupport !== initialData.listForSupport) {
+            updates.roles = { poortjie: { listForSupport: newListForSupport } };
+        }
+        window.sharedProfileRepository.save(user.uid, updates).then(saved => {
+            displayNameInput.value = SharedProfileRepository.optionalString(saved, 'displayName');
             try {
                 sessionStorage.removeItem('authUserCache');
             } catch (e) {}
 
             showStatus("Profile updated successfully!");
             initialData = {
-                displayName: newDisplayName,
+                username: usernameInput.value,
+                displayName: SharedProfileRepository.optionalString(saved, 'displayName'),
                 phone: newPhoneNumber,
                 bio: newBio,
                 photoUrl: newPhotoUrl,
@@ -528,12 +534,12 @@
             checkChanges();
 
             user.updateProfile({
-                displayName: newDisplayName,
+                displayName: SharedProfileRepository.optionalString(saved, 'displayName'),
                 photoURL: newPhotoUrl
             }).catch(err => console.error("Error updating auth profile:", err));
         }).catch(error => {
             console.error("Error updating profile:", error);
-            showStatus("Error updating profile. Please try again.", true);
+            showStatus(error.message, true);
             saveBtn.disabled = false;
             saveBtn.textContent = 'Save Changes';
         });
@@ -692,10 +698,6 @@
                         }
                     }
                 }
-
-                await firebase.firestore().collection('users').doc(currentUser.uid).set({
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
 
                 showPasswordStatus('Password saved and linked successfully! You can now log in using your email and this password next time.', false);
                 newPasswordInput.value = '';

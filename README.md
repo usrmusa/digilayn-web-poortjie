@@ -9,7 +9,7 @@ This repository intentionally contains the public website source.
 
 ## Technology
 
-Static HTML, CSS and JavaScript, with Tailwind CSS, Firebase-backed functionality and Google Maps. There is no application build step. Account, management and booking features require the appropriate authentication and server permissions.
+Static HTML, CSS and JavaScript, with Tailwind CSS, Firebase-backed functionality and Google Maps. Explicit local/live builds select the Firebase service target. Account, management and booking features require the appropriate authentication and server permissions.
 
 ## Structure
 
@@ -27,13 +27,36 @@ Static HTML, CSS and JavaScript, with Tailwind CSS, Firebase-backed functionalit
 
 ## Local Preview
 
-From the repository root, run:
+From the repository root, generate and serve the local output:
 
 ```sh
-python3 -m http.server 8000 --bind 127.0.0.1
+python3 tools/build-site.py local
+python3 -m http.server 8000 --bind 127.0.0.1 --directory dist/local
 ```
 
-Open [localhost:8000/home.html](http://127.0.0.1:8000/home.html). Use explicit `.html` paths with this simple server; it does not reproduce GitHub Pages extensionless URL handling. The site may normalise the displayed URL after loading. Previewing does not provide a separate Firebase test environment.
+Open [localhost:8000/home.html](http://127.0.0.1:8000/home.html). Serve this output
+as the document root when configuring IntelliJ local preview, or open the generated
+`dist/local/index.html` in IntelliJ. No URL environment parameter is needed. Local
+builds retain `.html` URLs, resolve internal navigation to existing files, and preserve
+IntelliJ project-path prefixes. Live builds keep the original clean URLs.
+
+The local build connects available Auth, Firestore, Storage and Functions SDKs to
+`127.0.0.1` ports 9099, 8080, 9199 and 5001 respectively, in Firebase project
+`digilayn-projects`. Start the suite from the canonical `Backend` repository;
+this website does not own a separate Functions implementation.
+
+Run `python3 tools/build-site.py live` to prepare `dist/live` for later publication.
+Source files explicitly select live services. Hostname, IntelliJ, Android emulator
+presence and fleet prod/dev selection never decide the service target.
+
+Local RTDB access and legacy Rider API requests fail explicitly because those local
+services are not configured. They never contact live services as a fallback.
+Normal login, registration, profile, suspension and shared-account checks retain
+existing behavior, using the selected target's services. Missing local data or
+functions remain real failures; no account data or backend functions are fabricated.
+
+These are local source/build changes. Login/register/profile behavior still needs
+owner validation; no account, emulator process, rule or hosting changes are implied.
 
 ## Shared Theme
 
@@ -66,3 +89,26 @@ See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-starte
 This repository is public intentionally. Keep credentials, service-account keys, access tokens, private account records, local environment files and editor metadata out of it. Backend functions and authoritative Firebase rules are maintained separately; do not deploy backend or rule changes from this website checkout.
 
 Firebase browser configuration identifies the project for client SDKs and is included deliberately. It does not grant administrative access; backend services and Firebase rules must enforce authorization. See [Firebase API key guidance](https://firebase.google.com/docs/projects/api-keys).
+
+## Shared Profile And Username Output
+
+Poortjie and Android now use the same shared `users/{uid}` field names: `displayName`,
+`phone`, `bio`, `photoUrl`, `username`, with Auth email and the original `createdAt`.
+Names normalize to title case with 1–3 words; saved phone numbers contain ten digits;
+bio text retains its entered whitespace and is limited to 128 characters. Optional
+fields are not invented from email prefixes. Google identity only seeds actual
+provider email/name/photo where the saved field is missing or empty.
+
+Usernames reserve `usernames/{name}` atomically with the profile, using a current
+`userId` and `claimId`. Per-claim history stores ownership start/end timestamps.
+Changing/clearing releases the old name immediately. Existing legacy reservations
+without claim/history metadata fail explicitly; no migration or guessed ownership
+is performed. The canonical schema is documented in the Backend README.
+
+Profile photos are uploaded under `users/{uid}/profile/{timestamp}.jpg` and their
+URL is saved before reporting success. Poortjie-only role settings are preserved.
+Local manifest links include same-origin credentials for IntelliJ's protected
+resource server. Existing live routes remain unchanged.
+
+These source changes and emulator tests do not establish successful Android Studio
+builds or browser registration/profile behavior; owner verification remains pending.
