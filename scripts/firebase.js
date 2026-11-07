@@ -33,16 +33,8 @@ const db = typeof firebase !== 'undefined' && typeof firebase.firestore === 'fun
 const auth = typeof firebase !== 'undefined' && typeof firebase.auth === 'function' ? firebase.auth() : null;
 const storage = typeof firebase !== 'undefined' && typeof firebase.storage === 'function' ? firebase.storage() : null;
 const functions = typeof firebase !== 'undefined' && typeof firebase.functions === 'function' ? firebase.app().functions('us-central1') : null;
-// RTDB has not been rebuilt locally. Do not instantiate its live SDK in local builds.
-const realtimeDatabase = !buildTarget.isLocal && typeof firebase !== 'undefined' && typeof firebase.database === 'function' ? firebase.database() : null;
-
-// Configure every available service before persistence, account listeners, or page code.
-if (buildTarget.isLocal) {
-  if (auth) auth.useEmulator('http://127.0.0.1:9099');
-  if (db) db.useEmulator('127.0.0.1', 8080);
-  if (storage) storage.useEmulator('127.0.0.1', 9199);
-  if (functions) functions.useEmulator('127.0.0.1', 5001);
-}
+// Live Realtime Database for LaynFleet presence
+const realtimeDatabase = typeof firebase !== 'undefined' && typeof firebase.database === 'function' ? firebase.database() : null;
 
 // Expose globally on window for unified access
 if (typeof window !== 'undefined') {
@@ -55,7 +47,6 @@ if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'rtdb', {
     configurable: true,
     get() {
-      if (buildTarget.isLocal) throw new Error('Local Realtime Database is not configured.');
       return realtimeDatabase;
     }
   });

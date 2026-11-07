@@ -27,7 +27,13 @@ Static HTML, CSS and JavaScript, with Tailwind CSS, Firebase-backed functionalit
 
 ## Local Preview
 
-From the repository root, generate and serve the local output:
+Double-click `launch-local.command` in Finder to rebuild and verify the local
+build, serve it at http://127.0.0.1:8102/ and open your browser. Python 3 is
+required. Keep its Terminal window open; Control-C stops the website server.
+Start the Backend Firebase Emulator Suite separately. The launcher never serves
+the live build; an unavailable emulator remains an error.
+
+Alternatively, from the repository root, generate and serve the local output:
 
 ```sh
 python3 tools/build-site.py local
@@ -99,11 +105,12 @@ bio text retains its entered whitespace and is limited to 128 characters. Option
 fields are not invented from email prefixes. Google identity only seeds actual
 provider email/name/photo where the saved field is missing or empty.
 
-Usernames reserve `usernames/{name}` atomically with the profile, using a current
-`userId` and `claimId`. Per-claim history stores ownership start/end timestamps.
-Changing/clearing releases the old name immediately. Existing legacy reservations
-without claim/history metadata fail explicitly; no migration or guessed ownership
-is performed. The canonical schema is documented in the Backend README.
+Usernames reserve `usernames/{name}` atomically with the profile, using `ownerId`
+(current owner uid, or null when free) and `ownedAt`. Ownership history is audit-only
+under `usernames/{name}/history/{uid}/periods/{id}` with `ownedAt`/`endedAt`.
+Claiming is allowed only when the reservation is unowned or already owned by the same
+uid. Changing or clearing releases the old name immediately for anyone to claim.
+The canonical schema is documented in the Backend README.
 
 Profile photos are uploaded under `users/{uid}/profile/{timestamp}.jpg` and their
 URL is saved before reporting success. Poortjie-only role settings are preserved.
@@ -112,3 +119,8 @@ resource server. Existing live routes remain unchanged.
 
 These source changes and emulator tests do not establish successful Android Studio
 builds or browser registration/profile behavior; owner verification remains pending.
+
+For Android Studio Play actions, use the scripts in
+`Apps/LaynFleet/local-dev/` in the Digilayn workspace. Console actions select a
+page via `tools/launch-local.py --page <relative-html-path>` and can reuse an
+already-running server after verifying its local build configuration.

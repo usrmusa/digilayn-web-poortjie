@@ -26,16 +26,13 @@ function load(target, hostname = 'localhost', failingService = null) {
   return { events, window, context, run: () => vm.runInContext(fs.readFileSync(path.join(root, 'scripts/firebase.js'), 'utf8'), context) };
 }
 
-test('local build selects all four emulators before account checks and persistence', () => {
+test('local build connects directly to online services without emulators', () => {
   const state = load('local', 'poortjie.info');
   state.run();
-  assert.deepEqual(state.events.slice(1, 5), [
-    ['auth', 'http://127.0.0.1:9099'], ['firestore', '127.0.0.1', 8080],
-    ['storage', '127.0.0.1', 9199], ['functions', '127.0.0.1', 5001]
-  ]);
+  assert.equal(state.events.some(event => ['auth', 'firestore', 'storage', 'functions'].includes(event[0])), false);
   assert.equal(state.events.at(-1)[0], 'account-gate');
-  assert.equal(state.events.some(event => event[0] === 'rtdb-initialize'), false);
-  assert.throws(() => state.window.rtdb, /Local Realtime Database is not configured/);
+  assert.equal(state.events.some(event => event[0] === 'rtdb-initialize'), true);
+  assert.equal(state.window.rtdb.live, true);
 });
 
 test('live build remains live on localhost because the build decides', () => {
@@ -49,12 +46,6 @@ test('missing build target fails before Firebase initializes', () => {
   const state = load(null);
   assert.throws(state.run, /valid website build target/);
   assert.equal(state.events.length, 0);
-});
-
-test('emulator setup failure stops account checks rather than using live services', () => {
-  const state = load('local', 'localhost', 'firestore');
-  assert.throws(state.run, /Emulator setup failed/);
-  assert.equal(state.events.some(event => event[0] === 'account-gate'), false);
 });
 
 test('local legacy Rider API reports unavailable without fetching or acquiring a token', async () => {

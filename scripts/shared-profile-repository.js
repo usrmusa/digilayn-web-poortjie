@@ -62,40 +62,28 @@
         const names = this.db.collection('usernames');
         const oldRef = previous ? names.doc(previous) : null;
         const old = oldRef ? await tx.get(oldRef) : null;
-        let oldHistoryRef = null;
-        if (oldRef) {
-          const reservation = old.exists ? old.data() : null;
-          if (!reservation || Object.keys(reservation).length !== 2 || reservation.userId !== uid || typeof reservation.claimId !== 'string' || !reservation.claimId || reservation.claimId.includes('/')) throw new Error('Username ownership/history mismatch.');
-          oldHistoryRef = oldRef.collection('history').doc(reservation.claimId);
-          const oldHistory = await tx.get(oldHistoryRef);
-          const history = oldHistory.exists ? oldHistory.data() : null;
-          if (!history || history.userId !== uid || typeof history.startedAt?.toMillis !== 'function' || history.endedAt !== null) throw new Error('Username ownership history is invalid.');
-        }
+        const oldOwnerId = old && old.exists ? (old.data().ownerId ?? null) : null;
         const nextRef = next && next !== previous ? names.doc(next) : null;
         if (nextRef) {
           const nextSnapshot = await tx.get(nextRef);
           if (nextSnapshot.exists) {
-            const reservation = nextSnapshot.data();
-            if (!Object.hasOwn(reservation, 'userId') || !Object.hasOwn(reservation, 'claimId') || Object.keys(reservation).length !== 2) throw new Error('Username reservation schema is invalid.');
-            if (reservation.userId !== null) {
-              if (typeof reservation.userId !== 'string') throw new Error('Username reservation schema is invalid.');
+            const ownerId = nextSnapshot.data().ownerId ?? null;
+            if (ownerId !== null && ownerId !== uid) {
               const error = new Error('This username is already taken.');
               error.code = 'auth/username-taken';
               throw error;
             }
-            if (reservation.claimId !== null) throw new Error('Released username claim is invalid.');
           }
         }
         this.checkIdentity(uid);
         if (previous !== next) {
-          if (oldRef) {
-            tx.set(oldRef, { userId: null, claimId: null });
-            tx.update(oldHistoryRef, { endedAt: this.serverTimestamp() });
+          if (oldRef && oldOwnerId === uid) {
+            tx.set(oldRef, { ownerId: null, ownedAt: null });
           }
           if (nextRef) {
-            const history = nextRef.collection('history').doc();
-            tx.set(nextRef, { userId: uid, claimId: history.id });
-            tx.set(history, { userId: uid, startedAt: this.serverTimestamp(), endedAt: null });
+            tx.set(nextRef, { ownerId: uid, ownedAt: this.serverTimestamp() });
+            const period = nextRef.collection('history').doc(uid).collection('periods').doc();
+            tx.set(period, { ownedAt: this.serverTimestamp(), endedAt: null });
           }
         }
         const update = { ...fields };

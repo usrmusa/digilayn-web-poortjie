@@ -49,11 +49,12 @@ test('claim atomically links the profile, reservation and start of history', asy
   await s.a.save('A', { username: 'alpha' });
   assert.equal(s.records.get('users/A').username, 'alpha');
   const claim = s.records.get('usernames/alpha');
-  assert.equal(claim.userId, 'A');
-  const history = s.records.get(`usernames/alpha/history/${claim.claimId}`);
-  assert.equal(history.userId, 'A');
-  assert.equal(history.endedAt, null);
-  assert.equal(typeof history.startedAt.toMillis(), 'number');
+  assert.equal(claim.ownerId, 'A');
+  assert.ok(claim.ownedAt instanceof Timestamp);
+  const periodKey = [...s.records.keys()].find(key => key.startsWith('usernames/alpha/history/A/periods/'));
+  const period = s.records.get(periodKey);
+  assert.equal(period.endedAt, null);
+  assert.ok(period.ownedAt instanceof Timestamp);
 });
 test('two claimants cannot acquire the same username', async () => {
   const s = fixture();
@@ -62,27 +63,23 @@ test('two claimants cannot acquire the same username', async () => {
   assert.equal(results.find(result => result.status === 'rejected').reason.code, 'auth/username-taken');
   assert.equal(s.records.get('users/B').username, undefined);
 });
-test('rename releases the old name immediately and retains closed ownership history', async () => {
+test('rename releases the old name immediately for anyone to claim', async () => {
   const s = fixture();
   await s.a.save('A', { username: 'alpha' });
-  const oldId = s.records.get('usernames/alpha').claimId;
   await s.a.save('A', { username: 'beta' });
-  assert.deepEqual(s.records.get('usernames/alpha'), { userId: null, claimId: null });
-  assert.ok(s.records.get(`usernames/alpha/history/${oldId}`).endedAt instanceof Timestamp);
+  assert.deepEqual(s.records.get('usernames/alpha'), { ownerId: null, ownedAt: null });
   await s.b.save('B', { username: 'alpha' });
-  assert.equal(s.records.get('usernames/alpha').userId, 'B');
-  assert.equal(s.records.get(`usernames/alpha/history/${oldId}`).userId, 'A');
-  assert.notEqual(s.records.get('usernames/alpha').claimId, oldId);
+  assert.equal(s.records.get('usernames/alpha').ownerId, 'B');
 });
-test('clearing releases the username without deleting history; repeats create no extra claim', async () => {
+test('clearing releases the username without deleting history', async () => {
   const s = fixture();
   await s.a.save('A', { username: 'alpha' });
   await s.a.save('A', { username: 'alpha' });
-  assert.equal([...s.records.keys()].filter(key => key.includes('/history/')).length, 1);
+  assert.equal([...s.records.keys()].filter(key => key.includes('/periods/')).length, 1);
   await s.a.save('A', { username: '' });
   assert.equal(s.records.get('users/A').username, '');
-  assert.equal(s.records.get('usernames/alpha').userId, null);
-  assert.equal([...s.records.keys()].filter(key => key.includes('/history/')).length, 1);
+  assert.equal(s.records.get('usernames/alpha').ownerId, null);
+  assert.equal([...s.records.keys()].filter(key => key.includes('/periods/')).length, 1);
 });
 test('a taken rename preserves the old claim and profile', async () => {
   const s = fixture();
@@ -90,14 +87,16 @@ test('a taken rename preserves the old claim and profile', async () => {
   await s.b.save('B', { username: 'beta' });
   await assert.rejects(s.a.save('A', { username: 'beta' }), error => error.code === 'auth/username-taken');
   assert.equal(s.records.get('users/A').username, 'alpha');
-  assert.equal(s.records.get('usernames/alpha').userId, 'A');
+  assert.equal(s.records.get('usernames/alpha').ownerId, 'A');
 });
-test('legacy or missing reservation history fails without synthesizing ownership', async () => {
+test('reclaiming a username already owned by the same user is allowed', async () => {
   const s = fixture();
-  s.records.set('users/A', { username: 'legacy' });
-  s.records.set('usernames/legacy', { userId: 'A', lockedUntil: null });
-  await assert.rejects(s.a.save('A', { username: 'beta' }), /history mismatch/);
-  assert.equal(s.records.has('usernames/beta'), false);
+  await s.a.save('A', { username: 'alpha' });
+  s.records.set('usernames/alpha', { ownerId: 'A', ownedAt: s.records.get('usernames/alpha').ownedAt });
+  await s.a.save('A', { username: '' });
+  await s.a.save('A', { username: 'alpha' });
+  assert.equal(s.records.get('usernames/alpha').ownerId, 'A');
+  assert.equal(s.records.get('users/A').username, 'alpha');
 });
 test('wrong identity, invalid username, overlong bio and invalid phone cannot be saved', async () => {
   const s = fixture();
@@ -126,5 +125,5 @@ test('public profile consent keeps the app requirement for a username', async ()
   await s.a.save('A', { username: 'alpha' });
   s.records.get('users/A').publicProfileConsent = true;
   await assert.rejects(s.a.save('A', { username: '' }), /consent/);
-  assert.equal(s.records.get('usernames/alpha').userId, 'A');
+  assert.equal(s.records.get('usernames/alpha').ownerId, 'A');
 });
