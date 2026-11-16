@@ -149,11 +149,11 @@
                     <input type="checkbox" id="policy-confirm" name="policy-confirm" required
                            class="mt-1 w-4 h-4 rounded border-digilayn-outline-variant text-digilayn-primary focus:ring-digilayn-primary transition cursor-pointer">
                     <span class="text-xs opacity-80 leading-tight group-hover:opacity-100 transition">
-                        I confirm that I understand I am responsible for the data I add, and I retain ownership of my content hosted by Google Firebase.
+                        I am 18 or older and agree to the <a href="https://digilayn.co.za/terms" target="_blank" rel="noopener noreferrer" class="underline font-bold">Terms of Use</a> and <a href="https://digilayn.co.za/privacy" target="_blank" rel="noopener noreferrer" class="underline font-bold">Privacy Policy</a>.
                     </span>
                 </label>
                 <p id="error-policy-confirm" class="text-[10px] text-digilayn-error font-bold mt-1 hidden">
-                    Please confirm you understand the data policy.</p>
+                    Please agree to the Terms of Use and Privacy Policy to continue.</p>
             </div>
             <div class="flex items-center justify-between mb-4">
                 <button type="submit"
@@ -161,12 +161,6 @@
                     Register
                 </button>
             </div>
-            <p class="text-[10px] text-center opacity-70 leading-tight">
-                By registering, you agree that you are responsible for what you add. You own your
-                data, hosted securely by Google Firebase. <a href="../support"
-                                                             class="underline font-bold">Read
-                Policy</a>
-            </p>
         </form>
         <p class="text-center text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mt-6">
             Already have an account? <a href="login"
@@ -176,10 +170,13 @@
     </div>
 </main>
 
-<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-70 text-xs">
-    &copy; 2026 Poortjie Services. Empowering poortjie economies.<br><a href="../support"
-                                                                        class="hover:underline">Data
-    Policy</a>
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-70 text-xs space-y-1">
+    <div>&copy; 2026 Poortjie Services. Empowering poortjie economies.</div>
+    <div class="space-x-3">
+        <a href="https://digilayn.co.za/terms" target="_blank" rel="noopener noreferrer" class="hover:underline">Terms of Use</a>
+        <span>&bull;</span>
+        <a href="https://digilayn.co.za/privacy" target="_blank" rel="noopener noreferrer" class="hover:underline">Privacy Policy</a>
+    </div>
 </footer>
 
 <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
@@ -410,7 +407,7 @@
                 phoneNumber: isPhoneValid ? null : 'Phone number must be 10 digits.',
                 password: isPasswordValid ? null : 'Password must be at least 6 characters.',
                 confirmPassword: passwordsMatch ? null : 'Passwords do not match.',
-                policyConfirm: isPolicyConfirmed ? null : 'Please confirm you understand the data policy.'
+                policyConfirm: isPolicyConfirmed ? null : 'Please agree to the Terms of Use and Privacy Policy to continue.'
             }
         };
     };
