@@ -20,6 +20,32 @@
     <link rel="shortcut icon" type="image/png" sizes="48x48" href="favicon/favicon-48x48.png">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="manifest" href="favicon/site.webmanifest">
+    <script>
+        if (window.console) {
+            const shouldFilter = (msg) => {
+                if (msg && typeof msg === 'string') {
+                    if (msg.includes('cdn.tailwindcss.com should not be used in production')) return true;
+                    if (msg.includes('Tailwind CSS: You should not use the CDN')) return true;
+                    if (msg.includes('enableMultiTabIndexedDbPersistence() will be deprecated')) return true;
+                }
+                return false;
+            };
+            if (window.console.warn) {
+                const originalWarn = window.console.warn;
+                window.console.warn = function() {
+                    if (shouldFilter(arguments[0])) return;
+                    originalWarn.apply(window.console, arguments);
+                };
+            }
+            if (window.console.log) {
+                const originalLog = window.console.log;
+                window.console.log = function() {
+                    if (shouldFilter(arguments[0])) return;
+                    originalLog.apply(window.console, arguments);
+                };
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="scripts/digilayn-tailwind.js"></script>
     <script>
@@ -31,18 +57,6 @@
             "%cWebsite developed by Musa Mgijima",
             `color: ${window.DigilaynTheme.getColor("on-surface-variant")}; font-size: 16px; font-style: italic;`
         );
-        if (window.console && window.console.log) {
-            const originalLog = window.console.log;
-            window.console.log = function() {
-                const msg = arguments[0];
-                if (msg && typeof msg === 'string') {
-                    if (msg.includes('cdn.tailwindcss.com should not be used in production')) return;
-                    if (msg.includes('Tailwind CSS: You should not use the CDN')) return;
-                    if (msg.includes('enableMultiTabIndexedDbPersistence() will be deprecated')) return;
-                }
-                originalLog.apply(window.console, arguments);
-            };
-        }
     </script>
     <style>
         #loader-overlay { background-color: var(--digilayn-surface-container-lowest); }
