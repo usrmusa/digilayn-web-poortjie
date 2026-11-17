@@ -22,25 +22,23 @@
     <link rel="manifest" href="favicon/site.webmanifest">
     <script>
         if (window.console) {
-            const shouldFilter = (msg) => {
-                if (msg && typeof msg === 'string') {
-                    if (msg.includes('cdn.tailwindcss.com should not be used in production')) return true;
-                    if (msg.includes('Tailwind CSS: You should not use the CDN')) return true;
-                    if (msg.includes('enableMultiTabIndexedDbPersistence() will be deprecated')) return true;
-                }
-                return false;
+            const shouldFilter = (args) => {
+                const text = Array.from(args).map(a => typeof a === 'string' ? a : (a && a.message) || '').join(' ');
+                return text.includes('cdn.tailwindcss.com should not be used in production') ||
+                       text.includes('Tailwind CSS: You should not use the CDN') ||
+                       text.includes('enableMultiTabIndexedDbPersistence');
             };
             if (window.console.warn) {
                 const originalWarn = window.console.warn;
                 window.console.warn = function() {
-                    if (shouldFilter(arguments[0])) return;
+                    if (shouldFilter(arguments)) return;
                     originalWarn.apply(window.console, arguments);
                 };
             }
             if (window.console.log) {
                 const originalLog = window.console.log;
                 window.console.log = function() {
-                    if (shouldFilter(arguments[0])) return;
+                    if (shouldFilter(arguments)) return;
                     originalLog.apply(window.console, arguments);
                 };
             }
