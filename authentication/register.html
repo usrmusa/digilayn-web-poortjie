@@ -39,7 +39,15 @@
 </header>
 
 <main class="max-w-md mx-auto px-6 pb-24">
-    <div class="card flex flex-col p-8 rounded-2xl border-l-4 border-l-digilayn-primary">
+    <div id="register-loader" class="card flex flex-col items-center justify-center p-12 rounded-2xl text-center border-l-4 border-l-digilayn-primary">
+        <svg class="animate-spin h-8 w-8 text-digilayn-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-sm font-bold text-digilayn-on-surface-variant">Checking account creation availability…</p>
+    </div>
+
+    <div id="register-card" class="card flex flex-col p-8 rounded-2xl border-l-4 border-l-digilayn-primary hidden">
         <h2 class="text-2xl font-bold mb-6 text-center">Create Your Account</h2>
         <div id="error-message"
              class="hidden mb-4 p-3 rounded-lg bg-digilayn-error-container text-digilayn-on-error-container text-sm font-medium border border-digilayn-error"></div>
@@ -183,7 +191,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
 <script src="../scripts/account-access-core.js"></script>
 <script src="../scripts/account-access-compat.js"></script>
 <script src="../scripts/shared-profile-repository.js"></script>
@@ -427,10 +434,7 @@
 
         const allowed = await AuthStore.checkAccountCreationEnabled();
         if (!allowed) {
-            errorMessage.textContent = AccountAccessCore.messages['auth/account-creation-disabled'];
-            errorMessage.classList.remove('hidden');
-            submitBtn.disabled = true;
-            if (googleRegisterBtn) googleRegisterBtn.disabled = true;
+            window.location.replace('login' + (window.location.search || ''));
             return;
         }
 
@@ -573,17 +577,16 @@
 
     // Check account creation availability on page load
     AuthStore.checkAccountCreationEnabled().then(allowed => {
-        if (!allowed) {
-            errorMessage.textContent = AccountAccessCore.messages['auth/account-creation-disabled'];
-            errorMessage.classList.remove('hidden');
-            if (submitBtn) submitBtn.disabled = true;
-            if (googleRegisterBtn) googleRegisterBtn.disabled = true;
+        if (allowed === true) {
+            const loader = document.getElementById('register-loader');
+            if (loader) loader.classList.add('hidden');
+            const card = document.getElementById('register-card');
+            if (card) card.classList.remove('hidden');
+        } else {
+            window.location.replace('login' + (window.location.search || ''));
         }
     }).catch(() => {
-        errorMessage.textContent = AccountAccessCore.messages['auth/account-creation-disabled'];
-        errorMessage.classList.remove('hidden');
-        if (submitBtn) submitBtn.disabled = true;
-        if (googleRegisterBtn) googleRegisterBtn.disabled = true;
+        window.location.replace('login' + (window.location.search || ''));
     });
 
     // Check redirect login results if redirect mode was used

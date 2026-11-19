@@ -76,12 +76,11 @@
 
     /** Checks whether global account creation is currently enabled */
     async function checkAccountCreationEnabled() {
-        if (typeof firebase === 'undefined' || typeof firebase.app !== 'function') return false;
+        if (typeof firebase === 'undefined' || typeof firebase.firestore !== 'function') return false;
         try {
-            const callable = firebase.app().functions('us-central1').httpsCallable('getAccountCreationPolicy');
-            const result = await callable({});
-            const data = result && result.data;
-            return !!(data && (data.accountCreation === true || data.accountCreationEnabled === true));
+            const doc = await firebase.firestore().collection('globalConfig').doc('featureToggles').get({ source: 'server' });
+            if (!doc.exists) return false;
+            return doc.data()?.accountCreation === true;
         } catch (err) {
             console.warn('AuthStore: failed to check account creation policy', err);
             return false;

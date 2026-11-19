@@ -6,6 +6,7 @@ const vm = require('node:vm');
 
 const authStoreSrc = fs.readFileSync(path.join(__dirname, '../scripts/viewmodels/auth-store.js'), 'utf8');
 const registerHtml = fs.readFileSync(path.join(__dirname, '../authentication/register.html'), 'utf8');
+const loginHtml = fs.readFileSync(path.join(__dirname, '../authentication/login.html'), 'utf8');
 const accountAccessCoreSrc = fs.readFileSync(path.join(__dirname, '../scripts/account-access-core.js'), 'utf8');
 
 test('AccountAccessCore defines friendly message for disabled account creation', () => {
@@ -17,14 +18,25 @@ test('AccountAccessCore defines friendly message for disabled account creation',
   );
 });
 
-test('register.html includes account creation gate and matches disabled error string', () => {
-  assert.match(registerHtml, /auth\/account-creation-disabled/);
+test('register.html includes account creation gate, loader, and auto-redirects on disabled', () => {
+  assert.match(registerHtml, /id="register-loader"/);
+  assert.match(registerHtml, /id="register-card"[^>]*hidden/);
   assert.match(registerHtml, /AuthStore\.checkAccountCreationEnabled/);
-  assert.match(registerHtml, /submitBtn\.disabled = true/);
-  assert.match(registerHtml, /googleRegisterBtn\.disabled = true/);
+  assert.match(registerHtml, /window\.location\.replace\('login'/);
+  assert.doesNotMatch(registerHtml, /firebase-functions-compat\.js/);
 });
 
-test('AuthStore exports checkAccountCreationEnabled', () => {
+test('login.html adjusts UI when account creation is disabled', () => {
+  assert.match(loginHtml, /id="google-login-btn"/);
+  assert.match(loginHtml, /id="google-login-divider"/);
+  assert.match(loginHtml, /id="register-prompt"/);
+  assert.match(loginHtml, /AuthStore\.checkAccountCreationEnabled/);
+  assert.doesNotMatch(loginHtml, /firebase-functions-compat\.js/);
+});
+
+test('AuthStore exports checkAccountCreationEnabled using direct Firestore reads', () => {
   assert.match(authStoreSrc, /checkAccountCreationEnabled/);
-  assert.match(authStoreSrc, /getAccountCreationPolicy/);
+  assert.match(authStoreSrc, /collection\('globalConfig'\)\.doc\('featureToggles'\)/);
+  assert.match(authStoreSrc, /accountCreation === true/);
+  assert.doesNotMatch(authStoreSrc, /getAccountCreationPolicy/);
 });
