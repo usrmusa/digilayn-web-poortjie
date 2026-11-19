@@ -983,7 +983,6 @@
   }
 
   async function handleScheduleSubmit() {
-    if (!currentUser) return;
     if (!scheduledRidesEnabled) {
       if (scheduleModalError) {
         scheduleModalError.textContent = 'Scheduled ride creation is currently disabled.';
@@ -1030,6 +1029,36 @@
       return;
     }
 
+    const isReturn = scheduleState.tripType === 'RETURN';
+    const note = (scheduleNotesInput?.value || '').trim().substring(0, 64);
+
+    if (!currentUser) {
+      // TODO: Temporary guest exploration mode - save pending Scheduled Ride booking before redirecting to login.
+      const pendingSchedule = {
+        type: 'SCHEDULED',
+        pickup: scheduleState.pickup,
+        dropoff: scheduleState.dropoff,
+        tripType: scheduleState.tripType,
+        returnWaitMinutes: scheduleState.returnWaitMinutes || 15,
+        dateVal,
+        timeVal,
+        scheduledEpoch,
+        note,
+        fare: scheduleState.fare,
+        distanceKm: scheduleState.distanceKm,
+        durationSeconds: scheduleState.durationSeconds
+      };
+      try {
+        sessionStorage.setItem('pendingRideBooking', JSON.stringify(pendingSchedule));
+        sessionStorage.setItem('redirectUrl', window.location.href);
+      } catch (e) {
+        console.warn('Could not store pending scheduled ride in sessionStorage:', e);
+      }
+      showToast('Please sign in to complete your scheduled ride request.', 3500);
+      window.location.href = '../../authentication/login?redirect=' + encodeURIComponent(window.location.href);
+      return;
+    }
+
     try {
       if (scheduleSubmitBtn) {
         scheduleSubmitBtn.disabled = true;
@@ -1038,8 +1067,6 @@
 
       const token = await currentUser.getIdToken();
       const requestId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('sched_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
-      const isReturn = scheduleState.tripType === 'RETURN';
-      const note = (scheduleNotesInput?.value || '').trim().substring(0, 64);
       const vehicleType = 'PRIVATE_CAR';
       const pricingSnapshot = getPricingSnapshot(vehicleType);
 
@@ -1253,26 +1280,25 @@
 
     // 2. Open community planned rides published by drivers (matching Android Dataset.AVAILABLE_PLANS)
     try {
-      const plannedQuery = db.collectionGroup('requests')
-        .where('environment', '==', fleetEnvironment)
-        .where('recordType', '==', 'plannedRideListings')
-        .where('status', '==', 'OPEN');
-
-      activePlannedListingsUnsub = plannedQuery.onSnapshot((snap) => {
-        const now = Date.now();
-        availablePlannedPlans = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-          .filter(p => {
-            const epoch = readEpochMillis(p.startAt || p.departure);
-            // Must not be expired: departure + 5 min must be > now (matches Android)
-            return epoch && (epoch + 5 * 60 * 1000 > now);
-          })
-          .sort((a, b) => (readEpochMillis(a.startAt || a.departure) || 0) - (readEpochMillis(b.startAt || b.departure) || 0));
-        updatePlannedRideDisplay();
-      }, (err) => {
-        console.warn('[LaynRider] Planned ride listings listener warning:', err);
-        availablePlannedPlans = [];
-        updatePlannedRideDisplay();
-      });
+      // TODO: Temporary guest exploration mode - listen to plannedRides collection which has public read permission for welcoming guests.
+      const listingsCol = db.collection('laynfleet').doc(fleetEnvironment).collection('plannedRides');
+      activePlannedListingsUnsub = listingsCol
+        .where('status', 'in', ['OPEN', 'SCHEDULED', 'ACTIVE'])
+        .onSnapshot((snap) => {
+          const now = Date.now();
+          availablePlannedPlans = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .filter(p => {
+              const epoch = readEpochMillis(p.startAt || p.departure);
+              // Must not be expired: departure + 5 min must be > now (matches Android)
+              return epoch && (epoch + 5 * 60 * 1000 > now);
+            })
+            .sort((a, b) => (readEpochMillis(a.startAt || a.departure) || 0) - (readEpochMillis(b.startAt || b.departure) || 0));
+          updatePlannedRideDisplay();
+        }, (err) => {
+          console.warn('[LaynRider] Planned ride listings listener warning:', err);
+          availablePlannedPlans = [];
+          updatePlannedRideDisplay();
+        });
     } catch (e) {
       console.warn('[LaynRider] Failed to init planned ride listings listener:', e);
       availablePlannedPlans = [];
@@ -1620,14 +1646,6 @@
     if (e && e.preventDefault) e.preventDefault();
     if (!selectedPlannedRide) return;
 
-    if (!currentUser) {
-      if (plannedReserveError) {
-        plannedReserveError.textContent = 'Please sign in to reserve a seat.';
-        plannedReserveError.classList.remove('is-hidden');
-      }
-      return;
-    }
-
     const pickupAddr = plannedReservePickupInput ? plannedReservePickupInput.value.trim() : '';
     if (!pickupAddr) {
       if (plannedReserveError) {
@@ -1651,6 +1669,28 @@
       lat: (reservePickupLocation && typeof reservePickupLocation.lat === 'number') ? reservePickupLocation.lat : ((selectedPlannedRide.pickup && selectedPlannedRide.pickup.lat) || POORTJIE_MAP_CENTER.lat),
       lng: (reservePickupLocation && typeof reservePickupLocation.lng === 'number') ? reservePickupLocation.lng : ((selectedPlannedRide.pickup && selectedPlannedRide.pickup.lng) || POORTJIE_MAP_CENTER.lng)
     };
+    const isReturn = !!(selectedPlannedKind === 'PASSENGER' && selectedPlannedRide.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
+
+    if (!currentUser) {
+      // TODO: Temporary guest exploration mode - save pending Planned Ride reservation before redirecting to login.
+      const pendingPlanned = {
+        type: 'PLANNED',
+        planId: selectedPlannedRide.id,
+        kind: selectedPlannedKind,
+        isReturnRide: isReturn,
+        note: note,
+        location: loc
+      };
+      try {
+        sessionStorage.setItem('pendingRideBooking', JSON.stringify(pendingPlanned));
+        sessionStorage.setItem('redirectUrl', window.location.href);
+      } catch (err) {
+        console.warn('Could not store pending planned ride in sessionStorage:', err);
+      }
+      showToast('Please sign in to complete your seat reservation.', 3500);
+      window.location.href = '../../authentication/login?redirect=' + encodeURIComponent(window.location.href);
+      return;
+    }
 
     if (plannedReserveSubmitBtn) {
       plannedReserveSubmitBtn.disabled = true;
@@ -1661,7 +1701,6 @@
     try {
       const token = await currentUser.getIdToken();
       const requestId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
-      const isReturn = !!(selectedPlannedKind === 'PASSENGER' && selectedPlannedRide.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
 
       const payload = {
         requestId: requestId,
@@ -2882,7 +2921,9 @@
 
   /** Save pending booking state to sessionStorage before redirecting to login */
   function savePendingBookingState() {
+    // TODO: Temporary guest exploration mode - save pending Quick Ride booking before redirecting to login.
     const pendingRide = {
+      type: 'QUICK',
       pickup: {
         address: (bookingState.pickup && bookingState.pickup.address) || (pickupAddressInput ? pickupAddressInput.value.trim() : ''),
         lat: bookingState.pickup ? bookingState.pickup.lat : null,
@@ -3858,7 +3899,7 @@
   }
 
   /** Resume pending booking saved in sessionStorage before login */
-  function checkAndResumePendingBooking() {
+  async function checkAndResumePendingBooking() {
     let pendingRaw = null;
     try {
       pendingRaw = sessionStorage.getItem('pendingRideBooking');
@@ -3876,48 +3917,126 @@
       return;
     }
 
-    if (!pendingRide || !pendingRide.pickup || !pendingRide.dropoff) {
+    if (!pendingRide) {
       sessionStorage.removeItem('pendingRideBooking');
       return;
     }
 
-    // Restore booking state
-    bookingState.pickup = pendingRide.pickup || { address: '', lat: null, lng: null };
-    bookingState.dropoff = pendingRide.dropoff || { address: '', lat: null, lng: null };
-    bookingState.note = pendingRide.note || '';
-    bookingState.vehicleType = pendingRide.vehicleType || 'PRIVATE_CAR';
-    bookingState.isReturnTrip = pendingRide.isReturnTrip !== false;
-    bookingState.actualOneWayDistanceKm = pendingRide.actualOneWayDistanceKm || null;
-    bookingState.estimatedDistanceKm = pendingRide.estimatedDistanceKm || null;
-    bookingState.upfrontPrice = pendingRide.upfrontPrice || null;
-    bookingState.ratePerKmSnapshot = pendingRide.ratePerKmSnapshot || null;
-    bookingState.minimumFareSnapshot = pendingRide.minimumFareSnapshot || null;
-    bookingState.returnPercentSnapshot = pendingRide.returnPercentSnapshot || null;
-    bookingTargetDriver = pendingRide.targetDriverId ? { uid: pendingRide.targetDriverId } : null;
+    const type = pendingRide.type || (pendingRide.pickup && pendingRide.dropoff ? 'QUICK' : null);
 
-    // Populate UI inputs
-    if (pickupAddressInput) pickupAddressInput.value = bookingState.pickup.address || '';
-    if (dropoffAddressInput) dropoffAddressInput.value = bookingState.dropoff.address || '';
-    if (bookingNoteInput) bookingNoteInput.value = bookingState.note || '';
-    if (bookingNoteCount) bookingNoteCount.textContent = `${(bookingState.note || '').length}/64`;
-    if (pickupClearBtn) pickupClearBtn.classList.toggle('is-hidden', !bookingState.pickup.address);
-    if (dropoffClearBtn) dropoffClearBtn.classList.toggle('is-hidden', !bookingState.dropoff.address);
+    // 1. PLANNED RIDE RESUME
+    if (type === 'PLANNED') {
+      try {
+        let plan = availablePlannedPlans.find(p => p.id === pendingRide.planId);
+        if (!plan) {
+          const planDoc = await db.collection('laynfleet').doc(fleetEnvironment).collection('plannedRides').doc(pendingRide.planId).get();
+          if (planDoc.exists) {
+            plan = { id: planDoc.id, ...planDoc.data() };
+          }
+        }
+        if (plan) {
+          sessionStorage.removeItem('pendingRideBooking');
+          openPlannedReserveModal(plan, pendingRide.kind || 'PASSENGER');
+          if (pendingRide.location && plannedReservePickupInput) {
+            plannedReservePickupInput.value = pendingRide.location.address || '';
+            reservePickupLocation = pendingRide.location;
+          }
+          if (pendingRide.note && plannedReserveNoteInput) {
+            plannedReserveNoteInput.value = pendingRide.note;
+          }
+          if (pendingRide.isReturnRide && plannedReserveReturnCheckbox) {
+            plannedReserveReturnCheckbox.checked = true;
+          }
+          showToast('Resuming your seat reservation…', 3000);
+        } else {
+          sessionStorage.removeItem('pendingRideBooking');
+          showToast('The planned ride you selected is no longer available.', 4000);
+        }
+      } catch (err) {
+        console.warn('Could not restore planned ride reservation:', err);
+        sessionStorage.removeItem('pendingRideBooking');
+      }
+      return;
+    }
 
-    setReturnTrip(bookingState.isReturnTrip);
-    validatePickupGeofence();
-    updateUpfrontFarePreview(bookingState.actualOneWayDistanceKm);
-
-    // If profile is NOT complete, prompt user to complete profile details first
-    if (!isProfileComplete) {
-      showToast('Please complete your profile to continue with your ride booking.', 4000);
-      openProfileModal(pendingRide.targetDriverId || null);
-    } else {
-      // Profile is complete! Automatically open confirmation dialog to continue booking
+    // 2. SCHEDULED RIDE RESUME
+    if (type === 'SCHEDULED') {
       sessionStorage.removeItem('pendingRideBooking');
-      showToast('Continuing with your ride request...', 3000);
-      setTimeout(() => {
-        openConfirmBookingModal();
-      }, 300);
+      scheduleState.pickup = pendingRide.pickup || { address: '', lat: null, lng: null };
+      scheduleState.dropoff = pendingRide.dropoff || { address: '', lat: null, lng: null };
+      scheduleState.tripType = pendingRide.tripType || 'ONE_WAY';
+      scheduleState.returnWaitMinutes = pendingRide.returnWaitMinutes || 15;
+      scheduleState.fare = pendingRide.fare || null;
+      scheduleState.distanceKm = pendingRide.distanceKm || null;
+      scheduleState.durationSeconds = pendingRide.durationSeconds || null;
+
+      if (schedulePickupInput) schedulePickupInput.value = scheduleState.pickup.address || '';
+      if (scheduleDropoffInput) scheduleDropoffInput.value = scheduleState.dropoff.address || '';
+      if (scheduleDateInput && pendingRide.dateVal) scheduleDateInput.value = pendingRide.dateVal;
+      if (scheduleTimeInput && pendingRide.timeVal) scheduleTimeInput.value = pendingRide.timeVal;
+      if (scheduleNotesInput && pendingRide.note) scheduleNotesInput.value = pendingRide.note;
+
+      if (scheduleState.tripType === 'RETURN') {
+        if (scheduleTypeReturnBtn) scheduleTypeReturnBtn.click();
+      } else {
+        if (scheduleTypeOneWayBtn) scheduleTypeOneWayBtn.click();
+      }
+
+      openScheduleModal();
+      updateScheduleFareEstimate();
+      showToast('Resuming your scheduled ride request…', 3000);
+      return;
+    }
+
+    // 3. QUICK RIDE RESUME
+    if (type === 'QUICK') {
+      if (!pendingRide.pickup || !pendingRide.dropoff) {
+        sessionStorage.removeItem('pendingRideBooking');
+        return;
+      }
+
+      // Restore booking state
+      bookingState.pickup = pendingRide.pickup || { address: '', lat: null, lng: null };
+      bookingState.dropoff = pendingRide.dropoff || { address: '', lat: null, lng: null };
+      bookingState.note = pendingRide.note || '';
+      bookingState.vehicleType = pendingRide.vehicleType || 'PRIVATE_CAR';
+      bookingState.isReturnTrip = pendingRide.isReturnTrip !== false;
+      bookingState.returnWaitMinutes = pendingRide.returnWaitMinutes || 15;
+      bookingState.waitPriceSnapshot = pendingRide.waitPriceSnapshot;
+      bookingState.actualOneWayDistanceKm = pendingRide.actualOneWayDistanceKm || null;
+      bookingState.estimatedDistanceKm = pendingRide.estimatedDistanceKm || null;
+      bookingState.upfrontPrice = pendingRide.upfrontPrice || null;
+      bookingState.ratePerKmSnapshot = pendingRide.ratePerKmSnapshot || null;
+      bookingState.minimumFareSnapshot = pendingRide.minimumFareSnapshot || null;
+      bookingState.curveScaleKmSnapshot = pendingRide.curveScaleKmSnapshot || null;
+      bookingState.returnPercentSnapshot = pendingRide.returnPercentSnapshot || null;
+      bookingTargetDriver = pendingRide.targetDriverId ? { uid: pendingRide.targetDriverId } : null;
+
+      // Populate UI inputs
+      if (pickupAddressInput) pickupAddressInput.value = bookingState.pickup.address || '';
+      if (dropoffAddressInput) dropoffAddressInput.value = bookingState.dropoff.address || '';
+      if (bookingNoteInput) bookingNoteInput.value = bookingState.note || '';
+      if (bookingNoteCount) bookingNoteCount.textContent = `${(bookingState.note || '').length}/64`;
+      if (pickupClearBtn) pickupClearBtn.classList.toggle('is-hidden', !bookingState.pickup.address);
+      if (dropoffClearBtn) dropoffClearBtn.classList.toggle('is-hidden', !bookingState.dropoff.address);
+
+      setReturnTrip(bookingState.isReturnTrip);
+      validatePickupGeofence();
+      updateUpfrontFarePreview(bookingState.actualOneWayDistanceKm);
+
+      // If profile is NOT complete, prompt user to complete profile details first
+      if (!isProfileComplete) {
+        showToast('Please complete your profile to continue with your ride booking.', 4000);
+        openProfileModal(pendingRide.targetDriverId || null);
+      } else {
+        // Profile is complete! Automatically open confirmation dialog to continue booking
+        sessionStorage.removeItem('pendingRideBooking');
+        showToast('Continuing with your ride request...', 3000);
+        setTimeout(() => {
+          openConfirmBookingModal();
+        }, 300);
+      }
+      return;
     }
   }
 
@@ -3931,20 +4050,20 @@
       rtdbPresence = {};
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
       if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
-      if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
       if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
-      availablePlannedPlans = [];
       myPlannedRequests = [];
-      updatePlannedRideDisplay();
 
       if (headerSignInBtn) headerSignInBtn.classList.remove('is-hidden');
       if (headerUserBtn) headerUserBtn.classList.add('is-hidden');
       if (headerSignOutBtn) headerSignOutBtn.classList.add('is-hidden');
+      if (headerAvatar) headerAvatar.classList.add('is-hidden');
 
-      if (heroNameEl) heroNameEl.textContent = 'rider';
+      if (heroNameEl) heroNameEl.textContent = 'Guest';
       if (activeBookingBanner) activeBookingBanner.classList.add('is-hidden');
 
-      showView('auth');
+      // TODO: Temporary guest exploration mode - allow unauthenticated guests to explore dashboard and planned rides. Revert to showView('auth') when exploration mode ends.
+      showView('app');
+      initPlannedRidesListener(null);
       return;
     }
 
@@ -3967,12 +4086,15 @@
       return;
     }
 
+    // TODO: Temporary guest exploration mode - consent gate removed per owner request to let users explore web smoothly.
+    /*
     // Terms & Privacy consent gate
     const hasConsent = await checkLaynFleetConsent(authUser.uid);
     if (!hasConsent) {
       showView('terms');
       return;
     }
+    */
 
     // Profile completeness gate
     const completeness = checkProfileCompleteness(userProfile, authUser);
@@ -4015,7 +4137,7 @@
     initPlannedRidesListener(authUser.uid);
 
     // Check if there is a pending ride booking from before login
-    checkAndResumePendingBooking();
+    await checkAndResumePendingBooking();
   }
 
   /** Sign Out */
