@@ -171,18 +171,32 @@
       <div id="planned-ride-card" class="dashboard-card planned-card is-hidden" style="cursor: pointer;">
         <div class="card-top-row">
           <div class="card-badge-row">
-            <span class="badge-pill badge-planned">PLANNED RIDE</span>
+            <span id="planned-card-badge" class="badge-pill badge-planned">TAG ALONG</span>
             <span id="planned-card-count" class="badge-count is-hidden">1 of 1</span>
           </div>
         </div>
         <div class="card-main-content">
-          <h3 id="planned-card-dest" class="card-main-title">—</h3>
-          <p id="planned-card-sub" class="card-sub-text">—</p>
+          <h3 id="planned-card-dest" class="card-main-title" style="font-size: 19px; font-weight: 700; margin-bottom: 4px; line-height: 1.25;">Going to "—"</h3>
+          <p id="planned-card-sub" class="card-sub-text" style="font-size: 13.5px; margin-bottom: 6px;">—</p>
+          <div id="planned-card-route-box" style="font-size: 12px; color: var(--digilayn-on-surface-variant); display: flex; flex-direction: column; gap: 4px; margin-top: 6px; padding: 8px 10px; background: rgba(0,0,0,0.03); border-radius: 6px;">
+            <div id="planned-card-from" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">📍 From: —</div>
+            <div id="planned-card-to" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">🎯 To: —</div>
+          </div>
         </div>
-        <div class="card-bottom-row">
+        <div class="card-bottom-row" style="margin-top: 10px;">
           <span id="planned-card-fare" class="planned-fare-tag">R --</span>
-          <span class="card-nav-arrow">➔</span>
+          <span id="planned-card-action-text" class="card-nav-arrow" style="font-weight: 700; color: var(--digilayn-primary); font-size: 13px;">Reserve Seat ➔</span>
         </div>
+      </div>
+
+      <!-- App Nudge outside/below the Planned Ride card -->
+      <div id="planned-ride-app-nudge" class="planned-nudge-box is-hidden" style="margin-top: -6px; margin-bottom: 14px; padding: 10px 14px; background: var(--digilayn-surface-variant, #f4f4f5); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--digilayn-outline-variant, #e4e4e7);">
+        <div style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); line-height: 1.35;">
+          <span>📱</span> <strong>Better on the LaynRider app:</strong> Live driver tracking & lock-screen push alerts.
+        </div>
+        <a href="../laynrider-sideload.apk" download="laynrider.apk" id="planned-download-apk-btn" class="btn btn-sm btn-primary" style="white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 12px;">
+          <span>⬇️</span> Download APK
+        </a>
       </div>
 
       <!-- 3. QUICK RIDE HERO SECTION (Local On-Demand) -->
@@ -863,6 +877,163 @@
 
         <div class="modal-actions" style="margin-top: 6px;">
           <button type="button" id="planned-modal-done-btn" class="btn btn-ghost btn-block">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PLANNED SEAT RESERVATION MODAL ===================== -->
+  <div id="planned-reserve-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="planned-reserve-title">
+    <div class="modal-card booking-modal-card" style="max-width: 480px;">
+      <div class="modal-drag-handle"></div>
+
+      <div class="modal-header">
+        <div>
+          <h3 id="planned-reserve-title" class="modal-title">Reserve a Seat</h3>
+          <p class="modal-subtitle">Tag Along Community Route</p>
+        </div>
+        <button id="planned-reserve-close" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
+        <!-- Route & Plan Info Card -->
+        <div class="review-route-card" style="background: var(--digilayn-surface-variant, #f4f4f5); border-radius: 12px; padding: 14px;">
+          <div style="margin-bottom: 8px;">
+            <span class="badge-pill badge-planned" style="font-size: 10.5px;">TAG ALONG ROUTE</span>
+            <h4 id="planned-reserve-dest-header" style="font-size: 17px; font-weight: 800; margin: 4px 0 2px 0; color: var(--digilayn-on-surface);">Going to "—"</h4>
+            <p id="planned-reserve-time-seats" style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 0;">Departs — · — seats available</p>
+          </div>
+
+          <div style="font-size: 12px; display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: rgba(0,0,0,0.03); border-radius: 8px; margin-top: 6px;">
+            <div id="planned-reserve-from-text" style="color: var(--digilayn-on-surface-variant);">📍 <strong>From:</strong> <span>—</span></div>
+            <div id="planned-reserve-to-text" style="color: var(--digilayn-on-surface-variant);">🎯 <strong>To:</strong> <span>—</span></div>
+          </div>
+
+          <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 8px;">
+            <span style="font-size: 12px; color: var(--digilayn-on-surface-variant);">Seat Fare:</span>
+            <span id="planned-reserve-fare-display" style="font-size: 18px; font-weight: 900; color: var(--digilayn-primary);">R --</span>
+          </div>
+        </div>
+
+        <!-- Pickup Location Input -->
+        <label class="field">
+          <span class="field-label">Your Pickup Location <span class="field-req">inside Poortjie</span></span>
+          <div style="display: flex; gap: 8px;">
+            <input id="planned-reserve-pickup-input" type="text" class="field-input" placeholder="Enter pickup address in Poortjie…" style="flex: 1;" />
+            <button type="button" id="planned-reserve-pickup-gps-btn" class="btn btn-ghost" title="Use current GPS location" style="padding: 0 10px; font-size: 13px;">📍 GPS</button>
+          </div>
+          <span class="field-hint" style="font-size: 11px; color: var(--digilayn-on-surface-variant); margin-top: 2px;">Driver will pick you up along their route in Poortjie.</span>
+        </label>
+
+        <!-- Return Trip Option (Conditional) -->
+        <div id="planned-reserve-return-wrap" class="field is-hidden">
+          <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 10px 12px; background: var(--digilayn-surface-variant, #f4f4f5); border-radius: 8px;">
+            <input type="checkbox" id="planned-reserve-return-checkbox" style="margin-top: 3px; width: 16px; height: 16px; accent-color: var(--digilayn-primary);" />
+            <div>
+              <strong style="font-size: 13px; color: var(--digilayn-on-surface); display: block;">Return Trip (Ride back with driver)</strong>
+              <span id="planned-reserve-return-hint" style="font-size: 11.5px; color: var(--digilayn-on-surface-variant);">Driver is offering a return ride. Total fare: R --</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Note to driver -->
+        <label class="field">
+          <span class="field-label">Note for Driver (Optional)</span>
+          <input id="planned-reserve-note-input" type="text" maxlength="120" class="field-input" placeholder="e.g. Near main gate, 1 small bag" />
+        </label>
+
+        <!-- Offline payment notice -->
+        <div class="payment-notice" style="padding: 8px 12px; font-size: 12px;">
+          <div class="payment-notice-icon" style="font-size: 16px;">💵</div>
+          <div class="payment-notice-text">
+            <strong>Offline Direct Payment:</strong> Pay the driver directly with cash or EFT upon boarding.
+          </div>
+        </div>
+
+        <div id="planned-reserve-error" class="form-error is-hidden"></div>
+
+        <div class="modal-actions" style="margin-top: 4px; display: flex; gap: 8px;">
+          <button type="button" id="planned-reserve-cancel-btn" class="btn btn-ghost" style="flex: 1;">Cancel</button>
+          <button type="button" id="planned-reserve-submit-btn" class="btn btn-primary btn-submit" style="flex: 2;">
+            <span>⚡</span> Confirm Seat Reservation
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PLANNED BOOKING DETAILS MODAL ===================== -->
+  <div id="planned-booking-details-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="planned-booking-details-title">
+    <div class="modal-card booking-modal-card" style="max-width: 480px;">
+      <div class="modal-drag-handle"></div>
+
+      <div class="modal-header">
+        <div>
+          <h3 id="planned-booking-details-title" class="modal-title">Your Reserved Seat</h3>
+          <span id="planned-booking-status-pill" class="badge-status" style="margin-top: 4px; display: inline-block;">CONFIRMED</span>
+        </div>
+        <button id="planned-booking-close" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
+        <div class="review-route-card">
+          <div class="review-route-item">
+            <div class="review-route-left">
+              <span class="review-route-label">Departure</span>
+              <div id="planned-booking-time" class="review-route-val">—</div>
+            </div>
+          </div>
+          <div class="review-route-divider"></div>
+          <div class="review-route-item">
+            <div class="review-route-left">
+              <span class="review-route-label">Pickup</span>
+              <div id="planned-booking-pickup" class="review-route-val">—</div>
+            </div>
+          </div>
+          <div class="review-route-divider"></div>
+          <div class="review-route-item">
+            <div class="review-route-left">
+              <span class="review-route-label">Destination</span>
+              <div id="planned-booking-dropoff" class="review-route-val">—</div>
+            </div>
+          </div>
+          <div class="review-route-divider"></div>
+          <div class="review-route-item">
+            <div class="review-route-left">
+              <span class="review-route-label">Fare (Pay Driver Offline)</span>
+              <div id="planned-booking-fare" class="review-route-val" style="font-weight: 800; color: var(--digilayn-primary);">R --</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Driver Card -->
+        <div id="planned-booking-driver-box" class="active-driver-card" style="background: var(--digilayn-surface-variant, #f4f4f5); padding: 12px; border-radius: 10px; display: flex; align-items: center; gap: 12px;">
+          <img id="planned-booking-driver-photo" class="driver-avatar-lg" src="" alt="Driver" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;" />
+          <div style="flex: 1;">
+            <strong id="planned-booking-driver-name" style="font-size: 14.5px; display: block;">Driver</strong>
+            <span id="planned-booking-vehicle" style="font-size: 12.5px; color: var(--digilayn-on-surface-variant);">Vehicle</span>
+          </div>
+        </div>
+
+        <!-- App Tracking Note -->
+        <div class="confirm-app-track-box" style="margin: 0; padding: 10px 12px;">
+          <div class="confirm-app-track-left">
+            <span class="confirm-app-track-icon">📱</span>
+            <div class="confirm-app-track-info">
+              <strong>Live Tracking on LaynRider App</strong>
+              <p>Real-time vehicle GPS & notifications</p>
+            </div>
+          </div>
+          <a href="../laynrider-sideload.apk" download="laynrider.apk" class="btn btn-sm btn-ghost confirm-app-track-btn" style="text-decoration: none;">
+            <span>Get APK</span> ⬇️
+          </a>
+        </div>
+
+        <div id="planned-booking-error" class="form-error is-hidden"></div>
+
+        <div class="modal-actions" style="margin-top: 6px; display: flex; flex-direction: column; gap: 8px;">
+          <button type="button" id="planned-booking-withdraw-btn" class="btn btn-danger btn-block" style="background: var(--digilayn-error, #ba1a1a); color: white; border: none; padding: 10px;">Withdraw Reservation</button>
+          <button type="button" id="planned-booking-dismiss-btn" class="btn btn-ghost btn-block">Close</button>
         </div>
       </div>
     </div>
