@@ -19,7 +19,8 @@
 
   const FS = global.FS;
   if (!FS) throw new Error('Firebase layout is required');
-  const fleetEnvironment = 'prod';
+  const urlEnv = new URLSearchParams(window.location.search).get('env');
+  const fleetEnvironment = (urlEnv === 'dev' || urlEnv === 'prod') ? urlEnv : 'prod';
   const riderApi = new global.RiderApi({
     get currentUser() { return global.AccountAccess.currentUser; },
     signOut: () => auth.signOut()
@@ -395,8 +396,10 @@
   let appConfigUnsub = null;
   let activeScheduledUnsub = null;
   let currentScheduledDoc = null;
-  let activePlannedUnsub = null;
+  let activePlannedListingsUnsub = null;
+  let activePlannedRequestsUnsub = null;
   let availablePlannedPlans = [];
+  let myPlannedRequests = [];
   let scheduleState = {
     date: '',
     time: '',
@@ -815,7 +818,11 @@
 
     if (scheduledStatusBadge) {
       const st = (booking.status || 'PENDING').toUpperCase();
-      scheduledStatusBadge.textContent = st === 'PENDING' ? 'SEARCHING' : st;
+      let badgeText = st;
+      if (st === 'PENDING') badgeText = 'SEARCHING';
+      else if (st === 'UNDER_REVIEW') badgeText = 'REVIEWING';
+      else if (st === 'SCHEDULED_CONFIRMED') badgeText = 'CONFIRMED';
+      scheduledStatusBadge.textContent = badgeText;
     }
   }
 
@@ -1081,31 +1088,95 @@
    * PLANNED RIDES (TAG ALONG & COMMUNITY ERRANDS)
    * ============================================================ */
 
-  function initPlannedRidesListener() {
-    if (activePlannedUnsub) { activePlannedUnsub(); activePlannedUnsub = null; }
+  function initPlannedRidesListener(uid) {
+    if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
+    if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
+
+    // 1. Rider's own booked planned requests (participating rides, matching Android Dataset.PLANNED_REQUESTS)
+    if (uid) {
+      try {
+        const myRequestsCol = db.collection('laynfleet').doc(fleetEnvironment)
+          .collection('plannedRideRequests').doc(uid).collection('requests');
+
+        activePlannedRequestsUnsub = myRequestsCol.onSnapshot((snap) => {
+          myPlannedRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .filter(d => !['COMPLETED', 'CANCELLED', 'REJECTED', 'WITHDRAWN'].includes(d.status))
+            .sort((a, b) => (readEpochMillis(a.departure || a.startAt) || 0) - (readEpochMillis(b.departure || b.startAt) || 0));
+          updatePlannedRideDisplay();
+        }, (err) => {
+          console.warn('[LaynRider] My planned requests listener warning:', err);
+          myPlannedRequests = [];
+          updatePlannedRideDisplay();
+        });
+      } catch (e) {
+        console.warn('[LaynRider] Failed to init my planned requests listener:', e);
+        myPlannedRequests = [];
+      }
+    } else {
+      myPlannedRequests = [];
+    }
+
+    // 2. Open community planned rides published by drivers (matching Android Dataset.AVAILABLE_PLANS)
     try {
       const plannedQuery = db.collectionGroup('requests')
         .where('environment', '==', fleetEnvironment)
         .where('recordType', '==', 'plannedRideListings')
         .where('status', '==', 'OPEN');
 
-      activePlannedUnsub = plannedQuery.onSnapshot((snap) => {
-        availablePlannedPlans = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderPlannedRideCard(availablePlannedPlans);
+      activePlannedListingsUnsub = plannedQuery.onSnapshot((snap) => {
+        const now = Date.now();
+        availablePlannedPlans = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .filter(p => {
+            const epoch = readEpochMillis(p.startAt || p.departure);
+            // Must not be expired: departure + 5 min must be > now (matches Android)
+            return epoch && (epoch + 5 * 60 * 1000 > now);
+          })
+          .sort((a, b) => (readEpochMillis(a.startAt || a.departure) || 0) - (readEpochMillis(b.startAt || b.departure) || 0));
+        updatePlannedRideDisplay();
       }, (err) => {
-        console.warn('[LaynRider] Planned rides listener warning:', err);
-        renderPlannedRideCard([]);
+        console.warn('[LaynRider] Planned ride listings listener warning:', err);
+        availablePlannedPlans = [];
+        updatePlannedRideDisplay();
       });
     } catch (e) {
-      console.warn('[LaynRider] Failed to init planned rides listener:', e);
-      renderPlannedRideCard([]);
+      console.warn('[LaynRider] Failed to init planned ride listings listener:', e);
+      availablePlannedPlans = [];
+      updatePlannedRideDisplay();
     }
   }
 
-  function renderPlannedRideCard(plans) {
+  function updatePlannedRideDisplay() {
     if (!plannedRideCard) return;
-    if (plans && plans.length > 0) {
-      const plan = plans[0];
+
+    // Filter community plans: exclude plans where rider is already participating
+    const unbookedCommunityPlans = availablePlannedPlans.filter(p =>
+      !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id)
+    );
+
+    // Matching Android priority (RiderDashboardScreen.kt):
+    // 1. If participating in a planned ride, show rider's booked plan first
+    if (myPlannedRequests.length > 0) {
+      const req = myPlannedRequests[0];
+      const dest = (req.destination && req.destination.address) || req.destination || '';
+      const cleanDest = typeof dest === 'string' ? dest.split(',')[0] : '';
+      if (plannedCardDest) plannedCardDest.textContent = cleanDest;
+
+      const epoch = readEpochMillis(req.departure || req.startAt);
+      const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+      const statusLabel = req.status === 'ACCEPTED' ? 'Confirmed' : (req.status || 'Booked');
+      if (plannedCardSub) plannedCardSub.textContent = timeStr ? `Departs ${timeStr} · ${statusLabel}` : statusLabel;
+
+      const fare = req.fare || req.oneWayFare;
+      if (plannedCardFare) plannedCardFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)}` : '';
+      if (plannedCardCount) {
+        plannedCardCount.textContent = `${myPlannedRequests.length} booked`;
+        plannedCardCount.classList.remove('is-hidden');
+      }
+
+      plannedRideCard.classList.remove('is-hidden');
+    } else if (unbookedCommunityPlans.length > 0) {
+      // 2. Otherwise show earliest available community plan from drivers
+      const plan = unbookedCommunityPlans[0];
       const dest = (plan.destination && plan.destination.address) || plan.destination || '';
       const cleanDest = typeof dest === 'string' ? dest.split(',')[0] : '';
       if (plannedCardDest) plannedCardDest.textContent = cleanDest;
@@ -1118,12 +1189,13 @@
       const fare = plan.oneWayFare ?? plan.fare;
       if (plannedCardFare) plannedCardFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)} per person` : '';
       if (plannedCardCount) {
-        plannedCardCount.textContent = `1 of ${plans.length}`;
+        plannedCardCount.textContent = `1 of ${unbookedCommunityPlans.length}`;
         plannedCardCount.classList.remove('is-hidden');
       }
 
       plannedRideCard.classList.remove('is-hidden');
     } else {
+      // 3. Otherwise hide the card completely
       if (plannedCardDest) plannedCardDest.textContent = '';
       if (plannedCardSub) plannedCardSub.textContent = '';
       if (plannedCardFare) plannedCardFare.textContent = '';
@@ -1135,8 +1207,42 @@
   function openPlannedModal() {
     if (plannedRidesList) {
       plannedRidesList.innerHTML = '';
-      if (availablePlannedPlans.length > 0) {
-        availablePlannedPlans.forEach(plan => {
+
+      if (myPlannedRequests.length > 0) {
+        myPlannedRequests.forEach(req => {
+          const item = document.createElement('div');
+          item.className = 'dashboard-card';
+          item.style.padding = '12px 16px';
+          item.style.marginBottom = '8px';
+          item.style.borderColor = 'var(--digilayn-primary)';
+
+          const dest = (req.destination && req.destination.address) || req.destination || 'Destination';
+          const epoch = readEpochMillis(req.departure || req.startAt);
+          const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+          const fare = req.fare || req.oneWayFare;
+          const fareStr = typeof fare === 'number' ? `R ${Math.round(fare)}` : 'R --';
+          const status = req.status || 'BOOKED';
+
+          item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <span class="badge-pill badge-planned" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">YOUR BOOKING · ${status}</span>
+                <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">${dest}</strong>
+                <p style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 2px 0 0 0;">Departs ${timeStr}</p>
+              </div>
+              <span class="planned-fare-tag">${fareStr}</span>
+            </div>
+          `;
+          plannedRidesList.appendChild(item);
+        });
+      }
+
+      const unbookedCommunityPlans = availablePlannedPlans.filter(p =>
+        !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id)
+      );
+
+      if (unbookedCommunityPlans.length > 0) {
+        unbookedCommunityPlans.forEach(plan => {
           const item = document.createElement('div');
           item.className = 'dashboard-card';
           item.style.padding = '12px 16px';
@@ -1161,7 +1267,9 @@
           `;
           plannedRidesList.appendChild(item);
         });
-      } else {
+      }
+
+      if (myPlannedRequests.length === 0 && unbookedCommunityPlans.length === 0) {
         const placeholder = document.createElement('div');
         placeholder.style.padding = '16px';
         placeholder.style.textAlign = 'center';
@@ -3242,6 +3350,17 @@
       rtdbPresence = {};
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
       if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
+      if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
+      if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
+      availablePlannedPlans = [];
+      myPlannedRequests = [];
+      updatePlannedRideDisplay();
+      if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
+      if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
+      if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
+      availablePlannedPlans = [];
+      myPlannedRequests = [];
+      updatePlannedRideDisplay();
 
       if (headerSignInBtn) headerSignInBtn.classList.remove('is-hidden');
       if (headerUserBtn) headerUserBtn.classList.add('is-hidden');
@@ -3264,6 +3383,17 @@
       }
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
       if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
+      if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
+      if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
+      availablePlannedPlans = [];
+      myPlannedRequests = [];
+      updatePlannedRideDisplay();
+      if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
+      if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
+      if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
+      availablePlannedPlans = [];
+      myPlannedRequests = [];
+      updatePlannedRideDisplay();
       showView('suspended');
       return;
     }
@@ -3313,7 +3443,7 @@
     }
     startActiveBookingListener(authUser.uid);
     initScheduledRidesListener(authUser.uid);
-    initPlannedRidesListener();
+    initPlannedRidesListener(authUser.uid);
 
     // Check if there is a pending ride booking from before login
     checkAndResumePendingBooking();
@@ -3324,6 +3454,12 @@
     try {
       await riderApi.signOut();
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
+      if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
+      if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
+      if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
+      availablePlannedPlans = [];
+      myPlannedRequests = [];
+      updatePlannedRideDisplay();
       if (typeof AuthStore !== 'undefined' && AuthStore.signOut) {
         await AuthStore.signOut();
       } else {
