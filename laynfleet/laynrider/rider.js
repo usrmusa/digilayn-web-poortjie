@@ -345,6 +345,9 @@
   const plannedCardTo = document.getElementById('planned-card-to');
   const plannedCardFare = document.getElementById('planned-card-fare');
   const plannedCardActionText = document.getElementById('planned-card-action-text');
+  const plannedCardBtnTagAlong = document.getElementById('planned-card-btn-tagalong');
+  const plannedCardBtnDeliver = document.getElementById('planned-card-btn-deliver');
+  const plannedCardBtnFetch = document.getElementById('planned-card-btn-fetch');
   const plannedRideAppNudge = document.getElementById('planned-ride-app-nudge');
 
   const heroNameEl = document.getElementById('hero-name');
@@ -387,16 +390,27 @@
   const plannedReserveClose = document.getElementById('planned-reserve-close');
   const plannedReserveCancelBtn = document.getElementById('planned-reserve-cancel-btn');
   const plannedReserveSubmitBtn = document.getElementById('planned-reserve-submit-btn');
+  const plannedReserveTitle = document.getElementById('planned-reserve-title');
+  const plannedReserveSubtitle = document.getElementById('planned-reserve-subtitle');
+  const plannedReserveBadge = document.getElementById('planned-reserve-badge');
+  const plannedRoleToggleGroup = document.getElementById('planned-role-toggle-group');
+  const plannedRolePassenger = document.getElementById('planned-role-passenger');
+  const plannedRoleDeliver = document.getElementById('planned-role-deliver');
+  const plannedRoleFetch = document.getElementById('planned-role-fetch');
   const plannedReserveDestHeader = document.getElementById('planned-reserve-dest-header');
   const plannedReserveTimeSeats = document.getElementById('planned-reserve-time-seats');
   const plannedReserveFromText = document.getElementById('planned-reserve-from-text');
   const plannedReserveToText = document.getElementById('planned-reserve-to-text');
+  const plannedReserveFareLabel = document.getElementById('planned-reserve-fare-label');
   const plannedReserveFareDisplay = document.getElementById('planned-reserve-fare-display');
+  const plannedReserveLocationLabel = document.getElementById('planned-reserve-location-label');
+  const plannedReserveLocationHint = document.getElementById('planned-reserve-location-hint');
   const plannedReservePickupInput = document.getElementById('planned-reserve-pickup-input');
   const plannedReservePickupGpsBtn = document.getElementById('planned-reserve-pickup-gps-btn');
   const plannedReserveReturnWrap = document.getElementById('planned-reserve-return-wrap');
   const plannedReserveReturnCheckbox = document.getElementById('planned-reserve-return-checkbox');
   const plannedReserveReturnHint = document.getElementById('planned-reserve-return-hint');
+  const plannedReserveNoteLabel = document.getElementById('planned-reserve-note-label');
   const plannedReserveNoteInput = document.getElementById('planned-reserve-note-input');
   const plannedReserveError = document.getElementById('planned-reserve-error');
 
@@ -442,6 +456,7 @@
   let myPlannedRequests = [];
   let selectedPlannedRide = null;
   let selectedPlannedBooking = null;
+  let selectedPlannedKind = 'PASSENGER';
   let reservePickupLocation = null;
   let scheduleState = {
     date: '',
@@ -1216,11 +1231,20 @@
 
       const fare = req.fare || req.oneWayFare;
       if (plannedCardFare) plannedCardFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)}` : '';
-      if (plannedCardActionText) plannedCardActionText.textContent = 'View Booking ➔';
-      if (plannedCardBadge) plannedCardBadge.textContent = 'TAG ALONG · BOOKED';
+
+      const kindLabel = req.kind === 'DELIVER' ? 'DELIVERY' : (req.kind === 'FETCH' ? 'FETCH ERRAND' : 'TAG ALONG');
+      if (plannedCardBadge) plannedCardBadge.textContent = `${kindLabel} · ${statusLabel.toUpperCase()}`;
       if (plannedCardCount) {
         plannedCardCount.textContent = `${myPlannedRequests.length} booked`;
         plannedCardCount.classList.remove('is-hidden');
+      }
+
+      if (plannedCardBtnTagAlong) plannedCardBtnTagAlong.classList.add('is-hidden');
+      if (plannedCardBtnDeliver) plannedCardBtnDeliver.classList.add('is-hidden');
+      if (plannedCardBtnFetch) plannedCardBtnFetch.classList.add('is-hidden');
+      if (plannedCardActionText) {
+        plannedCardActionText.textContent = 'View Booking ➔';
+        plannedCardActionText.classList.remove('is-hidden');
       }
 
       plannedRideCard.classList.remove('is-hidden');
@@ -1243,13 +1267,27 @@
       if (plannedCardTo) plannedCardTo.textContent = `🎯 To: ${fullDest}`;
 
       const fare = plan.oneWayFare ?? plan.fare;
-      if (plannedCardFare) plannedCardFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)} per person` : '';
-      if (plannedCardActionText) plannedCardActionText.textContent = 'Reserve Seat ➔';
-      if (plannedCardBadge) plannedCardBadge.textContent = 'TAG ALONG';
+      if (plannedCardFare) plannedCardFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)}` : '';
+      if (plannedCardBadge) plannedCardBadge.textContent = seats <= 0 ? 'ERRANDS ONLY' : 'TAG ALONG';
       if (plannedCardCount) {
         plannedCardCount.textContent = `1 of ${unbookedCommunityPlans.length}`;
         plannedCardCount.classList.remove('is-hidden');
       }
+
+      // Show Tag Along, Deliver, Fetch action buttons on card matching Android
+      if (plannedCardBtnTagAlong) {
+        if (seats > 0) plannedCardBtnTagAlong.classList.remove('is-hidden');
+        else plannedCardBtnTagAlong.classList.add('is-hidden');
+      }
+      if (plannedCardBtnDeliver) {
+        if (plan.allowErrands) plannedCardBtnDeliver.classList.remove('is-hidden');
+        else plannedCardBtnDeliver.classList.add('is-hidden');
+      }
+      if (plannedCardBtnFetch) {
+        if (plan.allowErrands && plan.isReturnRide) plannedCardBtnFetch.classList.remove('is-hidden');
+        else plannedCardBtnFetch.classList.add('is-hidden');
+      }
+      if (plannedCardActionText) plannedCardActionText.classList.add('is-hidden');
 
       plannedRideCard.classList.remove('is-hidden');
       if (plannedRideAppNudge) plannedRideAppNudge.classList.remove('is-hidden');
@@ -1284,11 +1322,12 @@
           const fare = req.fare || req.oneWayFare;
           const fareStr = typeof fare === 'number' ? `R ${Math.round(fare)}` : 'R --';
           const status = req.status === 'ACCEPTED' ? 'CONFIRMED' : (req.status || 'BOOKED');
+          const kindLabel = req.kind === 'DELIVER' ? 'DELIVERY' : (req.kind === 'FETCH' ? 'FETCH ERRAND' : 'TAG ALONG');
 
           item.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
-                <span class="badge-pill badge-planned" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">YOUR BOOKING · ${status}</span>
+                <span class="badge-pill badge-planned" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">${kindLabel} · ${status}</span>
                 <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">Going to "${cleanDest}"</strong>
                 <p style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 2px 0 0 0;">Departs ${timeStr}</p>
               </div>
@@ -1314,7 +1353,6 @@
           item.className = 'dashboard-card';
           item.style.padding = '12px 16px';
           item.style.marginBottom = '8px';
-          item.style.cursor = 'pointer';
 
           const dest = (plan.destination && plan.destination.address) || plan.destination || 'Destination';
           const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
@@ -1332,14 +1370,23 @@
               </div>
               <span class="planned-fare-tag">${fareStr}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-              <span style="font-size: 11.5px; color: var(--digilayn-on-surface-variant);">Pay driver upon boarding</span>
-              <span style="font-size: 12px; font-weight: 700; color: var(--digilayn-primary);">Reserve Seat ➔</span>
+            <div style="display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-top: 10px;">
+              ${seats > 0 ? '<button type="button" class="btn btn-sm btn-primary modal-action-btn" data-kind="PASSENGER" style="padding: 4px 10px; font-size: 11.5px;">🧑 Tag Along</button>' : ''}
+              ${plan.allowErrands ? '<button type="button" class="btn btn-sm btn-ghost modal-action-btn" data-kind="DELIVER" style="padding: 4px 10px; font-size: 11.5px;">📦 Deliver</button>' : ''}
+              ${plan.allowErrands && plan.isReturnRide ? '<button type="button" class="btn btn-sm btn-ghost modal-action-btn" data-kind="FETCH" style="padding: 4px 10px; font-size: 11.5px;">🛍️ Fetch</button>' : ''}
             </div>
           `;
+          const buttons = item.querySelectorAll('.modal-action-btn');
+          buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              closePlannedModal();
+              openPlannedReserveModal(plan, btn.getAttribute('data-kind'));
+            });
+          });
           item.addEventListener('click', () => {
             closePlannedModal();
-            openPlannedReserveModal(plan);
+            openPlannedReserveModal(plan, seats > 0 ? 'PASSENGER' : 'DELIVER');
           });
           plannedRidesList.appendChild(item);
         });
@@ -1362,7 +1409,85 @@
     if (plannedModal) plannedModal.classList.add('is-hidden');
   }
 
-  function openPlannedReserveModal(plan) {
+  function selectPlannedRole(kind) {
+    selectedPlannedKind = kind;
+    if (plannedRolePassenger) {
+      if (kind === 'PASSENGER') plannedRolePassenger.className = 'btn btn-sm btn-primary';
+      else plannedRolePassenger.className = 'btn btn-sm btn-ghost';
+    }
+    if (plannedRoleDeliver) {
+      if (kind === 'DELIVER') plannedRoleDeliver.className = 'btn btn-sm btn-primary';
+      else plannedRoleDeliver.className = 'btn btn-sm btn-ghost';
+    }
+    if (plannedRoleFetch) {
+      if (kind === 'FETCH') plannedRoleFetch.className = 'btn btn-sm btn-primary';
+      else plannedRoleFetch.className = 'btn btn-sm btn-ghost';
+    }
+
+    if (!selectedPlannedRide) return;
+    const plan = selectedPlannedRide;
+    const dest = (plan.destination && plan.destination.address) || plan.destination || '';
+    const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
+    const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
+    const oneWayFare = plan.oneWayFare ?? plan.fare ?? 0;
+    const returnFare = plan.returnFare ?? (oneWayFare * 2);
+
+    if (kind === 'PASSENGER') {
+      if (plannedReserveTitle) plannedReserveTitle.textContent = 'Reserve a Seat';
+      if (plannedReserveSubtitle) plannedReserveSubtitle.textContent = 'Tag Along Community Route';
+      if (plannedReserveBadge) plannedReserveBadge.textContent = 'TAG ALONG ROUTE';
+      if (plannedReserveFareLabel) plannedReserveFareLabel.textContent = 'Seat Fare:';
+      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Your Pickup Location <span class="field-req">inside Poortjie</span>';
+      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will pick you up along their route in Poortjie.';
+      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>From:</strong> <span>${fullPickup}</span>`;
+      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>To:</strong> <span>${dest}</span>`;
+      if (plannedReserveNoteLabel) plannedReserveNoteLabel.textContent = 'Note for Driver (Optional)';
+      if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. Near blue gate, 1 bag';
+
+      if (plan.isReturnRide && plannedReserveReturnWrap) {
+        plannedReserveReturnWrap.classList.remove('is-hidden');
+      } else if (plannedReserveReturnWrap) {
+        plannedReserveReturnWrap.classList.add('is-hidden');
+      }
+
+      const isReturn = !!(plan.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
+      if (plannedReserveFareDisplay) plannedReserveFareDisplay.textContent = `R ${Math.round(isReturn ? returnFare : oneWayFare)}`;
+      if (plannedReserveSubmitBtn) plannedReserveSubmitBtn.innerHTML = '<span>⚡</span> Confirm Seat Reservation';
+    } else if (kind === 'DELIVER') {
+      if (plannedReserveTitle) plannedReserveTitle.textContent = 'Send a Delivery';
+      if (plannedReserveSubtitle) plannedReserveSubtitle.textContent = 'Driver delivers your parcel along this route';
+      if (plannedReserveBadge) plannedReserveBadge.textContent = 'ERRAND DELIVERY';
+      if (plannedReserveFareLabel) plannedReserveFareLabel.textContent = 'Delivery Fare:';
+      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Parcel Collection Location <span class="field-req">inside Poortjie</span>';
+      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will collect the package from you at this location in Poortjie.';
+      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>Collect in Poortjie:</strong> <span>Your address</span>`;
+      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Deliver to:</strong> <span>${dest}</span>`;
+      if (plannedReserveNoteLabel) plannedReserveNoteLabel.innerHTML = 'Parcel Description & Recipient Contact <span class="field-req">required</span>';
+      if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. 1 small parcel, Deliver to John 0821234567';
+
+      if (plannedReserveReturnWrap) plannedReserveReturnWrap.classList.add('is-hidden');
+      if (plannedReserveFareDisplay) plannedReserveFareDisplay.textContent = `R ${Math.round(oneWayFare)}`;
+      if (plannedReserveSubmitBtn) plannedReserveSubmitBtn.innerHTML = '<span>📦</span> Confirm Errand Delivery';
+    } else if (kind === 'FETCH') {
+      if (plannedReserveTitle) plannedReserveTitle.textContent = 'Fetch an Item';
+      if (plannedReserveSubtitle) plannedReserveSubtitle.textContent = 'Driver fetches an item at destination and returns it to you';
+      if (plannedReserveBadge) plannedReserveBadge.textContent = 'ERRAND FETCH';
+      if (plannedReserveFareLabel) plannedReserveFareLabel.textContent = 'Fetch Fare:';
+      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Your Drop-off Location <span class="field-req">inside Poortjie</span>';
+      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will bring the fetched item to you at this location in Poortjie.';
+      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>Fetch at:</strong> <span>${dest}</span>`;
+      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Drop-off in Poortjie:</strong> <span>Your address</span>`;
+      if (plannedReserveNoteLabel) plannedReserveNoteLabel.innerHTML = 'Item Details & Collection Contact <span class="field-req">required</span>';
+      if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. Order #445 at reception, collect from Sarah';
+
+      if (plannedReserveReturnWrap) plannedReserveReturnWrap.classList.add('is-hidden');
+      const fetchFare = Math.round(plan.returnFare || oneWayFare);
+      if (plannedReserveFareDisplay) plannedReserveFareDisplay.textContent = `R ${fetchFare}`;
+      if (plannedReserveSubmitBtn) plannedReserveSubmitBtn.innerHTML = '<span>🛍️</span> Confirm Errand Fetch';
+    }
+  }
+
+  function openPlannedReserveModal(plan, initialKind = 'PASSENGER') {
     if (!plan) return;
     selectedPlannedRide = plan;
     const dest = (plan.destination && plan.destination.address) || plan.destination || '';
@@ -1374,36 +1499,16 @@
     const seats = plan.availablePlaces ?? plan.seats ?? 0;
     if (plannedReserveTimeSeats) plannedReserveTimeSeats.textContent = `Departs ${timeStr} · ${seats} seats available`;
 
+    if (plannedRoleToggleGroup) {
+      if (plannedRolePassenger) plannedRolePassenger.style.display = seats > 0 ? '' : 'none';
+      if (plannedRoleDeliver) plannedRoleDeliver.style.display = plan.allowErrands ? '' : 'none';
+      if (plannedRoleFetch) plannedRoleFetch.style.display = (plan.allowErrands && plan.isReturnRide) ? '' : 'none';
+    }
+
+    const defaultKind = (seats <= 0 && plan.allowErrands) ? 'DELIVER' : initialKind;
+    selectPlannedRole(defaultKind);
+
     const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
-    const fullDest = dest || '—';
-    if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>From:</strong> <span>${fullPickup}</span>`;
-    if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>To:</strong> <span>${fullDest}</span>`;
-
-    const oneWayFare = plan.oneWayFare ?? plan.fare ?? 0;
-    const returnFare = plan.returnFare ?? (oneWayFare * 2);
-
-    function updateReserveFare() {
-      const isReturn = !!(plan.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
-      const activeFare = isReturn ? returnFare : oneWayFare;
-      if (plannedReserveFareDisplay) plannedReserveFareDisplay.textContent = `R ${Math.round(activeFare)}`;
-    }
-
-    if (plan.isReturnRide && plannedReserveReturnWrap) {
-      plannedReserveReturnWrap.classList.remove('is-hidden');
-      if (plannedReserveReturnCheckbox) {
-        plannedReserveReturnCheckbox.checked = false;
-        plannedReserveReturnCheckbox.onchange = updateReserveFare;
-      }
-      if (plannedReserveReturnHint) {
-        plannedReserveReturnHint.textContent = `Driver is offering a return ride. Total fare: R ${Math.round(returnFare)}.`;
-      }
-    } else if (plannedReserveReturnWrap) {
-      plannedReserveReturnWrap.classList.add('is-hidden');
-    }
-
-    updateReserveFare();
-
-    // Default pickup address: use user's saved pickup, plan pickup, or Poortjie Taxi Rank
     const defaultPickupAddr = (bookingState.pickup && bookingState.pickup.address) || (typeof fullPickup === 'string' ? fullPickup : 'Poortjie Taxi Rank, Thwala Dr, Poortjie');
     reservePickupLocation = {
       address: defaultPickupAddr,
@@ -1420,7 +1525,6 @@
 
     if (plannedReserveSubmitBtn) {
       plannedReserveSubmitBtn.disabled = false;
-      plannedReserveSubmitBtn.innerHTML = '<span>⚡</span> Confirm Seat Reservation';
     }
 
     if (plannedReserveModal) plannedReserveModal.classList.remove('is-hidden');
@@ -1435,7 +1539,7 @@
     if (e && e.preventDefault) e.preventDefault();
     if (!selectedPlannedRide) return;
 
-    if (!auth.currentUser) {
+    if (!currentUser) {
       if (plannedReserveError) {
         plannedReserveError.textContent = 'Please sign in to reserve a seat.';
         plannedReserveError.classList.remove('is-hidden');
@@ -1446,7 +1550,16 @@
     const pickupAddr = plannedReservePickupInput ? plannedReservePickupInput.value.trim() : '';
     if (!pickupAddr) {
       if (plannedReserveError) {
-        plannedReserveError.textContent = 'Please enter your pickup location in Poortjie.';
+        plannedReserveError.textContent = 'Please enter your location in Poortjie.';
+        plannedReserveError.classList.remove('is-hidden');
+      }
+      return;
+    }
+
+    const note = plannedReserveNoteInput ? plannedReserveNoteInput.value.trim() : '';
+    if ((selectedPlannedKind === 'DELIVER' || selectedPlannedKind === 'FETCH') && !note) {
+      if (plannedReserveError) {
+        plannedReserveError.textContent = 'Please describe the package/item and recipient contact in the note.';
         plannedReserveError.classList.remove('is-hidden');
       }
       return;
@@ -1460,19 +1573,18 @@
 
     if (plannedReserveSubmitBtn) {
       plannedReserveSubmitBtn.disabled = true;
-      plannedReserveSubmitBtn.innerHTML = '<span>⏳</span> Reserving…';
+      plannedReserveSubmitBtn.innerHTML = '<span>⏳</span> Submitting…';
     }
     if (plannedReserveError) plannedReserveError.classList.add('is-hidden');
 
     try {
-      const token = await auth.currentUser.getIdToken();
+      const token = await currentUser.getIdToken();
       const requestId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
-      const isReturn = !!(selectedPlannedRide.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
-      const note = plannedReserveNoteInput ? plannedReserveNoteInput.value.trim() : '';
+      const isReturn = !!(selectedPlannedKind === 'PASSENGER' && selectedPlannedRide.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
 
       const payload = {
         requestId: requestId,
-        kind: 'PASSENGER',
+        kind: selectedPlannedKind,
         isReturnRide: isReturn,
         note: note,
         location: loc
@@ -1492,14 +1604,13 @@
       const data = await resp.json().catch(() => null);
 
       if (!resp.ok) {
-        const msg = (data && data.error && data.error.message) || 'Failed to reserve seat. Please try again.';
+        const msg = (data && data.error && data.error.message) || 'Failed to submit request. Please try again.';
         if (plannedReserveError) {
           plannedReserveError.textContent = msg;
           plannedReserveError.classList.remove('is-hidden');
         }
         if (plannedReserveSubmitBtn) {
           plannedReserveSubmitBtn.disabled = false;
-          plannedReserveSubmitBtn.innerHTML = '<span>⚡</span> Confirm Seat Reservation';
         }
         return;
       }
@@ -1508,7 +1619,10 @@
       if (plannedModal && !plannedModal.classList.contains('is-hidden')) {
         plannedModal.classList.add('is-hidden');
       }
-      showToast('🎉 Seat reserved! Pay driver directly upon boarding.');
+      const successMsg = selectedPlannedKind === 'DELIVER'
+        ? '📦 Delivery errand requested! Driver will contact you.'
+        : (selectedPlannedKind === 'FETCH' ? '🛍️ Fetch errand requested! Driver will contact you.' : '🎉 Seat reserved! Pay driver directly upon boarding.');
+      showToast(successMsg);
     } catch (err) {
       console.error('[LaynRider] Seat reservation error:', err);
       if (plannedReserveError) {
@@ -1517,7 +1631,6 @@
       }
       if (plannedReserveSubmitBtn) {
         plannedReserveSubmitBtn.disabled = false;
-        plannedReserveSubmitBtn.innerHTML = '<span>⚡</span> Confirm Seat Reservation';
       }
     }
   }
