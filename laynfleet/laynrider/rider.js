@@ -3062,29 +3062,65 @@
         confirmBookingSubmitBtn.innerHTML = '<div class="spinner" style="width:16px;height:16px;"></div> Requesting…';
       }
 
-      const requestedDriverId = bookingTargetDriver ? bookingTargetDriver.uid : null;
+      const token = await currentUser.getIdToken();
+      const requestId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
       const isReturn = bookingState.isReturnTrip !== false;
-      const result = await riderApi.createBooking({
-        pickup: {
-          address: bookingState.pickup.address,
-          lat: bookingState.pickup.lat,
-          lng: bookingState.pickup.lng
+      const vehicleType = bookingState.vehicleType || 'PRIVATE_CAR';
+      const pricingSnapshot = getPricingSnapshot(vehicleType);
+
+      const pickup = {
+        address: (bookingState.pickup && bookingState.pickup.address) || 'Current Location',
+        lat: Number(bookingState.pickup && bookingState.pickup.lat),
+        lng: Number(bookingState.pickup && bookingState.pickup.lng)
+      };
+      const dropoff = {
+        address: (bookingState.dropoff && bookingState.dropoff.address) || 'Destination',
+        lat: Number(bookingState.dropoff && bookingState.dropoff.lat),
+        lng: Number(bookingState.dropoff && bookingState.dropoff.lng)
+      };
+
+      const fare = Number(bookingState.upfrontPrice || pricingSnapshot.minimumFare);
+      const distanceKm = Number(bookingState.estimatedDistanceKm || bookingState.actualOneWayDistanceKm || 1);
+      const durationSeconds = Math.round(Number(bookingState.durationSeconds || ((distanceKm / 40) * 3600) || 600));
+
+      const payload = {
+        requestId,
+        pickup,
+        dropoff,
+        vehicleType,
+        note: (bookingState.note || '').substring(0, 64),
+        isReturnRide: isReturn,
+        returnWaitMinutes: isReturn ? (Number(bookingState.returnWaitMinutes) || 15) : null,
+        fare: Math.max(fare, pricingSnapshot.minimumFare),
+        distanceKm: Math.max(distanceKm, 0.1),
+        durationSeconds: Math.max(durationSeconds, 60),
+        pricingSnapshot
+      };
+
+      const resp = await fetch('https://api.digilayn.co.za/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Layn-App': 'laynrider',
+          'X-Layn-Environment': fleetEnvironment
         },
-        dropoff: {
-          address: bookingState.dropoff.address,
-          lat: bookingState.dropoff.lat,
-          lng: bookingState.dropoff.lng
-        },
-        note: bookingState.note || '',
-        vehicleType: bookingState.vehicleType || 'PRIVATE_CAR',
-        requestedDriverId: requestedDriverId,
-        isReturnTrip: isReturn,
-        returnWaitMinutes: isReturn ? (bookingState.returnWaitMinutes || 15) : null,
+        body: JSON.stringify(payload)
       });
-      const saved = await quickRequestsFor(currentUser.uid).doc(result.bookingId).get({ source: 'server' });
-      if (!saved.exists || saved.data().riderId !== currentUser.uid) throw new Error('Your booking could not be loaded.');
-      currentBookingDoc = { id: saved.id, ...saved.data() };
-      riderApi.finishBookingRequest();
+
+      const json = await resp.json().catch(() => null);
+      if (!resp.ok) {
+        const msg = (json && json.error && (json.error.message || json.error.code)) || 'Failed to request ride.';
+        throw new Error(msg);
+      }
+
+      const bookingId = json?.data?.bookingId;
+      if (!bookingId) throw new Error('No booking ID returned from server.');
+
+      const saved = await quickRequestsFor(currentUser.uid).doc(bookingId).get({ source: 'server' });
+      if (saved.exists) {
+        currentBookingDoc = { id: saved.id, ...saved.data() };
+      }
 
       closeConfirmBookingModal();
       closeBookingModal();
@@ -3292,7 +3328,7 @@
       }
       return {
         title: 'No Drivers Available',
-        reason: rawReason || noDriverEvent?.detail || 'All available drivers in Poortjie are currently busy or offline. Please try again shortly.',
+        reason: rawReason || noDriverEvent?.detail || 'All available drivers are currently busy or offline. Please try again shortly.',
         icon: '📍'
       };
     }
@@ -3662,7 +3698,7 @@
       }
     }
 
-    if (trackPickupText) trackPickupText.textContent = booking.pickup?.address || 'Poortjie';
+    if (trackPickupText) trackPickupText.textContent = booking.pickup?.address || 'Pickup';
     if (trackDropoffText) trackDropoffText.textContent = booking.dropoff?.address || 'Destination';
     const trackFareAmount = document.getElementById('track-fare-amount');
     if (trackFareAmount) {
@@ -4110,6 +4146,44 @@
         }
       });
     }
+
+    // Planned card role action buttons
+    if (plannedCardBtnTagAlong) {
+      plannedCardBtnTagAlong.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const unbooked = availablePlannedPlans.filter(p => !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id));
+        if (unbooked.length > 0) openPlannedReserveModal(unbooked[0], 'PASSENGER');
+        else openPlannedModal();
+      });
+    }
+    if (plannedCardBtnDeliver) {
+      plannedCardBtnDeliver.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const unbooked = availablePlannedPlans.filter(p => !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id));
+        if (unbooked.length > 0) openPlannedReserveModal(unbooked[0], 'DELIVER');
+        else openPlannedModal();
+      });
+    }
+    if (plannedCardBtnFetch) {
+      plannedCardBtnFetch.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const unbooked = availablePlannedPlans.filter(p => !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id));
+        if (unbooked.length > 0) openPlannedReserveModal(unbooked[0], 'FETCH');
+        else openPlannedModal();
+      });
+    }
+
+    // Planned modal role toggle buttons
+    if (plannedRolePassenger) {
+      plannedRolePassenger.addEventListener('click', () => selectPlannedRole('PASSENGER'));
+    }
+    if (plannedRoleDeliver) {
+      plannedRoleDeliver.addEventListener('click', () => selectPlannedRole('DELIVER'));
+    }
+    if (plannedRoleFetch) {
+      plannedRoleFetch.addEventListener('click', () => selectPlannedRole('FETCH'));
+    }
+
     if (plannedModalClose) plannedModalClose.addEventListener('click', closePlannedModal);
     if (plannedModalDoneBtn) plannedModalDoneBtn.addEventListener('click', closePlannedModal);
 
