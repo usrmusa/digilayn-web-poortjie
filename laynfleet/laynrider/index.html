@@ -23,7 +23,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>LaynRider — Fleet Ride-Booking</title>
-  <meta name="description" content="LaynRider — book local on-demand and scheduled rides from verified Poortjie drivers." />
+  <meta name="description" content="LaynRider — book local on-demand and scheduled rides from verified drivers." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -39,12 +39,12 @@
   <header class="header-nav">
     <div class="header-content">
       <div class="header-left">
-        <a href="../../home" class="back-link" title="Back to Poortjie Home">
+        <a href="../../home" class="back-link" title="Back Home">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
         </a>
-        <a href="../../home" class="brand-wrap" title="Poortjie Services">
+        <a href="../../home" class="brand-wrap" title="LaynFleet Services">
           <div class="brand-text">
             <h1 class="brand-title">Layn<span class="brand-accent">Rider</span></h1>
           </div>
@@ -194,16 +194,6 @@
         </div>
       </div>
 
-      <!-- App Nudge outside/below the Planned Ride card -->
-      <div id="planned-ride-app-nudge" class="planned-nudge-box is-hidden" style="margin-top: -6px; margin-bottom: 14px; padding: 10px 14px; background: var(--digilayn-surface-variant, #f4f4f5); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid var(--digilayn-outline-variant, #e4e4e7);">
-        <div style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); line-height: 1.35;">
-          <span>📱</span> <strong>Better on the LaynRider app:</strong> Live driver tracking & lock-screen push alerts.
-        </div>
-        <a href="../laynrider-sideload.apk" download="laynrider.apk" id="planned-download-apk-btn" class="btn btn-sm btn-primary" style="white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 12px;">
-          <span>⬇️</span> Download APK
-        </a>
-      </div>
-
       <!-- 3. QUICK RIDE HERO SECTION (Local On-Demand) -->
       <section class="dashboard-hero-grid">
         <!-- Main Action Hero Card -->
@@ -220,26 +210,6 @@
               <span class="btn-icon">⚡</span> Quick Ride
             </button>
           </div>
-        </div>
-
-        <!-- Android App Nudge Card -->
-        <div class="hero-info-card">
-          <div class="info-card-header">
-            <span class="info-card-badge">Official App</span>
-            <h3 class="info-card-title">LaynRider on Android</h3>
-          </div>
-          <p style="font-size: 13px; color: var(--digilayn-on-surface-variant); margin: 6px 0 12px 0;">
-            Background GPS tracking & lock-screen push alerts.
-          </p>
-          <a href="../download.html" class="nudge-compact" title="Download LaynRider & LaynDriver Android Apps">
-            <div class="nudge-left">
-              <span class="nudge-icon">📱</span>
-              <span class="nudge-text">Google Play</span>
-            </div>
-            <span class="btn btn-sm btn-ghost nudge-btn">
-              Get App ↗
-            </span>
-          </a>
         </div>
       </section>
 
@@ -301,7 +271,7 @@
           </button>
           <div>
             <h3 id="booking-step-title" class="modal-title">Where are you?</h3>
-            <p id="booking-step-subtitle" class="modal-subtitle">Enter pickup address or use GPS inside Poortjie</p>
+            <p id="booking-step-subtitle" class="modal-subtitle">Enter pickup address or use GPS</p>
           </div>
         </div>
         <button id="booking-modal-close" class="modal-close" aria-label="Close">&times;</button>
@@ -638,7 +608,7 @@
       <div id="track-completed-section" class="is-hidden" style="display: flex; flex-direction: column; gap: 16px; text-align: center; padding: 12px 0;">
         <span style="font-size: 40px;">🎉</span>
         <h4 style="font-size: 18px; font-weight: 800;">Trip Completed!</h4>
-        <p style="font-size: 13px; color: var(--digilayn-on-surface-variant);">Thank you for riding with LaynRider in Poortjie.</p>
+        <p style="font-size: 13px; color: var(--digilayn-on-surface-variant);">Thank you for riding with LaynRider.</p>
 
         <div style="background: var(--digilayn-surface-container-high); border-radius: var(--radius-sm); padding: 14px; text-align: center;">
           <div style="font-size: 11px; color: var(--digilayn-on-surface-variant); text-transform: uppercase;">Total Fare Paid</div>
@@ -794,7 +764,7 @@
 
         <!-- Pickup -->
         <label class="field">
-          <span class="field-label">Pickup Location <span class="field-req">inside Poortjie</span></span>
+          <span class="field-label">Pickup Location</span>
           <div style="display: flex; gap: 8px;">
             <input id="schedule-pickup-input" type="text" class="field-input" placeholder="Enter pickup address…" style="flex: 1;" />
             <button type="button" id="schedule-pickup-gps-btn" class="btn btn-ghost" title="Use current GPS location" style="padding: 0 10px; font-size: 13px;">📍 GPS</button>
@@ -929,12 +899,12 @@
 
         <!-- Location Input (Pickup for Passenger/Deliver, Dropoff for Fetch) -->
         <label class="field">
-          <span id="planned-reserve-location-label" class="field-label">Your Pickup Location <span class="field-req">inside Poortjie</span></span>
+          <span id="planned-reserve-location-label" class="field-label">Your Pickup Location</span>
           <div style="display: flex; gap: 8px;">
-            <input id="planned-reserve-pickup-input" type="text" class="field-input" placeholder="Enter pickup address in Poortjie…" style="flex: 1;" />
+            <input id="planned-reserve-pickup-input" type="text" class="field-input" placeholder="Enter pickup address…" style="flex: 1;" />
             <button type="button" id="planned-reserve-pickup-gps-btn" class="btn btn-ghost" title="Use current GPS location" style="padding: 0 10px; font-size: 13px;">📍 GPS</button>
           </div>
-          <span id="planned-reserve-location-hint" class="field-hint" style="font-size: 11px; color: var(--digilayn-on-surface-variant); margin-top: 2px;">Driver will pick you up along their route in Poortjie.</span>
+          <span id="planned-reserve-location-hint" class="field-hint" style="font-size: 11px; color: var(--digilayn-on-surface-variant); margin-top: 2px;">Driver will pick you up along their route.</span>
         </label>
 
         <!-- Return Trip Option (Conditional, Passenger only) -->
@@ -1128,7 +1098,7 @@
         </div>
         <h3 id="app-test-modal-title" class="test-modal-title">LaynRider Is Now on Google Play!</h3>
         <p class="test-modal-subtitle">
-          Get the official LaynRider Android app to book local rides across Poortjie.
+          Get the official LaynRider Android app to book local rides.
         </p>
       </div>
 

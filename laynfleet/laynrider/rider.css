@@ -323,7 +323,7 @@ img, svg, video, canvas, audio, iframe, embed, object {
 
 .dashboard-hero-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: 1fr;
   gap: 18px;
   align-items: stretch;
 }
