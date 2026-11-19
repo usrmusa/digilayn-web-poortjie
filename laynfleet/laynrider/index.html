@@ -22,8 +22,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>LaynRider — Book a Ride in Poortjie</title>
-  <meta name="description" content="LaynRider — request a local ride from verified Poortjie drivers." />
+  <title>LaynRider — Fleet Ride-Booking</title>
+  <meta name="description" content="LaynRider — book local on-demand and scheduled rides from verified Poortjie drivers." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,7 +46,7 @@
         </a>
         <a href="../../home" class="brand-wrap" title="Poortjie Services">
           <div class="brand-text">
-            <h1 class="brand-title">Poortjie <span class="brand-accent">Rides</span></h1>
+            <h1 class="brand-title">Layn<span class="brand-accent">Rider</span></h1>
           </div>
         </a>
       </div>
@@ -75,7 +75,7 @@
     <div id="boot-view" class="boot-loader">
       <img src="laynrider.png" alt="LaynRider" class="boot-logo" />
       <div class="spinner"></div>
-      <p class="boot-text">Connecting to Poortjie Rides…</p>
+      <p class="boot-text">Connecting to LaynRider…</p>
     </div>
 
     <!-- SUSPENDED VIEW -->
@@ -94,7 +94,7 @@
       <div class="auth-gate-header">
         <img src="laynrider.png" alt="LaynRider" class="auth-gate-img" />
         <h2 class="auth-gate-title">Sign in to LaynRider</h2>
-        <p class="auth-gate-desc">Please sign in with your Poortjie account to book local rides in Poortjie.</p>
+        <p class="auth-gate-desc">Please sign in with your Poortjie account to book rides with LaynRider.</p>
       </div>
 
       <a href="../../authentication/login" onclick="sessionStorage.setItem('redirectUrl', window.location.href);" class="btn btn-primary btn-block">
@@ -106,61 +106,54 @@
       </p>
     </div>
 
+    <!-- TERMS & PRIVACY CONSENT GATE VIEW -->
+    <div id="terms-gate-view" class="auth-gate-card is-hidden">
+      <div class="auth-gate-header">
+        <img src="laynrider.png" alt="LaynRider" class="auth-gate-img" />
+        <h2 class="auth-gate-title">Welcome to LaynRider</h2>
+        <p class="auth-gate-desc">Accept the LaynRider Terms of Use and Privacy Policy to continue.</p>
+        <div class="legal-links-row" style="margin-top: 8px; font-size: 13px;">
+          <a href="../../terms" target="_blank" rel="noopener" style="color: var(--digilayn-primary); font-weight: 600; text-decoration: underline;">Terms of Use</a>
+          <span style="color: var(--digilayn-on-surface-variant); margin: 0 4px;">·</span>
+          <a href="../../privacy" target="_blank" rel="noopener" style="color: var(--digilayn-primary); font-weight: 600; text-decoration: underline;">Privacy Policy</a>
+        </div>
+      </div>
+
+      <div class="terms-acceptance-box" style="margin: 16px 0; padding: 12px; background: var(--digilayn-surface-variant, #f4f4f5); border-radius: 8px;">
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; text-align: left; font-size: 14px;">
+          <input type="checkbox" id="terms-accept-checkbox" style="margin-top: 3px; cursor: pointer;" />
+          <span>I accept the LaynRider Terms of Use and Privacy Policy.</span>
+        </label>
+      </div>
+
+      <div id="terms-gate-error" class="form-error is-hidden" style="margin-bottom: 12px;"></div>
+
+      <button id="terms-continue-btn" class="btn btn-primary btn-block" disabled>
+        Continue
+      </button>
+    </div>
+
+    <!-- PROFILE INCOMPLETE GATE VIEW -->
+    <div id="profile-gate-view" class="auth-gate-card is-hidden">
+      <div class="auth-gate-header">
+        <span style="font-size: 40px; display: block; margin-bottom: 8px;">👤</span>
+        <h2 class="auth-gate-title">Complete your profile</h2>
+        <p class="auth-gate-desc">Add these details so drivers can recognise and contact you:</p>
+      </div>
+
+      <ul id="profile-gate-missing-list" class="profile-gate-list" style="margin: 16px 0; text-align: left; list-style: none; padding: 0;">
+        <!-- Dynamically populated: Full name, Phone number, Profile photo -->
+      </ul>
+
+      <button id="profile-gate-complete-btn" class="btn btn-primary btn-block">
+        Complete Profile
+      </button>
+    </div>
+
     <!-- MAIN APP / RIDER DASHBOARD -->
     <div id="app-view" class="is-hidden app-view-container">
 
-      <!-- HERO DASHBOARD SECTION (Desktop 2-col, Mobile clean stack) -->
-      <section class="dashboard-hero-grid">
-        <!-- Main Action Hero Card -->
-        <div class="hero-main-card">
-          <div class="hero-badge-row">
-            <span class="hero-eyebrow">🟢 Poortjie Rides · Live</span>
-          </div>
-          <h2 class="hero-title">Where to, <span id="hero-name">rider</span>?</h2>
-          <p class="hero-sub">Book a verified local driver in seconds. Pickup inside Poortjie, drop-off anywhere.</p>
-          <div class="hero-actions">
-            <button id="quick-ride-btn" class="btn btn-primary btn-hero">
-              <span class="btn-icon">⚡</span> Quick Ride
-            </button>
-          </div>
-        </div>
-
-        <!-- How It Works / Guarantees & Android App Card -->
-        <div class="hero-info-card">
-          <div class="info-card-header">
-            <span class="info-card-badge">Kasi Transport</span>
-            <h3 class="info-card-title">Direct & Transparent</h3>
-          </div>
-          <a href="download" class="nudge-compact" title="Download LaynRider & LaynDriver Android Apps">
-            <div class="nudge-left">
-              <span class="nudge-icon">📱</span>
-              <span class="nudge-text">Download Android App</span>
-            </div>
-            <span class="btn btn-sm btn-ghost nudge-btn">
-              Get App
-            </span>
-          </a>
-        </div>
-      </section>
-
-      <!-- PROFILE INCOMPLETE CHECKLIST -->
-      <div id="profile-incomplete-banner" class="profile-gate-card is-hidden">
-        <div class="profile-gate-head">
-          <span class="profile-gate-icon">👤</span>
-          <div>
-            <strong>Finish your profile to request rides</strong>
-            <p>Drivers need to know who they're picking up. Add the details below.</p>
-          </div>
-        </div>
-        <ul class="profile-gate-list">
-          <li id="check-name" class="profile-check"><span class="check-dot"></span> Full name (1–3 words)</li>
-          <li id="check-phone" class="profile-check"><span class="check-dot"></span> Phone number (10 digits)</li>
-          <li id="check-photo" class="profile-check"><span class="check-dot"></span> Profile photo</li>
-        </ul>
-        <button id="complete-profile-btn" class="btn btn-primary btn-block">Complete Profile</button>
-      </div>
-
-      <!-- ACTIVE BOOKING WIDGET (If rider has a live booking) -->
+      <!-- 1. ACTIVE BOOKING WIDGET (Top priority when active) -->
       <div id="active-booking-banner" class="active-booking-widget is-hidden">
         <div class="alert-content">
           <span id="active-booking-icon" class="active-booking-icon">🚖</span>
@@ -172,7 +165,103 @@
             <p id="active-booking-status-text" style="font-size: 13px; color: var(--digilayn-on-surface-variant); margin-top: 2px;">Finding your ride…</p>
           </div>
         </div>
-        <button id="view-active-booking-btn" class="btn btn-sm btn-primary">Track Trip</button>
+        <button id="view-active-booking-btn" class="btn btn-sm btn-primary">Track Ride</button>
+      </div>
+
+      <!-- 2. PLANNED RIDE CARD (Tag Along / Community Errands) -->
+      <div id="planned-ride-card" class="dashboard-card planned-card is-hidden" style="cursor: pointer;">
+        <div class="card-top-row">
+          <div class="card-badge-row">
+            <span class="badge-pill badge-planned">PLANNED RIDE</span>
+            <span id="planned-card-count" class="badge-count is-hidden">1 of 1</span>
+          </div>
+        </div>
+        <div class="card-main-content">
+          <h3 id="planned-card-dest" class="card-main-title">Southgate Mall</h3>
+          <p id="planned-card-sub" class="card-sub-text">Departs 08:30 · 3 seats available</p>
+        </div>
+        <div class="card-bottom-row">
+          <span id="planned-card-fare" class="planned-fare-tag">R 35 per person</span>
+          <span class="card-nav-arrow">➔</span>
+        </div>
+      </div>
+
+      <!-- 3. QUICK RIDE HERO SECTION (Local On-Demand) -->
+      <section class="dashboard-hero-grid">
+        <!-- Main Action Hero Card -->
+        <div id="hero-quick-card" class="hero-main-card" style="cursor: pointer;">
+          <div class="hero-badge-row">
+            <span class="hero-eyebrow">
+              <span class="live-dot-green"></span> LOCAL ON-DEMAND
+            </span>
+          </div>
+          <h2 class="hero-title">Where to, <span id="hero-name">rider</span>?</h2>
+          <p class="hero-sub">Book your local driver by tapping this card</p>
+          <div class="hero-actions">
+            <button id="quick-ride-btn" class="btn btn-primary btn-hero">
+              <span class="btn-icon">⚡</span> Quick Ride
+            </button>
+          </div>
+        </div>
+
+        <!-- Android App Nudge Card -->
+        <div class="hero-info-card">
+          <div class="info-card-header">
+            <span class="info-card-badge">Official App</span>
+            <h3 class="info-card-title">LaynRider on Android</h3>
+          </div>
+          <p style="font-size: 13px; color: var(--digilayn-on-surface-variant); margin: 6px 0 12px 0;">
+            Background GPS tracking & lock-screen push alerts.
+          </p>
+          <a href="download" class="nudge-compact" title="Download LaynRider & LaynDriver Android Apps">
+            <div class="nudge-left">
+              <span class="nudge-icon">📱</span>
+              <span class="nudge-text">Google Play</span>
+            </div>
+            <span class="btn btn-sm btn-ghost nudge-btn">
+              Get App ↗
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 4. SCHEDULED RIDE CARDS -->
+      <!-- State A: Empty invite card -->
+      <div id="scheduled-invite-card" class="dashboard-card scheduled-card" style="cursor: pointer;">
+        <div class="card-top-row">
+          <span class="badge-pill badge-scheduled">SCHEDULE A RIDE</span>
+        </div>
+        <div class="card-main-content">
+          <h3 class="card-main-title">Plan a ride in advance</h3>
+          <p class="card-sub-text">Book a private ride · Cancel anytime</p>
+        </div>
+        <div class="card-bottom-row">
+          <span class="card-action-text" style="color: var(--digilayn-primary); font-weight: 700; font-size: 13px;">Schedule Ride</span>
+          <span class="card-nav-arrow">➔</span>
+        </div>
+      </div>
+
+      <!-- State B: Active scheduled request summary -->
+      <div id="scheduled-active-card" class="dashboard-card scheduled-card is-hidden" style="cursor: pointer;">
+        <div class="card-top-row">
+          <div class="card-badge-row">
+            <span class="badge-pill badge-scheduled-active">SCHEDULED RIDE</span>
+            <span id="scheduled-status-badge" class="badge-status">CONFIRMED</span>
+          </div>
+        </div>
+        <div class="card-main-content">
+          <h3 id="scheduled-card-dest" class="card-main-title">Destination</h3>
+          <p id="scheduled-card-time" class="card-sub-text">Scheduled for --</p>
+        </div>
+        <div class="card-bottom-row">
+          <span id="scheduled-card-fare" class="planned-fare-tag">R --</span>
+          <button type="button" id="scheduled-view-details-btn" class="btn btn-sm btn-ghost">View Details</button>
+        </div>
+      </div>
+
+      <!-- 5. OFFLINE PAYMENT REMINDER -->
+      <div class="offline-payment-note" style="text-align: center; padding: 12px 0; font-size: 12px; color: var(--digilayn-on-surface-variant);">
+        <span>Payment is arranged offline directly with your driver.</span>
       </div>
 
     </div>
@@ -661,43 +750,182 @@
     </div>
   </div>
 
-  <!-- ===================== COMPLETE PROFILE MODAL ===================== -->
-  <div id="profile-modal" class="modal-overlay is-hidden">
-    <div class="modal-card" style="max-width: 440px;">
+  <!-- ===================== SCHEDULE A RIDE MODAL ===================== -->
+  <div id="schedule-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
+    <div class="modal-card booking-modal-card">
+      <div class="modal-drag-handle"></div>
+
       <div class="modal-header">
-        <h3 class="modal-title">Complete your profile</h3>
-        <button id="profile-modal-close" class="modal-close" aria-label="Close">&times;</button>
-      </div>
-
-      <p style="font-size: 13px; color: var(--digilayn-on-surface-variant); margin-top: -6px;">
-        Add the details drivers need to accept your ride. Missing items are highlighted.
-      </p>
-
-      <!-- Avatar uploader -->
-      <div class="avatar-upload">
-        <div class="avatar-ring" id="profile-avatar-ring">
-          <img id="profile-avatar-preview" class="avatar-preview" src="" alt="Your photo" />
-          <label for="profile-photo-input" class="avatar-edit" title="Upload a photo">📷</label>
+        <div>
+          <h3 id="schedule-modal-title" class="modal-title">Schedule a Ride</h3>
+          <p class="modal-subtitle">Plan a private ride in advance</p>
         </div>
-        <input type="file" id="profile-photo-input" accept="image/*" class="is-hidden" />
-        <span id="profile-photo-hint" class="avatar-hint">Tap the camera to add a photo</span>
+        <button id="schedule-modal-close" class="modal-close" aria-label="Close">&times;</button>
       </div>
 
-      <label class="field" id="field-name">
-        <span class="field-label">Full name <span class="field-req">required</span></span>
-        <input id="profile-name-input" type="text" class="field-input" placeholder="e.g. Thabo Mokoena" autocomplete="name" />
-        <span class="field-hint">1–3 words, letters only.</span>
-      </label>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
+        <!-- Schedule Date & Time -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="field">
+            <span class="field-label">Date <span class="field-req">required</span></span>
+            <input id="schedule-date-input" type="date" class="field-input" />
+          </label>
+          <label class="field">
+            <span class="field-label">Time <span class="field-req">required</span></span>
+            <input id="schedule-time-input" type="time" class="field-input" />
+          </label>
+        </div>
+        <span class="field-hint" style="margin-top: -6px; font-size: 12px; color: var(--digilayn-on-surface-variant);">Must be scheduled at least 30 minutes in advance.</span>
 
-      <label class="field" id="field-phone">
-        <span class="field-label">Phone number <span class="field-req">required</span></span>
-        <input id="profile-phone-input" type="tel" inputmode="numeric" maxlength="10" class="field-input" placeholder="0123456789" autocomplete="tel" />
-        <span class="field-hint">Exactly 10 digits. Not shared publicly.</span>
-      </label>
+        <!-- Pickup -->
+        <label class="field">
+          <span class="field-label">Pickup Location <span class="field-req">inside Poortjie</span></span>
+          <div style="display: flex; gap: 8px;">
+            <input id="schedule-pickup-input" type="text" class="field-input" placeholder="Enter pickup address…" style="flex: 1;" />
+            <button type="button" id="schedule-pickup-gps-btn" class="btn btn-ghost" title="Use current GPS location" style="padding: 0 10px; font-size: 13px;">📍 GPS</button>
+          </div>
+        </label>
 
-      <div id="profile-modal-error" class="form-error is-hidden"></div>
+        <!-- Dropoff -->
+        <label class="field">
+          <span class="field-label">Destination <span class="field-req">required</span></span>
+          <input id="schedule-dropoff-input" type="text" class="field-input" placeholder="Enter destination…" />
+        </label>
 
-      <button id="profile-save-btn" class="btn btn-primary btn-block">Save & Continue</button>
+        <!-- Trip Type: One-way vs Return -->
+        <div class="field">
+          <span class="field-label">Ride Type</span>
+          <div class="trip-type-toggle" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+            <button type="button" id="schedule-type-oneway" class="trip-type-btn is-active">One-Way</button>
+            <button type="button" id="schedule-type-return" class="trip-type-btn">Return Trip</button>
+          </div>
+        </div>
+
+        <div id="schedule-return-options" class="field is-hidden">
+          <span class="field-label">Return Stop Duration</span>
+          <div class="wait-pills-row" style="display: flex; gap: 6px; margin-top: 4px;">
+            <button type="button" class="wait-pill is-active" data-mins="15">15 min</button>
+            <button type="button" class="wait-pill" data-mins="30">30 min</button>
+            <button type="button" class="wait-pill" data-mins="45">45 min</button>
+            <button type="button" class="wait-pill" data-mins="60">60 min</button>
+          </div>
+        </div>
+
+        <!-- Note to driver -->
+        <label class="field">
+          <span class="field-label">Note for Driver (Optional)</span>
+          <input id="schedule-notes-input" type="text" class="field-input" placeholder="e.g. 2 bags, gate code…" />
+        </label>
+
+        <!-- Fare Estimate Preview -->
+        <div id="schedule-fare-card" class="fare-preview-card">
+          <div class="fare-preview-main">
+            <div class="fare-preview-info">
+              <span class="fare-preview-title">Estimated Upfront Fare</span>
+              <span id="schedule-fare-breakdown" class="fare-preview-breakdown">Enter pickup & destination to calculate fare</span>
+            </div>
+            <div id="schedule-fare-amount" class="fare-preview-amount">R --</div>
+          </div>
+        </div>
+
+        <div id="schedule-modal-error" class="form-error is-hidden"></div>
+
+        <div class="modal-actions" style="margin-top: 6px;">
+          <button type="button" id="schedule-modal-cancel" class="btn btn-ghost">Cancel</button>
+          <button type="button" id="schedule-submit-btn" class="btn btn-primary btn-submit">
+            <span>📅</span> Schedule Ride
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PLANNED RIDES MODAL ===================== -->
+  <div id="planned-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="planned-modal-title">
+    <div class="modal-card booking-modal-card">
+      <div class="modal-drag-handle"></div>
+
+      <div class="modal-header">
+        <div>
+          <h3 id="planned-modal-title" class="modal-title">Planned Rides</h3>
+          <p class="modal-subtitle">Tag Along & Community Errands</p>
+        </div>
+        <button id="planned-modal-close" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
+        <div class="planned-info-box" style="padding: 12px; background: var(--digilayn-surface-variant, #f4f4f5); border-radius: 8px; font-size: 13px; color: var(--digilayn-on-surface-variant);">
+          <span>ℹ️</span> <strong>Tag Along:</strong> Routes and departure times are scheduled in advance by drivers. You reserve a seat and pay directly upon boarding.
+        </div>
+
+        <div id="planned-rides-list" class="planned-rides-list" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Dynamically populated or community preview card -->
+        </div>
+
+        <div class="modal-actions" style="margin-top: 6px;">
+          <button type="button" id="planned-modal-done-btn" class="btn btn-ghost btn-block">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SCHEDULED RIDE DETAILS MODAL ===================== -->
+  <div id="scheduled-details-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="scheduled-details-title">
+    <div class="modal-card booking-modal-card">
+      <div class="modal-drag-handle"></div>
+
+      <div class="modal-header">
+        <div>
+          <h3 id="scheduled-details-title" class="modal-title">Your Scheduled Ride</h3>
+          <span id="scheduled-details-status-pill" class="badge-status" style="margin-top: 4px; display: inline-block;">CONFIRMED</span>
+        </div>
+        <button id="scheduled-details-close" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px; padding: 16px;">
+        <div class="review-route-card">
+          <div class="review-route-item">
+            <div class="review-route-left">
+              <span class="review-route-label">Scheduled Time</span>
+              <div id="scheduled-details-time" class="review-route-val">—</div>
+            </div>
+          </div>
+          <div class="review-route-divider"></div>
+          <div class="review-route-item">
+            <div class="review-route-left">
+              <span class="review-route-label">Pickup</span>
+              <div id="scheduled-details-pickup" class="review-route-val">—</div>
+            </div>
+          </div>
+          <div class="review-route-divider"></div>
+          <div class="review-route-item">
+            <div class="review-route-left">
+              <span class="review-route-label">Destination</span>
+              <div id="scheduled-details-dropoff" class="review-route-val">—</div>
+            </div>
+          </div>
+          <div class="review-route-divider"></div>
+          <div class="review-route-item">
+            <div class="review-route-left">
+              <span class="review-route-label">Upfront Fare</span>
+              <div id="scheduled-details-fare" class="review-route-val">R --</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="scheduled-details-driver-box" class="active-driver-card is-hidden">
+          <img id="scheduled-details-driver-photo" class="driver-avatar-lg" src="" alt="Driver" />
+          <div style="flex: 1;">
+            <strong id="scheduled-details-driver-name" style="font-size: 15px; display: block;">Driver</strong>
+            <span id="scheduled-details-vehicle" style="font-size: 13px; color: var(--digilayn-on-surface-variant);">Vehicle</span>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 8px;">
+          <button type="button" id="scheduled-cancel-btn" class="btn btn-danger btn-block">Cancel Scheduled Ride</button>
+          <button type="button" id="scheduled-details-dismiss" class="btn btn-ghost btn-block">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 

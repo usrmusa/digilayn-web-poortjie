@@ -323,27 +323,89 @@
   const appTestModalCancel = document.getElementById('app-test-modal-cancel');
   const appTestDownloadBtn = document.getElementById('app-test-download-btn');
 
-  // Profile Completion Modal
-  const profileModal = document.getElementById('profile-modal');
-  const profileModalClose = document.getElementById('profile-modal-close');
-  const profileAvatarRing = document.getElementById('profile-avatar-ring');
-  const profileAvatarPreview = document.getElementById('profile-avatar-preview');
-  const profilePhotoInput = document.getElementById('profile-photo-input');
-  const profilePhotoHint = document.getElementById('profile-photo-hint');
-  const profileNameInput = document.getElementById('profile-name-input');
-  const profilePhoneInput = document.getElementById('profile-phone-input');
-  const profileNameField = document.getElementById('field-name');
-  const profilePhoneField = document.getElementById('field-phone');
-  const profileModalError = document.getElementById('profile-modal-error');
-  const profileSaveBtn = document.getElementById('profile-save-btn');
-  const heroNameEl = document.getElementById('hero-name');
-  const checkNameEl = document.getElementById('check-name');
-  const checkPhoneEl = document.getElementById('check-phone');
-  const checkPhotoEl = document.getElementById('check-photo');
+  // Gate Elements
+  const termsGateView = document.getElementById('terms-gate-view');
+  const termsAcceptCheckbox = document.getElementById('terms-accept-checkbox');
+  const termsContinueBtn = document.getElementById('terms-continue-btn');
+  const termsGateError = document.getElementById('terms-gate-error');
 
-  // Profile completion working state
-  let selectedProfilePhotoFile = null;
-  let pendingBookingDriverId = undefined; // undefined = none; null = Quick Ride; string = specific driver
+  const profileGateView = document.getElementById('profile-gate-view');
+  const profileGateMissingList = document.getElementById('profile-gate-missing-list');
+  const profileGateCompleteBtn = document.getElementById('profile-gate-complete-btn');
+
+  // Dashboard Planned & Scheduled Cards
+  const plannedRideCard = document.getElementById('planned-ride-card');
+  const plannedCardDest = document.getElementById('planned-card-dest');
+  const plannedCardSub = document.getElementById('planned-card-sub');
+  const plannedCardFare = document.getElementById('planned-card-fare');
+  const plannedCardCount = document.getElementById('planned-card-count');
+
+  const heroNameEl = document.getElementById('hero-name');
+  const heroQuickCard = document.getElementById('hero-quick-card');
+
+  const scheduledInviteCard = document.getElementById('scheduled-invite-card');
+  const scheduledActiveCard = document.getElementById('scheduled-active-card');
+  const scheduledCardDest = document.getElementById('scheduled-card-dest');
+  const scheduledCardTime = document.getElementById('scheduled-card-time');
+  const scheduledCardFare = document.getElementById('scheduled-card-fare');
+  const scheduledStatusBadge = document.getElementById('scheduled-status-badge');
+  const scheduledViewDetailsBtn = document.getElementById('scheduled-view-details-btn');
+
+  // Schedule Modal Elements
+  const scheduleModal = document.getElementById('schedule-modal');
+  const scheduleModalClose = document.getElementById('schedule-modal-close');
+  const scheduleModalCancel = document.getElementById('schedule-modal-cancel');
+  const scheduleDateInput = document.getElementById('schedule-date-input');
+  const scheduleTimeInput = document.getElementById('schedule-time-input');
+  const schedulePickupInput = document.getElementById('schedule-pickup-input');
+  const schedulePickupGpsBtn = document.getElementById('schedule-pickup-gps-btn');
+  const scheduleDropoffInput = document.getElementById('schedule-dropoff-input');
+  const scheduleTypeOneway = document.getElementById('schedule-type-oneway');
+  const scheduleTypeReturn = document.getElementById('schedule-type-return');
+  const scheduleReturnOptions = document.getElementById('schedule-return-options');
+  const scheduleNotesInput = document.getElementById('schedule-notes-input');
+  const scheduleFareBreakdown = document.getElementById('schedule-fare-breakdown');
+  const scheduleFareAmount = document.getElementById('schedule-fare-amount');
+  const scheduleModalError = document.getElementById('schedule-modal-error');
+  const scheduleSubmitBtn = document.getElementById('schedule-submit-btn');
+
+  // Planned Modal Elements
+  const plannedModal = document.getElementById('planned-modal');
+  const plannedModalClose = document.getElementById('planned-modal-close');
+  const plannedModalDoneBtn = document.getElementById('planned-modal-done-btn');
+  const plannedRidesList = document.getElementById('planned-rides-list');
+
+  // Scheduled Details Modal Elements
+  const scheduledDetailsModal = document.getElementById('scheduled-details-modal');
+  const scheduledDetailsClose = document.getElementById('scheduled-details-close');
+  const scheduledDetailsDismiss = document.getElementById('scheduled-details-dismiss');
+  const scheduledDetailsTime = document.getElementById('scheduled-details-time');
+  const scheduledDetailsPickup = document.getElementById('scheduled-details-pickup');
+  const scheduledDetailsDropoff = document.getElementById('scheduled-details-dropoff');
+  const scheduledDetailsFare = document.getElementById('scheduled-details-fare');
+  const scheduledDetailsStatusPill = document.getElementById('scheduled-details-status-pill');
+  const scheduledDetailsDriverBox = document.getElementById('scheduled-details-driver-box');
+  const scheduledDetailsDriverPhoto = document.getElementById('scheduled-details-driver-photo');
+  const scheduledDetailsDriverName = document.getElementById('scheduled-details-driver-name');
+  const scheduledDetailsVehicle = document.getElementById('scheduled-details-vehicle');
+  const scheduledCancelBtn = document.getElementById('scheduled-cancel-btn');
+
+  // Scheduled & Planned State
+  let activeScheduledUnsub = null;
+  let currentScheduledDoc = null;
+  let activePlannedUnsub = null;
+  let availablePlannedPlans = [];
+  let scheduleState = {
+    date: '',
+    time: '',
+    pickup: null,
+    dropoff: null,
+    tripType: 'ONE_WAY',
+    returnWaitMinutes: 15,
+    note: '',
+    distanceKm: null,
+    fare: null
+  };
 
   /** Web Audio Chime Notification on Quote Received */
   function playQuoteChime() {
@@ -583,19 +645,61 @@
     }
   }
 
-  /** Evaluate profile completeness strictly against Android spec */
+  const CONSENT_REVISION = '2026-11-16';
+
+  /** Check LaynFleet Terms & Privacy consent (mirrors Android FirestoreConsentRepository) */
+  async function checkLaynFleetConsent(uid) {
+    if (!uid) return false;
+    try {
+      const snap = await db.collection('laynfleet').doc(fleetEnvironment).collection('riders').doc(uid).get({ source: 'server' });
+      if (!snap.exists) return false;
+      const data = snap.data() || {};
+      const consent = data.laynFleetConsent;
+      return Boolean(
+        consent &&
+        consent.termsVersion === CONSENT_REVISION &&
+        consent.privacyVersion === CONSENT_REVISION &&
+        consent.acceptedAt
+      );
+    } catch (e) {
+      console.warn('[LaynRider] Failed to verify consent status:', e);
+      return false;
+    }
+  }
+
+  /** Persist LaynFleet Terms & Privacy consent acceptance */
+  async function saveLaynFleetConsent(uid) {
+    if (!uid) throw new Error('Sign in required');
+    await db.collection('laynfleet').doc(fleetEnvironment).collection('riders').doc(uid).set({
+      uid: uid,
+      laynFleetConsent: {
+        termsVersion: CONSENT_REVISION,
+        privacyVersion: CONSENT_REVISION,
+        acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }
+    }, { merge: true });
+  }
+
+  /** Evaluate profile completeness strictly against Android RiderProfileRequirements */
   function checkProfileCompleteness(data, authRecord) {
     if (!data) data = {};
-    const name = data.displayName || authRecord.displayName || '';
-    const phone = data.phone || authRecord.phoneNumber || '';
-    const photo = data.photoUrl || authRecord.photoURL || '';
+    if (!authRecord) authRecord = {};
+    const name = (data.displayName || data.fullName || authRecord.displayName || '').trim();
+    const phone = (data.phone || authRecord.phoneNumber || '').replace(/\D/g, '');
+    const photo = (data.photoUrl || authRecord.photoURL || '').trim();
 
     const nameOk = isValidName(name);
     const phoneOk = isValidPhone(phone);
-    const photoOk = Boolean(photo && photo.trim().length > 0);
+    const photoOk = Boolean(photo && photo.length > 0);
+
+    const missing = [];
+    if (!nameOk) missing.push({ id: 'name', label: 'Full name (1–3 words, letters only)' });
+    if (!phoneOk) missing.push({ id: 'phone', label: 'Phone number (10 digits)' });
+    if (!photoOk) missing.push({ id: 'photo', label: 'Profile photo' });
 
     return {
-      isComplete: nameOk && phoneOk && photoOk,
+      isComplete: missing.length === 0,
+      missing,
       name,
       phone,
       photo,
@@ -605,182 +709,429 @@
     };
   }
 
+  /** Render missing profile details on the dashboard gate */
+  function renderMissingProfileDetails(missingList) {
+    if (!profileGateMissingList) return;
+    profileGateMissingList.innerHTML = '';
+    (missingList || []).forEach(item => {
+      const li = document.createElement('li');
+      li.className = 'profile-gate-item is-missing';
+      li.textContent = item.label;
+      profileGateMissingList.appendChild(li);
+    });
+  }
+
+  /** Navigate user to global Poortjie profile page */
+  function navigateToProfile() {
+    sessionStorage.setItem('redirectUrl', window.location.href);
+    window.location.href = '../../authentication/profile';
+  }
+
   /** ============================================================
-   * INLINE PROFILE COMPLETION (fill missing details to request)
+   * SCHEDULED RIDES (SCHEDULE A RIDE / YOUR RIDES)
    * ============================================================ */
 
-  /** Reflect completeness onto the dashboard checklist + hero greeting. */
-  function updateProfileChecklist(completeness) {
-    const setDone = (el, done) => {
-      if (!el) return;
-      el.classList.toggle('is-done', !!done);
-    };
-    setDone(checkNameEl, completeness.nameOk);
-    setDone(checkPhoneEl, completeness.phoneOk);
-    setDone(checkPhotoEl, completeness.photoOk);
-  }
+  function initScheduledRidesListener(uid) {
+    if (!uid) return;
+    if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
 
-  /**
-   * Open the inline completion modal. `resumeDriverId` remembers what the rider
-   * was trying to book (null = Quick Ride, string = specific driver) so we can
-   * continue straight into booking once the profile is valid.
-   */
-  function openProfileModal(resumeDriverId) {
-    pendingBookingDriverId = resumeDriverId;
-    if (profileModalError) profileModalError.classList.add('is-hidden');
-    selectedProfilePhotoFile = null;
+    try {
+      const scheduledCol = db.collection('laynfleet').doc(fleetEnvironment)
+        .collection('scheduledRequests').doc(uid).collection('requests');
 
-    const completeness = checkProfileCompleteness(userProfile, currentUser || {});
+      activeScheduledUnsub = scheduledCol.onSnapshot((snap) => {
+        const list = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .filter(d => !['CANCELLED', 'COMPLETED', 'EXPIRED'].includes(d.status));
 
-    if (profileNameInput) profileNameInput.value = completeness.name || '';
-    if (profilePhoneInput) profilePhoneInput.value = (completeness.phone || '').replace(/\D/g, '').slice(0, 10);
-
-    const photo = completeness.photo || (currentUser && currentUser.photoURL) || '';
-    if (profileAvatarPreview) {
-      profileAvatarPreview.src = photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(completeness.name || 'R')}&background=22c55e&color=fff&size=160`;
+        if (list.length > 0) {
+          list.sort((a, b) => (readEpochMillis(a.scheduledTime) || 0) - (readEpochMillis(b.scheduledTime) || 0));
+          currentScheduledDoc = list[0];
+          renderActiveScheduledCard(currentScheduledDoc, list.length);
+        } else {
+          currentScheduledDoc = null;
+          if (scheduledActiveCard) scheduledActiveCard.classList.add('is-hidden');
+          if (scheduledInviteCard) scheduledInviteCard.classList.remove('is-hidden');
+        }
+      }, (err) => {
+        console.warn('[LaynRider] Scheduled requests listener warning:', err);
+      });
+    } catch (e) {
+      console.warn('[LaynRider] Failed to init scheduled requests listener:', e);
     }
-    if (profilePhotoHint) {
-      profilePhotoHint.textContent = completeness.photoOk ? 'Looks good — tap to change' : 'Tap the camera to add a photo';
+  }
+
+  function renderActiveScheduledCard(booking, count) {
+    if (!booking) return;
+    if (scheduledInviteCard) scheduledInviteCard.classList.add('is-hidden');
+    if (scheduledActiveCard) scheduledActiveCard.classList.remove('is-hidden');
+
+    const dest = (booking.dropoff && booking.dropoff.address) || booking.destination || 'Scheduled Destination';
+    const cleanDest = dest.split(',')[0];
+    if (scheduledCardDest) scheduledCardDest.textContent = cleanDest;
+
+    const epoch = readEpochMillis(booking.scheduledTime) || Date.now();
+    const dateObj = new Date(epoch);
+    const timeStr = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' at ' +
+                    dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (scheduledCardTime) scheduledCardTime.textContent = 'Scheduled for ' + timeStr;
+
+    const fare = booking.fare || booking.upfrontPrice;
+    if (scheduledCardFare) {
+      scheduledCardFare.textContent = typeof fare === 'number' ? 'R ' + Math.round(fare) : 'R --';
     }
 
-    markMissingFields(completeness);
-    if (profileModal) profileModal.classList.remove('is-hidden');
+    if (scheduledStatusBadge) {
+      const st = (booking.status || 'PENDING').toUpperCase();
+      scheduledStatusBadge.textContent = st === 'PENDING' ? 'SEARCHING' : st;
+    }
   }
 
-  function closeProfileModal() {
-    if (profileModal) profileModal.classList.add('is-hidden');
-    selectedProfilePhotoFile = null;
-  }
-
-  /** Highlight which fields still need attention. */
-  function markMissingFields(completeness) {
-    if (profileNameField) profileNameField.classList.toggle('is-missing', !completeness.nameOk);
-    if (profilePhoneField) profilePhoneField.classList.toggle('is-missing', !completeness.phoneOk);
-    if (profileAvatarRing) profileAvatarRing.classList.toggle('is-missing', !completeness.photoOk);
-  }
-
-  /** Preview a picked photo locally before upload. */
-  function handleProfilePhotoPick(e) {
-    const file = e && e.target && e.target.files && e.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      showToast('Please choose an image file.');
+  function openScheduleModal() {
+    if (!isProfileComplete) {
+      showToast('Please complete your profile to schedule a ride.');
+      navigateToProfile();
       return;
     }
-    selectedProfilePhotoFile = file;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      if (profileAvatarPreview) profileAvatarPreview.src = ev.target.result;
-      if (profileAvatarRing) profileAvatarRing.classList.remove('is-missing');
-      if (profilePhotoHint) profilePhotoHint.textContent = 'Photo ready — tap Save';
+    if (scheduleModalError) scheduleModalError.classList.add('is-hidden');
+
+    // Default date to today, time to now + 45 min
+    const now = new Date(Date.now() + 45 * 60 * 1000);
+    const pad = n => String(n).padStart(2, '0');
+    const dateVal = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    const timeVal = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+    if (scheduleDateInput) {
+      scheduleDateInput.min = dateVal;
+      scheduleDateInput.value = dateVal;
+    }
+    if (scheduleTimeInput) scheduleTimeInput.value = timeVal;
+
+    scheduleState = {
+      date: dateVal,
+      time: timeVal,
+      pickup: bookingState.pickup.address ? { ...bookingState.pickup } : null,
+      dropoff: bookingState.dropoff.address ? { ...bookingState.dropoff } : null,
+      tripType: 'ONE_WAY',
+      returnWaitMinutes: 15,
+      note: '',
+      distanceKm: null,
+      fare: null
     };
-    reader.readAsDataURL(file);
+
+    if (schedulePickupInput) schedulePickupInput.value = scheduleState.pickup?.address || '';
+    if (scheduleDropoffInput) scheduleDropoffInput.value = scheduleState.dropoff?.address || '';
+    updateScheduleFareEstimate();
+
+    if (scheduleModal) scheduleModal.classList.remove('is-hidden');
   }
 
-  /** Upload the profile photo to users/{uid}/profile/{ts}.jpg (mirrors Android). */
-  async function uploadProfilePhoto(file, uid) {
-    const reportProgress = message => {
-      if (profilePhotoHint) {
-        profilePhotoHint.textContent = message;
-        profilePhotoHint.setAttribute('role', 'status');
+  function closeScheduleModal() {
+    if (scheduleModal) scheduleModal.classList.add('is-hidden');
+  }
+
+  function updateScheduleFareEstimate() {
+    if (!scheduleState.pickup || !scheduleState.dropoff || !global.google || !global.google.maps) {
+      if (scheduleFareAmount) scheduleFareAmount.textContent = 'R --';
+      if (scheduleFareBreakdown) scheduleFareBreakdown.textContent = 'Enter pickup & destination to calculate fare';
+      return;
+    }
+
+    const service = new google.maps.DistanceMatrixService();
+    service.getDistanceMatrix({
+      origins: [new google.maps.LatLng(scheduleState.pickup.lat, scheduleState.pickup.lng)],
+      destinations: [new google.maps.LatLng(scheduleState.dropoff.lat, scheduleState.dropoff.lng)],
+      travelMode: google.maps.TravelMode.DRIVING,
+      unitSystem: google.maps.UnitSystem.METRIC
+    }, (response, status) => {
+      if (status === 'OK' && response.rows[0]?.elements[0]?.status === 'OK') {
+        const distKm = response.rows[0].elements[0].distance.value / 1000;
+        scheduleState.distanceKm = distKm;
+
+        const rateObj = activePricingRates['PRIVATE_CAR'] || DEFAULT_PRICING_RATES['PRIVATE_CAR'];
+        const isReturn = scheduleState.tripType === 'RETURN';
+        let fare = rateObj.ratePerKm * distKm;
+        if (fare < rateObj.minimumFare) fare = rateObj.minimumFare;
+        if (isReturn) {
+          fare = fare * (1 + (rateObj.returnTripPercent || 80) / 100);
+          fare += (rateObj.waitRatePerMinute || 1.5) * (scheduleState.returnWaitMinutes || 15);
+        }
+        scheduleState.fare = Math.round(fare);
+
+        if (scheduleFareAmount) scheduleFareAmount.textContent = 'R ' + scheduleState.fare;
+        if (scheduleFareBreakdown) {
+          scheduleFareBreakdown.textContent = `~${distKm.toFixed(1)} km · ${isReturn ? 'Return Trip' : 'One-Way'}`;
+        }
       }
-    };
-    const blob = await ImageUpload.compressFile(file, reportProgress);
-    const path = `users/${uid}/profile/${Date.now()}.jpg`;
-    const ref = storage.ref().child(path);
-    await ImageUpload.upload(ref, blob, reportProgress);
-    return ref.getDownloadURL();
+    });
   }
 
-  /** Validate + persist the profile, then resume the pending booking if valid. */
-  async function handleProfileSave() {
+  async function handleScheduleSubmit() {
     if (!currentUser) return;
-    if (profileModalError) profileModalError.classList.add('is-hidden');
+    if (scheduleModalError) scheduleModalError.classList.add('is-hidden');
 
-    const name = (profileNameInput ? profileNameInput.value : '').trim();
-    const phone = (profilePhoneInput ? profilePhoneInput.value : '').replace(/\D/g, '');
-    const hasExistingPhoto = Boolean((userProfile && userProfile.photoUrl) || (currentUser && currentUser.photoURL));
+    const dateVal = scheduleDateInput?.value;
+    const timeVal = scheduleTimeInput?.value;
+    if (!dateVal || !timeVal) {
+      if (scheduleModalError) {
+        scheduleModalError.textContent = 'Please select a valid date and time.';
+        scheduleModalError.classList.remove('is-hidden');
+      }
+      return;
+    }
 
-    if (!isValidName(name)) {
-      return showProfileError('Enter your full name (1–3 words, letters only).');
+    const scheduledDate = new Date(`${dateVal}T${timeVal}`);
+    const scheduledEpoch = scheduledDate.getTime();
+    const minEpoch = Date.now() + 25 * 60 * 1000; // at least 25-30 min lead time
+    if (isNaN(scheduledEpoch) || scheduledEpoch < minEpoch) {
+      if (scheduleModalError) {
+        scheduleModalError.textContent = 'Rides must be scheduled at least 30 minutes in advance.';
+        scheduleModalError.classList.remove('is-hidden');
+      }
+      return;
     }
-    if (!isValidPhone(phone)) {
-      return showProfileError('Enter a valid 10-digit phone number.');
+
+    if (!scheduleState.pickup || !scheduleState.pickup.lat) {
+      if (scheduleModalError) {
+        scheduleModalError.textContent = 'Please enter a valid pickup address inside Poortjie.';
+        scheduleModalError.classList.remove('is-hidden');
+      }
+      return;
     }
-    if (!selectedProfilePhotoFile && !hasExistingPhoto) {
-      return showProfileError('Add a profile photo so drivers can recognise you.');
+
+    if (!scheduleState.dropoff || !scheduleState.dropoff.lat) {
+      if (scheduleModalError) {
+        scheduleModalError.textContent = 'Please enter a valid destination address.';
+        scheduleModalError.classList.remove('is-hidden');
+      }
+      return;
     }
 
     try {
-      if (profileSaveBtn) {
-        profileSaveBtn.disabled = true;
-        profileSaveBtn.innerHTML = '<div class="spinner"></div> Saving…';
+      if (scheduleSubmitBtn) {
+        scheduleSubmitBtn.disabled = true;
+        scheduleSubmitBtn.innerHTML = '<div class="spinner"></div> Scheduling…';
       }
 
-      let photoUrl = (userProfile && userProfile.photoUrl) || (currentUser && currentUser.photoURL) || '';
-      if (selectedProfilePhotoFile) {
-        photoUrl = await uploadProfilePhoto(selectedProfilePhotoFile, currentUser.uid);
-      }
+      const isReturn = scheduleState.tripType === 'RETURN';
+      const note = (scheduleNotesInput?.value || '').trim();
 
-      // Persist to shared identity doc (camelCase, merge) — matches Android upsertUser.
-      await usersCol.doc(currentUser.uid).set({
-        displayName: name,
-        phone: phone,
-        photoUrl: photoUrl,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      const bookingPayload = {
+        pickup: scheduleState.pickup,
+        dropoff: scheduleState.dropoff,
+        vehicleType: 'PRIVATE_CAR',
+        note,
+        requestedDriverId: null,
+        isReturnTrip: isReturn,
+        returnWaitMinutes: isReturn ? (scheduleState.returnWaitMinutes || 15) : null,
+        scheduledTime: scheduledEpoch
+      };
 
-      // Refresh local profile + UI.
-      userProfile = Object.assign({}, userProfile, { displayName: name, phone: phone, photoUrl: photoUrl });
-      userCache.set(currentUser.uid, userProfile);
-      renderUserState(currentUser, userProfile);
+      const result = await riderApi.createBooking(bookingPayload);
 
-      showToast('Profile saved!');
-      closeProfileModal();
+      // Persist scheduled record in rider's scheduledRequests collection
+      const record = {
+        riderId: currentUser.uid,
+        status: result.status || 'PENDING',
+        fare: result.upfrontPrice || scheduleState.fare || 50,
+        pickup: scheduleState.pickup,
+        dropoff: scheduleState.dropoff,
+        destination: scheduleState.dropoff.address,
+        isReturnRide: isReturn,
+        returnWaitMinutes: isReturn ? scheduleState.returnWaitMinutes : null,
+        scheduledTime: scheduledEpoch,
+        note,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
 
-      // Check if there is a pending ride booking to resume
-      let pendingRaw = null;
-      try {
-        pendingRaw = sessionStorage.getItem('pendingRideBooking');
-      } catch (e) {}
+      await db.collection('laynfleet').doc(fleetEnvironment)
+        .collection('scheduledRequests').doc(currentUser.uid)
+        .collection('requests').doc(result.bookingId).set(record, { merge: true });
 
-      if (pendingRaw) {
-        let pendingRide = null;
-        try { pendingRide = JSON.parse(pendingRaw); } catch(e) {}
-        if (pendingRide && isProfileComplete) {
-          sessionStorage.removeItem('pendingRideBooking');
-          setTimeout(() => {
-            openConfirmBookingModal();
-          }, 200);
-          return;
-        }
-      }
-
-      // Resume whatever the rider was trying to book.
-      if (isProfileComplete && pendingBookingDriverId !== undefined) {
-        const resume = pendingBookingDriverId;
-        pendingBookingDriverId = undefined;
-        setTimeout(() => openBookingForm(resume), 150);
-      }
+      riderApi.finishBookingRequest();
+      closeScheduleModal();
+      showToast('Ride scheduled successfully!');
     } catch (err) {
-      console.error('Failed to save profile:', err);
-      if (profilePhotoHint) profilePhotoHint.textContent = 'Profile save failed. Please try again or choose another picture.';
-      showProfileError('Could not save your profile. Please try again.');
+      console.error('[LaynRider] Failed to schedule ride:', err);
+      if (scheduleModalError) {
+        scheduleModalError.textContent = err.message || 'Could not schedule ride. Please try again.';
+        scheduleModalError.classList.remove('is-hidden');
+      }
     } finally {
-      if (profileSaveBtn) {
-        profileSaveBtn.disabled = false;
-        profileSaveBtn.textContent = 'Save & Continue';
+      if (scheduleSubmitBtn) {
+        scheduleSubmitBtn.disabled = false;
+        scheduleSubmitBtn.innerHTML = '<span>📅</span> Schedule Ride';
       }
     }
   }
 
-  function showProfileError(msg) {
-    if (profileModalError) {
-      profileModalError.textContent = msg;
-      profileModalError.classList.remove('is-hidden');
-    } else {
-      showToast(msg);
+  function openScheduledDetailsModal() {
+    if (!currentScheduledDoc) return;
+    const b = currentScheduledDoc;
+
+    if (scheduledDetailsTime) {
+      const epoch = readEpochMillis(b.scheduledTime) || Date.now();
+      const d = new Date(epoch);
+      scheduledDetailsTime.textContent = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) +
+        ' at ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
+
+    if (scheduledDetailsPickup) {
+      scheduledDetailsPickup.textContent = (b.pickup && b.pickup.address) || '—';
+    }
+    if (scheduledDetailsDropoff) {
+      scheduledDetailsDropoff.textContent = (b.dropoff && b.dropoff.address) || b.destination || '—';
+    }
+    if (scheduledDetailsFare) {
+      const fare = b.fare || b.upfrontPrice;
+      scheduledDetailsFare.textContent = typeof fare === 'number' ? 'R ' + Math.round(fare) : 'R --';
+    }
+    if (scheduledDetailsStatusPill) {
+      const st = (b.status || 'PENDING').toUpperCase();
+      scheduledDetailsStatusPill.textContent = st === 'PENDING' ? 'SEARCHING' : st;
+    }
+
+    if (b.driverName && scheduledDetailsDriverBox) {
+      scheduledDetailsDriverBox.classList.remove('is-hidden');
+      if (scheduledDetailsDriverName) scheduledDetailsDriverName.textContent = b.driverName;
+      if (scheduledDetailsVehicle) scheduledDetailsVehicle.textContent = b.driverVehicle || 'Assigned Driver';
+      if (scheduledDetailsDriverPhoto) {
+        scheduledDetailsDriverPhoto.src = b.driverPhotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.driverName)}&background=22c55e&color=fff&size=120`;
+      }
+    } else if (scheduledDetailsDriverBox) {
+      scheduledDetailsDriverBox.classList.add('is-hidden');
+    }
+
+    if (scheduledDetailsModal) scheduledDetailsModal.classList.remove('is-hidden');
+  }
+
+  function closeScheduledDetailsModal() {
+    if (scheduledDetailsModal) scheduledDetailsModal.classList.add('is-hidden');
+  }
+
+  async function handleCancelScheduledRide() {
+    if (!currentScheduledDoc || !currentUser) return;
+    const confirmCancel = window.confirm('Are you sure you want to cancel this scheduled ride?');
+    if (!confirmCancel) return;
+
+    try {
+      if (scheduledCancelBtn) scheduledCancelBtn.disabled = true;
+      await db.collection('laynfleet').doc(fleetEnvironment)
+        .collection('scheduledRequests').doc(currentUser.uid)
+        .collection('requests').doc(currentScheduledDoc.id).set({
+          status: 'CANCELLED',
+          cancelReason: 'Cancelled by rider',
+          cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+      showToast('Scheduled ride cancelled.');
+      closeScheduledDetailsModal();
+    } catch (e) {
+      console.error('[LaynRider] Failed to cancel scheduled ride:', e);
+      showToast('Failed to cancel. Please try again.');
+    } finally {
+      if (scheduledCancelBtn) scheduledCancelBtn.disabled = false;
+    }
+  }
+
+  /** ============================================================
+   * PLANNED RIDES (TAG ALONG & COMMUNITY ERRANDS)
+   * ============================================================ */
+
+  function initPlannedRidesListener() {
+    if (activePlannedUnsub) { activePlannedUnsub(); activePlannedUnsub = null; }
+    try {
+      const plannedQuery = db.collectionGroup('requests')
+        .where('environment', '==', fleetEnvironment)
+        .where('recordType', '==', 'plannedRideListings')
+        .where('status', '==', 'OPEN');
+
+      activePlannedUnsub = plannedQuery.onSnapshot((snap) => {
+        availablePlannedPlans = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderPlannedRideCard(availablePlannedPlans);
+      }, (err) => {
+        console.warn('[LaynRider] Planned rides listener warning:', err);
+        renderPlannedRideCard([]);
+      });
+    } catch (e) {
+      console.warn('[LaynRider] Failed to init planned rides listener:', e);
+      renderPlannedRideCard([]);
+    }
+  }
+
+  function renderPlannedRideCard(plans) {
+    if (!plannedRideCard) return;
+    if (plans && plans.length > 0) {
+      const plan = plans[0];
+      const dest = (plan.destination && plan.destination.address) || plan.destination || 'Southgate Mall';
+      const cleanDest = typeof dest === 'string' ? dest.split(',')[0] : 'Southgate Mall';
+      if (plannedCardDest) plannedCardDest.textContent = cleanDest;
+
+      const epoch = readEpochMillis(plan.startAt || plan.departure) || Date.now();
+      const timeStr = new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const seats = plan.availablePlaces || plan.seats || 3;
+      if (plannedCardSub) plannedCardSub.textContent = `Departs ${timeStr} · ${seats} seats available`;
+
+      const fare = plan.oneWayFare || plan.fare || 35;
+      if (plannedCardFare) plannedCardFare.textContent = `R ${Math.round(fare)} per person`;
+      if (plannedCardCount) {
+        plannedCardCount.textContent = `1 of ${plans.length}`;
+        plannedCardCount.classList.remove('is-hidden');
+      }
+
+      plannedRideCard.classList.remove('is-hidden');
+    } else {
+      // Default Tag Along community route preview
+      if (plannedCardDest) plannedCardDest.textContent = 'Southgate Mall & Trade Routes';
+      if (plannedCardSub) plannedCardSub.textContent = 'Tag Along & errands · Reserve a seat';
+      if (plannedCardFare) plannedCardFare.textContent = 'Fixed per-seat fares';
+      if (plannedCardCount) plannedCardCount.classList.add('is-hidden');
+      plannedRideCard.classList.remove('is-hidden');
+    }
+  }
+
+  function openPlannedModal() {
+    if (plannedRidesList) {
+      plannedRidesList.innerHTML = '';
+      if (availablePlannedPlans.length > 0) {
+        availablePlannedPlans.forEach(plan => {
+          const item = document.createElement('div');
+          item.className = 'dashboard-card';
+          item.style.padding = '12px 16px';
+          item.style.marginBottom = '8px';
+
+          const dest = (plan.destination && plan.destination.address) || plan.destination || 'Destination';
+          const epoch = readEpochMillis(plan.startAt || plan.departure) || Date.now();
+          const timeStr = new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const seats = plan.availablePlaces || 3;
+          const fare = plan.oneWayFare || 35;
+
+          item.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <strong style="font-size: 15px; color: var(--digilayn-on-surface);">${dest}</strong>
+                <p style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 2px 0 0 0;">Departs ${timeStr} · ${seats} seats left</p>
+              </div>
+              <span class="planned-fare-tag">R ${Math.round(fare)}</span>
+            </div>
+            <p style="font-size: 12px; color: var(--digilayn-on-surface-variant); margin-top: 8px;">Pay driver directly upon boarding.</p>
+          `;
+          plannedRidesList.appendChild(item);
+        });
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.style.padding = '16px';
+        placeholder.style.textAlign = 'center';
+        placeholder.style.color = 'var(--digilayn-on-surface-variant)';
+        placeholder.style.fontSize = '13px';
+        placeholder.innerHTML = '<strong>No departures scheduled right now.</strong><p style="margin-top: 4px;">Drivers post upcoming Tag Along routes here regularly. Check back soon!</p>';
+        plannedRidesList.appendChild(placeholder);
+      }
+    }
+    if (plannedModal) plannedModal.classList.remove('is-hidden');
+  }
+
+  function closePlannedModal() {
+    if (plannedModal) plannedModal.classList.add('is-hidden');
   }
 
   /** Switch primary UI views */
@@ -788,6 +1139,8 @@
     if (bootView) bootView.classList.add('is-hidden');
     if (authGateView) authGateView.classList.add('is-hidden');
     if (suspendedView) suspendedView.classList.add('is-hidden');
+    if (termsGateView) termsGateView.classList.add('is-hidden');
+    if (profileGateView) profileGateView.classList.add('is-hidden');
     if (appView) appView.classList.add('is-hidden');
 
     if (viewName === 'boot') {
@@ -799,6 +1152,16 @@
       if (headerSignOutBtn) headerSignOutBtn.classList.add('is-hidden');
     } else if (viewName === 'suspended') {
       if (suspendedView) suspendedView.classList.remove('is-hidden');
+      if (headerSignInBtn) headerSignInBtn.classList.add('is-hidden');
+      if (headerUserBtn) headerUserBtn.classList.remove('is-hidden');
+      if (headerSignOutBtn) headerSignOutBtn.classList.remove('is-hidden');
+    } else if (viewName === 'terms') {
+      if (termsGateView) termsGateView.classList.remove('is-hidden');
+      if (headerSignInBtn) headerSignInBtn.classList.add('is-hidden');
+      if (headerUserBtn) headerUserBtn.classList.remove('is-hidden');
+      if (headerSignOutBtn) headerSignOutBtn.classList.remove('is-hidden');
+    } else if (viewName === 'profile-gate') {
+      if (profileGateView) profileGateView.classList.remove('is-hidden');
       if (headerSignInBtn) headerSignInBtn.classList.add('is-hidden');
       if (headerUserBtn) headerUserBtn.classList.remove('is-hidden');
       if (headerSignOutBtn) headerSignOutBtn.classList.remove('is-hidden');
@@ -1331,6 +1694,43 @@
           const lng = place.geometry.location.lng();
           const addr = place.formatted_address || place.name || dropoffAddressInput.value;
           setDropoffLocation(addr, lat, lng);
+        }
+      });
+    }
+
+    if (schedulePickupInput) {
+      const schedulePickupAutocomplete = new google.maps.places.Autocomplete(schedulePickupInput, {
+        bounds: circle.getBounds(),
+        componentRestrictions: { country: 'za' },
+        fields: ['formatted_address', 'name', 'geometry']
+      });
+
+      schedulePickupAutocomplete.addListener('place_changed', () => {
+        const place = schedulePickupAutocomplete.getPlace();
+        if (place && place.geometry && place.geometry.location) {
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+          const addr = place.formatted_address || place.name || schedulePickupInput.value;
+          scheduleState.pickup = { address: addr, lat, lng };
+          updateScheduleFareEstimate();
+        }
+      });
+    }
+
+    if (scheduleDropoffInput) {
+      const scheduleDropoffAutocomplete = new google.maps.places.Autocomplete(scheduleDropoffInput, {
+        componentRestrictions: { country: 'za' },
+        fields: ['formatted_address', 'name', 'geometry']
+      });
+
+      scheduleDropoffAutocomplete.addListener('place_changed', () => {
+        const place = scheduleDropoffAutocomplete.getPlace();
+        if (place && place.geometry && place.geometry.location) {
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+          const addr = place.formatted_address || place.name || scheduleDropoffInput.value;
+          scheduleState.dropoff = { address: addr, lat, lng };
+          updateScheduleFareEstimate();
         }
       });
     }
@@ -2789,7 +3189,7 @@
   }
 
   /** Render user state */
-  function renderUserState(authUser, profileData) {
+  async function renderUserState(authUser, profileData) {
     if (!authUser) {
       currentUser = null;
       userProfile = null;
@@ -2797,16 +3197,16 @@
       if (presenceUnsub) { presenceUnsub(); presenceUnsub = null; }
       rtdbPresence = {};
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
+      if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
 
       if (headerSignInBtn) headerSignInBtn.classList.remove('is-hidden');
       if (headerUserBtn) headerUserBtn.classList.add('is-hidden');
       if (headerSignOutBtn) headerSignOutBtn.classList.add('is-hidden');
 
       if (heroNameEl) heroNameEl.textContent = 'rider';
-      if (profileIncompleteBanner) profileIncompleteBanner.classList.add('is-hidden');
       if (activeBookingBanner) activeBookingBanner.classList.add('is-hidden');
 
-      showView('app');
+      showView('auth');
       return;
     }
 
@@ -2819,12 +3219,26 @@
         reasonEl.textContent = userProfile.suspendedReason || 'Account suspended by management.';
       }
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
+      if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
       showView('suspended');
       return;
     }
 
+    // Terms & Privacy consent gate
+    const hasConsent = await checkLaynFleetConsent(authUser.uid);
+    if (!hasConsent) {
+      showView('terms');
+      return;
+    }
+
+    // Profile completeness gate
     const completeness = checkProfileCompleteness(userProfile, authUser);
     isProfileComplete = completeness.isComplete;
+    if (!isProfileComplete) {
+      renderMissingProfileDetails(completeness.missing);
+      showView('profile-gate');
+      return;
+    }
 
     const displayName = completeness.name || authUser.email || 'Rider';
     const firstName = (displayName.split(' ')[0]) || 'Rider';
@@ -2837,11 +3251,6 @@
       } else {
         headerAvatar.src = 'https://placehold.co/100x100/22c55e/ffffff?text=' + encodeURIComponent(displayName[0] || 'R');
       }
-    }
-
-    updateProfileChecklist(completeness);
-    if (profileIncompleteBanner) {
-      profileIncompleteBanner.classList.toggle('is-hidden', isProfileComplete);
     }
 
     showView('app');
@@ -2859,6 +3268,8 @@
       presenceUnsub = () => presenceRef.off('value', onPresence);
     }
     startActiveBookingListener(authUser.uid);
+    initScheduledRidesListener(authUser.uid);
+    initPlannedRidesListener();
 
     // Check if there is a pending ride booking from before login
     checkAndResumePendingBooking();
@@ -2887,29 +3298,130 @@
     const suspendedSignOutBtn = document.getElementById('suspended-signout-btn');
     if (suspendedSignOutBtn) suspendedSignOutBtn.addEventListener('click', handleSignOut);
 
-    if (completeProfileBtn) completeProfileBtn.addEventListener('click', () => openProfileModal());
-    if (headerUserBtn) headerUserBtn.addEventListener('click', () => openProfileModal());
+    if (headerUserBtn) headerUserBtn.addEventListener('click', navigateToProfile);
+    if (profileGateCompleteBtn) profileGateCompleteBtn.addEventListener('click', navigateToProfile);
 
-    // Profile Completion Modal
-    if (profileModalClose) profileModalClose.addEventListener('click', closeProfileModal);
-    if (profilePhotoInput) profilePhotoInput.addEventListener('change', handleProfilePhotoPick);
-    if (profileSaveBtn) profileSaveBtn.addEventListener('click', handleProfileSave);
-    if (profilePhoneInput) {
-      profilePhoneInput.addEventListener('input', () => {
-        profilePhoneInput.value = profilePhoneInput.value.replace(/\D/g, '').slice(0, 10);
-        if (profilePhoneField) profilePhoneField.classList.toggle('is-missing', !isValidPhone(profilePhoneInput.value));
+    // Terms Gate Checkbox and Continue
+    if (termsAcceptCheckbox) {
+      termsAcceptCheckbox.addEventListener('change', () => {
+        if (termsContinueBtn) termsContinueBtn.disabled = !termsAcceptCheckbox.checked;
       });
     }
-    if (profileNameInput) {
-      profileNameInput.addEventListener('input', () => {
-        if (profileNameField) profileNameField.classList.toggle('is-missing', !isValidName(profileNameInput.value.trim()));
+    if (termsContinueBtn) {
+      termsContinueBtn.addEventListener('click', async () => {
+        if (!currentUser || !termsAcceptCheckbox?.checked) return;
+        try {
+          termsContinueBtn.disabled = true;
+          termsContinueBtn.innerHTML = '<div class="spinner"></div> Saving…';
+          if (termsGateError) termsGateError.classList.add('is-hidden');
+          await saveLaynFleetConsent(currentUser.uid);
+          await renderUserState(currentUser, userProfile);
+        } catch (e) {
+          console.error('[LaynRider] Failed to save terms consent:', e);
+          if (termsGateError) {
+            termsGateError.textContent = 'Could not record consent. Please try again.';
+            termsGateError.classList.remove('is-hidden');
+          }
+          termsContinueBtn.disabled = false;
+          termsContinueBtn.textContent = 'Continue';
+        }
       });
     }
-    if (profileModal) {
-      profileModal.addEventListener('click', (e) => {
-        if (e.target === profileModal) closeProfileModal();
+
+    // Quick Ride Cards
+    if (quickRideBtn) quickRideBtn.addEventListener('click', () => openBookingForm());
+    if (heroQuickCard) heroQuickCard.addEventListener('click', (e) => {
+      if (e.target !== quickRideBtn && !quickRideBtn?.contains(e.target)) openBookingForm();
+    });
+
+    // Scheduled Ride Cards & Modals
+    if (scheduledInviteCard) scheduledInviteCard.addEventListener('click', openScheduleModal);
+    if (scheduledActiveCard) scheduledActiveCard.addEventListener('click', openScheduledDetailsModal);
+    if (scheduledViewDetailsBtn) {
+      scheduledViewDetailsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openScheduledDetailsModal();
       });
     }
+    if (scheduleModalClose) scheduleModalClose.addEventListener('click', closeScheduleModal);
+    if (scheduleModalCancel) scheduleModalCancel.addEventListener('click', closeScheduleModal);
+    if (scheduleSubmitBtn) scheduleSubmitBtn.addEventListener('click', handleScheduleSubmit);
+    if (scheduledDetailsClose) scheduledDetailsClose.addEventListener('click', closeScheduledDetailsModal);
+    if (scheduledDetailsDismiss) scheduledDetailsDismiss.addEventListener('click', closeScheduledDetailsModal);
+    if (scheduledCancelBtn) scheduledCancelBtn.addEventListener('click', handleCancelScheduledRide);
+
+    // Scheduled Trip Type Toggle
+    if (scheduleTypeOneway) {
+      scheduleTypeOneway.addEventListener('click', () => {
+        scheduleTypeOneway.classList.add('is-active');
+        if (scheduleTypeReturn) scheduleTypeReturn.classList.remove('is-active');
+        if (scheduleReturnOptions) scheduleReturnOptions.classList.add('is-hidden');
+        scheduleState.tripType = 'ONE_WAY';
+        updateScheduleFareEstimate();
+      });
+    }
+    if (scheduleTypeReturn) {
+      scheduleTypeReturn.addEventListener('click', () => {
+        scheduleTypeReturn.classList.add('is-active');
+        if (scheduleTypeOneway) scheduleTypeOneway.classList.remove('is-active');
+        if (scheduleReturnOptions) scheduleReturnOptions.classList.remove('is-hidden');
+        scheduleState.tripType = 'RETURN';
+        updateScheduleFareEstimate();
+      });
+    }
+    const scheduleWaitPills = document.querySelectorAll('#schedule-return-options .wait-pill');
+    scheduleWaitPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        scheduleWaitPills.forEach(p => p.classList.remove('is-active'));
+        pill.classList.add('is-active');
+        scheduleState.returnWaitMinutes = parseInt(pill.getAttribute('data-mins'), 10) || 15;
+        updateScheduleFareEstimate();
+      });
+    });
+
+    if (schedulePickupGpsBtn) {
+      schedulePickupGpsBtn.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          showToast('Geolocation is not supported by your browser.');
+          return;
+        }
+        schedulePickupGpsBtn.disabled = true;
+        schedulePickupGpsBtn.textContent = '…';
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            schedulePickupGpsBtn.disabled = false;
+            schedulePickupGpsBtn.textContent = '📍 GPS';
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            if (global.google && global.google.maps) {
+              const geocoder = new google.maps.Geocoder();
+              geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                const addr = (status === 'OK' && results[0]) ? results[0].formatted_address : `GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                scheduleState.pickup = { address: addr, lat, lng };
+                if (schedulePickupInput) schedulePickupInput.value = addr;
+                updateScheduleFareEstimate();
+              });
+            } else {
+              const addr = `GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+              scheduleState.pickup = { address: addr, lat, lng };
+              if (schedulePickupInput) schedulePickupInput.value = addr;
+              updateScheduleFareEstimate();
+            }
+          },
+          (err) => {
+            schedulePickupGpsBtn.disabled = false;
+            schedulePickupGpsBtn.textContent = '📍 GPS';
+            showToast('Could not fetch GPS location.');
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      });
+    }
+
+    // Planned Ride Card & Modal
+    if (plannedRideCard) plannedRideCard.addEventListener('click', openPlannedModal);
+    if (plannedModalClose) plannedModalClose.addEventListener('click', closePlannedModal);
+    if (plannedModalDoneBtn) plannedModalDoneBtn.addEventListener('click', closePlannedModal);
 
     // Quick Ride
     if (quickRideBtn) quickRideBtn.addEventListener('click', () => openBookingForm());

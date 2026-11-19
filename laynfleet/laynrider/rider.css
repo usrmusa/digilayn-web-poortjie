@@ -2911,3 +2911,191 @@ img, svg, video, canvas, audio, iframe, embed, object {
   color: var(--digilayn-primary);
 }
 
+/* ============================================================
+   LAYNFLEET DASHBOARD CARDS & BADGES (ALIGNED WITH ANDROID)
+   ============================================================ */
+.live-dot-green {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  margin-right: 4px;
+}
+
+.dashboard-card {
+  background: var(--digilayn-surface, #ffffff);
+  border: 1.5px solid var(--digilayn-outline-variant, #e4e4e7);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  margin-bottom: 14px;
+}
+
+.dashboard-card:hover {
+  border-color: var(--digilayn-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.planned-card {
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  background: linear-gradient(to bottom right, rgba(254, 243, 199, 0.25), var(--digilayn-surface, #ffffff));
+}
+
+.scheduled-card {
+  border: 1.5px solid var(--digilayn-outline-variant, #e4e4e7);
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-pill {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.badge-planned {
+  background: #fef3c7;
+  color: #78350f;
+}
+
+.badge-scheduled {
+  background: var(--digilayn-surface-variant, #f4f4f5);
+  color: var(--digilayn-on-surface-variant, #71717a);
+}
+
+.badge-scheduled-active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge-status {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--digilayn-surface-variant, #e4e4e7);
+  color: var(--digilayn-on-surface, #18181b);
+}
+
+.card-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-main-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--digilayn-on-surface, #18181b);
+  margin: 0;
+}
+
+.card-sub-text {
+  font-size: 13px;
+  color: var(--digilayn-on-surface-variant, #71717a);
+  margin: 0;
+}
+
+.card-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.planned-fare-tag {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--digilayn-primary);
+}
+
+.card-nav-arrow {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--digilayn-primary);
+}
+
+/* Profile Gate Item */
+.profile-gate-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 14px;
+  color: var(--digilayn-on-surface, #18181b);
+}
+
+.profile-gate-item.is-missing {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.profile-gate-item.is-missing::before {
+  content: "⚠️";
+}
+
+.profile-gate-item.is-complete {
+  color: #16a34a;
+}
+
+.profile-gate-item.is-complete::before {
+  content: "✅";
+}
+
+/* Trip Type Toggle Pills */
+.trip-type-btn {
+  padding: 10px 14px;
+  border: 1.5px solid var(--digilayn-outline-variant, #e4e4e7);
+  background: var(--digilayn-surface, #ffffff);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--digilayn-on-surface-variant, #71717a);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.trip-type-btn.is-active {
+  border-color: var(--digilayn-primary);
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--digilayn-primary);
+}
+
+.wait-pill {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1.5px solid var(--digilayn-outline-variant, #e4e4e7);
+  background: var(--digilayn-surface, #ffffff);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--digilayn-on-surface-variant, #71717a);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wait-pill.is-active {
+  border-color: var(--digilayn-primary);
+  background: var(--digilayn-primary);
+  color: #ffffff;
+}
+
+
