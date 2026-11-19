@@ -391,6 +391,8 @@
   const scheduledCancelBtn = document.getElementById('scheduled-cancel-btn');
 
   // Scheduled & Planned State
+  let scheduledRidesEnabled = true;
+  let appConfigUnsub = null;
   let activeScheduledUnsub = null;
   let currentScheduledDoc = null;
   let activePlannedUnsub = null;
@@ -750,13 +752,44 @@
         } else {
           currentScheduledDoc = null;
           if (scheduledActiveCard) scheduledActiveCard.classList.add('is-hidden');
-          if (scheduledInviteCard) scheduledInviteCard.classList.remove('is-hidden');
+          if (scheduledInviteCard) scheduledInviteCard.classList.toggle('is-hidden', !scheduledRidesEnabled);
         }
       }, (err) => {
         console.warn('[LaynRider] Scheduled requests listener warning:', err);
       });
     } catch (e) {
       console.warn('[LaynRider] Failed to init scheduled requests listener:', e);
+    }
+  }
+
+  function updateScheduledRidesVisibility() {
+    if (!currentScheduledDoc && scheduledInviteCard) {
+      scheduledInviteCard.classList.toggle('is-hidden', !scheduledRidesEnabled);
+    }
+    if (bookingScheduleBtn) {
+      bookingScheduleBtn.classList.toggle('is-hidden', !scheduledRidesEnabled);
+    }
+  }
+
+  /** Listen for feature toggles from appConfig/laynrider */
+  function initAppConfigListener() {
+    if (appConfigUnsub) { appConfigUnsub(); appConfigUnsub = null; }
+    try {
+      const configDoc = db.collection(FS.laynfleet).doc(fleetEnvironment).collection('appConfig').doc('laynrider');
+      appConfigUnsub = configDoc.onSnapshot((snapshot) => {
+        const data = snapshot.exists ? (snapshot.data() || {}) : {};
+        // Owner decision: default to true if omitted, null, or on error
+        scheduledRidesEnabled = data.scheduledRidesEnabled !== false;
+        updateScheduledRidesVisibility();
+      }, (err) => {
+        console.warn('[LaynRider] appConfig listener warning:', err);
+        scheduledRidesEnabled = true;
+        updateScheduledRidesVisibility();
+      });
+    } catch (err) {
+      console.warn('[LaynRider] Failed to init appConfig listener:', err);
+      scheduledRidesEnabled = true;
+      updateScheduledRidesVisibility();
     }
   }
 
@@ -787,6 +820,10 @@
   }
 
   function openScheduleModal() {
+    if (!scheduledRidesEnabled) {
+      showToast('Scheduled ride creation is currently disabled.');
+      return;
+    }
     if (!isProfileComplete) {
       showToast('Please complete your profile to schedule a ride.');
       navigateToProfile();
@@ -867,6 +904,13 @@
 
   async function handleScheduleSubmit() {
     if (!currentUser) return;
+    if (!scheduledRidesEnabled) {
+      if (scheduleModalError) {
+        scheduleModalError.textContent = 'Scheduled ride creation is currently disabled.';
+        scheduleModalError.classList.remove('is-hidden');
+      }
+      return;
+    }
     if (scheduleModalError) scheduleModalError.classList.add('is-hidden');
 
     const dateVal = scheduleDateInput?.value;
@@ -1062,17 +1106,17 @@
     if (!plannedRideCard) return;
     if (plans && plans.length > 0) {
       const plan = plans[0];
-      const dest = (plan.destination && plan.destination.address) || plan.destination || 'Southgate Mall';
-      const cleanDest = typeof dest === 'string' ? dest.split(',')[0] : 'Southgate Mall';
+      const dest = (plan.destination && plan.destination.address) || plan.destination || '';
+      const cleanDest = typeof dest === 'string' ? dest.split(',')[0] : '';
       if (plannedCardDest) plannedCardDest.textContent = cleanDest;
 
-      const epoch = readEpochMillis(plan.startAt || plan.departure) || Date.now();
-      const timeStr = new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const seats = plan.availablePlaces || plan.seats || 3;
-      if (plannedCardSub) plannedCardSub.textContent = `Departs ${timeStr} · ${seats} seats available`;
+      const epoch = readEpochMillis(plan.startAt || plan.departure);
+      const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+      const seats = plan.availablePlaces ?? plan.seats ?? 0;
+      if (plannedCardSub) plannedCardSub.textContent = timeStr ? `Departs ${timeStr} · ${seats} seats available` : `${seats} seats available`;
 
-      const fare = plan.oneWayFare || plan.fare || 35;
-      if (plannedCardFare) plannedCardFare.textContent = `R ${Math.round(fare)} per person`;
+      const fare = plan.oneWayFare ?? plan.fare;
+      if (plannedCardFare) plannedCardFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)} per person` : '';
       if (plannedCardCount) {
         plannedCardCount.textContent = `1 of ${plans.length}`;
         plannedCardCount.classList.remove('is-hidden');
@@ -1080,12 +1124,11 @@
 
       plannedRideCard.classList.remove('is-hidden');
     } else {
-      // Default Tag Along community route preview
-      if (plannedCardDest) plannedCardDest.textContent = 'Southgate Mall & Trade Routes';
-      if (plannedCardSub) plannedCardSub.textContent = 'Tag Along & errands · Reserve a seat';
-      if (plannedCardFare) plannedCardFare.textContent = 'Fixed per-seat fares';
+      if (plannedCardDest) plannedCardDest.textContent = '';
+      if (plannedCardSub) plannedCardSub.textContent = '';
+      if (plannedCardFare) plannedCardFare.textContent = '';
       if (plannedCardCount) plannedCardCount.classList.add('is-hidden');
-      plannedRideCard.classList.remove('is-hidden');
+      plannedRideCard.classList.add('is-hidden');
     }
   }
 
@@ -1100,10 +1143,11 @@
           item.style.marginBottom = '8px';
 
           const dest = (plan.destination && plan.destination.address) || plan.destination || 'Destination';
-          const epoch = readEpochMillis(plan.startAt || plan.departure) || Date.now();
-          const timeStr = new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          const seats = plan.availablePlaces || 3;
-          const fare = plan.oneWayFare || 35;
+          const epoch = readEpochMillis(plan.startAt || plan.departure);
+          const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+          const seats = plan.availablePlaces ?? plan.seats ?? 0;
+          const fare = plan.oneWayFare ?? plan.fare;
+          const fareStr = typeof fare === 'number' ? `R ${Math.round(fare)}` : 'R --';
 
           item.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -1111,7 +1155,7 @@
                 <strong style="font-size: 15px; color: var(--digilayn-on-surface);">${dest}</strong>
                 <p style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 2px 0 0 0;">Departs ${timeStr} · ${seats} seats left</p>
               </div>
-              <span class="planned-fare-tag">R ${Math.round(fare)}</span>
+              <span class="planned-fare-tag">${fareStr}</span>
             </div>
             <p style="font-size: 12px; color: var(--digilayn-on-surface-variant); margin-top: 8px;">Pay driver directly upon boarding.</p>
           `;
@@ -3697,6 +3741,7 @@
   function boot() {
     initListeners();
     initPricingRatesListener();
+    initAppConfigListener();
 
     AccountAccess.observe(async (authUser) => {
       if (!authUser) {
