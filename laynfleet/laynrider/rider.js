@@ -114,6 +114,19 @@
   };
   let activePricingRates = { ...DEFAULT_PRICING_RATES };
 
+  function getPricingSnapshot(vehicleType = 'PRIVATE_CAR') {
+    const vType = (vehicleType || 'PRIVATE_CAR').toUpperCase();
+    const r = activePricingRates[vType] || DEFAULT_PRICING_RATES[vType] || DEFAULT_PRICING_RATES.PRIVATE_CAR;
+    return {
+      ratePerKm: Number(r.ratePerKm),
+      minimumFare: Number(r.minimumFare),
+      curveScaleKm: (typeof r.curveScaleKm === 'number' && Number.isFinite(r.curveScaleKm) && r.curveScaleKm > 0) ? r.curveScaleKm : null,
+      returnRidePercent: Number(r.returnRidePercent ?? r.returnTripPercent ?? 80),
+      waitRatePerMinute: Number(r.waitRatePerMinute ?? 1.50),
+      freeWaitMinutes: Number(r.freeWaitMinutes ?? 10)
+    };
+  }
+
   // User cache for driver identities & reviews
   const userCache = new Map();
   const driverReviewsCache = new Map();
@@ -946,8 +959,10 @@
       unitSystem: google.maps.UnitSystem.METRIC
     }, (response, status) => {
       if (status === 'OK' && response.rows[0]?.elements[0]?.status === 'OK') {
-        const distKm = response.rows[0].elements[0].distance.value / 1000;
+        const elem = response.rows[0].elements[0];
+        const distKm = elem.distance.value / 1000;
         scheduleState.distanceKm = distKm;
+        scheduleState.durationSeconds = elem.duration ? Math.round(elem.duration.value) : Math.round((distKm / 40) * 3600);
 
         const rateObj = activePricingRates['PRIVATE_CAR'] || DEFAULT_PRICING_RATES['PRIVATE_CAR'];
         const isReturn = scheduleState.tripType === 'RETURN';
@@ -1001,7 +1016,7 @@
 
     if (!scheduleState.pickup || !scheduleState.pickup.lat) {
       if (scheduleModalError) {
-        scheduleModalError.textContent = 'Please enter a valid pickup address inside Poortjie.';
+        scheduleModalError.textContent = 'Please enter a valid pickup address within the service area.';
         scheduleModalError.classList.remove('is-hidden');
       }
       return;
@@ -1021,44 +1036,62 @@
         scheduleSubmitBtn.innerHTML = '<div class="spinner"></div> Scheduling…';
       }
 
+      const token = await currentUser.getIdToken();
+      const requestId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('sched_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
       const isReturn = scheduleState.tripType === 'RETURN';
-      const note = (scheduleNotesInput?.value || '').trim();
+      const note = (scheduleNotesInput?.value || '').trim().substring(0, 64);
+      const vehicleType = 'PRIVATE_CAR';
+      const pricingSnapshot = getPricingSnapshot(vehicleType);
 
-      const bookingPayload = {
-        pickup: scheduleState.pickup,
-        dropoff: scheduleState.dropoff,
-        vehicleType: 'PRIVATE_CAR',
-        note,
-        requestedDriverId: null,
-        isReturnTrip: isReturn,
-        returnWaitMinutes: isReturn ? (scheduleState.returnWaitMinutes || 15) : null,
-        scheduledTime: scheduledEpoch
+      const pickup = {
+        address: scheduleState.pickup.address || '',
+        lat: Number(scheduleState.pickup.lat),
+        lng: Number(scheduleState.pickup.lng)
+      };
+      const dropoff = {
+        address: scheduleState.dropoff.address || '',
+        lat: Number(scheduleState.dropoff.lat),
+        lng: Number(scheduleState.dropoff.lng)
       };
 
-      const result = await riderApi.createBooking(bookingPayload);
+      const fare = Number(scheduleState.fare || pricingSnapshot.minimumFare);
+      const distanceKm = Number(scheduleState.distanceKm || 1);
+      const durationSeconds = Math.round(Number(scheduleState.durationSeconds || ((distanceKm / 40) * 3600) || 600));
 
-      // Persist scheduled record in rider's scheduledRequests collection
-      const record = {
-        riderId: currentUser.uid,
-        status: result.status || 'PENDING',
-        fare: result.upfrontPrice || scheduleState.fare || 50,
-        pickup: scheduleState.pickup,
-        dropoff: scheduleState.dropoff,
-        destination: scheduleState.dropoff.address,
+      const payload = {
+        requestId,
+        pickup,
+        dropoff,
+        vehicleType,
+        note,
         isReturnRide: isReturn,
-        returnWaitMinutes: isReturn ? scheduleState.returnWaitMinutes : null,
+        returnWaitMinutes: isReturn ? (Number(scheduleState.returnWaitMinutes) || 15) : null,
         scheduledTime: scheduledEpoch,
-        note,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        fare: Math.max(fare, pricingSnapshot.minimumFare),
+        distanceKm: Math.max(distanceKm, 0.1),
+        durationSeconds: Math.max(durationSeconds, 60),
+        pricingSnapshot
       };
 
-      await db.collection('laynfleet').doc(fleetEnvironment)
-        .collection('scheduledRequests').doc(currentUser.uid)
-        .collection('requests').doc(result.bookingId).set(record, { merge: true });
+      const resp = await fetch('https://api.digilayn.co.za/scheduled-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Layn-App': 'laynrider',
+          'X-Layn-Environment': fleetEnvironment
+        },
+        body: JSON.stringify(payload)
+      });
 
-      riderApi.finishBookingRequest();
+      const json = await resp.json().catch(() => null);
+      if (!resp.ok) {
+        const msg = (json && json.error && (json.error.message || json.error.code)) || 'Could not schedule ride.';
+        throw new Error(msg);
+      }
+
       closeScheduleModal();
-      showToast('Ride scheduled successfully!');
+      showToast('📅 Ride scheduled successfully!');
     } catch (err) {
       console.error('[LaynRider] Failed to schedule ride:', err);
       if (scheduleModalError) {
@@ -1124,13 +1157,25 @@
 
     try {
       if (scheduledCancelBtn) scheduledCancelBtn.disabled = true;
-      await db.collection('laynfleet').doc(fleetEnvironment)
-        .collection('scheduledRequests').doc(currentUser.uid)
-        .collection('requests').doc(currentScheduledDoc.id).set({
-          status: 'CANCELLED',
-          cancelReason: 'Cancelled by rider',
-          cancelledAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+      const token = await currentUser.getIdToken();
+      const actionId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('act_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
+
+      const resp = await fetch(`https://api.digilayn.co.za/scheduled-requests/${currentScheduledDoc.id}/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Layn-App': 'laynrider',
+          'X-Layn-Environment': fleetEnvironment
+        },
+        body: JSON.stringify({ actionId, reason: 'Cancelled by rider' })
+      });
+
+      const json = await resp.json().catch(() => null);
+      if (!resp.ok) {
+        const msg = (json && json.error && (json.error.message || json.error.code)) || 'Failed to cancel scheduled ride.';
+        throw new Error(msg);
+      }
 
       showToast('Scheduled ride cancelled.');
       closeScheduledDetailsModal();
@@ -1224,7 +1269,7 @@
       const statusLabel = req.status === 'ACCEPTED' ? 'Confirmed' : (req.status || 'Booked');
       if (plannedCardSub) plannedCardSub.textContent = timeStr ? `Departs ${timeStr} · ${statusLabel}` : statusLabel;
 
-      const fullPickup = (req.pickup && req.pickup.address) || req.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
+      const fullPickup = (req.pickup && req.pickup.address) || req.pickup || 'Pick-up Location';
       const fullDest = dest || '—';
       if (plannedCardFrom) plannedCardFrom.textContent = `📍 From: ${fullPickup}`;
       if (plannedCardTo) plannedCardTo.textContent = `🎯 To: ${fullDest}`;
@@ -1261,7 +1306,7 @@
       const seats = plan.availablePlaces ?? plan.seats ?? 0;
       if (plannedCardSub) plannedCardSub.textContent = timeStr ? `Departs ${timeStr} · ${seats} seats available` : `${seats} seats available`;
 
-      const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
+      const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Pick-up Location';
       const fullDest = dest || '—';
       if (plannedCardFrom) plannedCardFrom.textContent = `📍 From: ${fullPickup}`;
       if (plannedCardTo) plannedCardTo.textContent = `🎯 To: ${fullDest}`;
@@ -1428,7 +1473,7 @@
     const plan = selectedPlannedRide;
     const dest = (plan.destination && plan.destination.address) || plan.destination || '';
     const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
-    const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
+    const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Pick-up Location';
     const oneWayFare = plan.oneWayFare ?? plan.fare ?? 0;
     const returnFare = plan.returnFare ?? (oneWayFare * 2);
 
@@ -1437,8 +1482,8 @@
       if (plannedReserveSubtitle) plannedReserveSubtitle.textContent = 'Tag Along Community Route';
       if (plannedReserveBadge) plannedReserveBadge.textContent = 'TAG ALONG ROUTE';
       if (plannedReserveFareLabel) plannedReserveFareLabel.textContent = 'Seat Fare:';
-      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Your Pickup Location <span class="field-req">inside Poortjie</span>';
-      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will pick you up along their route in Poortjie.';
+      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Your Pickup Location';
+      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will pick you up along their route.';
       if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>From:</strong> <span>${fullPickup}</span>`;
       if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>To:</strong> <span>${dest}</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.textContent = 'Note for Driver (Optional)';
@@ -1458,9 +1503,9 @@
       if (plannedReserveSubtitle) plannedReserveSubtitle.textContent = 'Driver delivers your parcel along this route';
       if (plannedReserveBadge) plannedReserveBadge.textContent = 'ERRAND DELIVERY';
       if (plannedReserveFareLabel) plannedReserveFareLabel.textContent = 'Delivery Fare:';
-      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Parcel Collection Location <span class="field-req">inside Poortjie</span>';
-      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will collect the package from you at this location in Poortjie.';
-      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>Collect in Poortjie:</strong> <span>Your address</span>`;
+      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Parcel Collection Location';
+      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will collect the package from you at this location.';
+      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>Collection:</strong> <span>Your address</span>`;
       if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Deliver to:</strong> <span>${dest}</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.innerHTML = 'Parcel Description & Recipient Contact <span class="field-req">required</span>';
       if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. 1 small parcel, Deliver to John 0821234567';
@@ -1473,10 +1518,10 @@
       if (plannedReserveSubtitle) plannedReserveSubtitle.textContent = 'Driver fetches an item at destination and returns it to you';
       if (plannedReserveBadge) plannedReserveBadge.textContent = 'ERRAND FETCH';
       if (plannedReserveFareLabel) plannedReserveFareLabel.textContent = 'Fetch Fare:';
-      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Your Drop-off Location <span class="field-req">inside Poortjie</span>';
-      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will bring the fetched item to you at this location in Poortjie.';
+      if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Your Drop-off Location';
+      if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will bring the fetched item to you at this location.';
       if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>Fetch at:</strong> <span>${dest}</span>`;
-      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Drop-off in Poortjie:</strong> <span>Your address</span>`;
+      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Drop-off:</strong> <span>Your address</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.innerHTML = 'Item Details & Collection Contact <span class="field-req">required</span>';
       if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. Order #445 at reception, collect from Sarah';
 
@@ -1508,8 +1553,8 @@
     const defaultKind = (seats <= 0 && plan.allowErrands) ? 'DELIVER' : initialKind;
     selectPlannedRole(defaultKind);
 
-    const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
-    const defaultPickupAddr = (bookingState.pickup && bookingState.pickup.address) || (typeof fullPickup === 'string' ? fullPickup : 'Poortjie Taxi Rank, Thwala Dr, Poortjie');
+    const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Pick-up Location';
+    const defaultPickupAddr = (bookingState.pickup && bookingState.pickup.address) || (typeof fullPickup === 'string' ? fullPickup : 'Pick-up Location');
     reservePickupLocation = {
       address: defaultPickupAddr,
       lat: (bookingState.pickup && bookingState.pickup.lat) || (plan.pickup && plan.pickup.lat) || POORTJIE_MAP_CENTER.lat,
@@ -1550,7 +1595,7 @@
     const pickupAddr = plannedReservePickupInput ? plannedReservePickupInput.value.trim() : '';
     if (!pickupAddr) {
       if (plannedReserveError) {
-        plannedReserveError.textContent = 'Please enter your location in Poortjie.';
+        plannedReserveError.textContent = 'Please enter your location.';
         plannedReserveError.classList.remove('is-hidden');
       }
       return;
@@ -2367,7 +2412,7 @@
     if (bookingStepTitle && bookingStepSubtitle) {
       if (step === 1) {
         bookingStepTitle.textContent = 'Where are you?';
-        bookingStepSubtitle.textContent = 'Enter pickup address or use GPS inside Poortjie';
+        bookingStepSubtitle.textContent = 'Enter pickup address or use GPS';
       } else if (step === 2) {
         bookingStepTitle.textContent = 'Where are you going?';
         bookingStepSubtitle.textContent = 'Search any destination address';
@@ -2405,7 +2450,7 @@
     // 5. Update Step-specific data
     if (step === 2) {
       if (step2PickupSummaryText) {
-        step2PickupSummaryText.textContent = (bookingState.pickup && bookingState.pickup.address) || 'Current Location (Poortjie)';
+        step2PickupSummaryText.textContent = (bookingState.pickup && bookingState.pickup.address) || 'Current Location';
       }
       const hasDropoff = Boolean(bookingState.dropoff && bookingState.dropoff.address && bookingState.dropoff.address.trim());
       if (step2TripTypeSection) {
@@ -2485,7 +2530,7 @@
     bookingTargetDriver = null; // Quick Ride (Auto-Dispatch)
 
     if (bookingTargetTitle) bookingTargetTitle.textContent = 'Quick Ride Auto-Dispatch';
-    if (bookingTargetSubtitle) bookingTargetSubtitle.textContent = 'Nearest available driver in Poortjie';
+    if (bookingTargetSubtitle) bookingTargetSubtitle.textContent = 'Nearest available driver';
     if (bookingTargetTypeBadge) bookingTargetTypeBadge.textContent = 'Private Car';
     bookingState.vehicleType = 'PRIVATE_CAR';
 
@@ -2632,7 +2677,7 @@
     if (pickupGeofenceBadge) {
       if (allowed) {
         pickupGeofenceBadge.className = 'geofence-badge is-valid';
-        pickupGeofenceBadge.textContent = '🟢 Inside Poortjie';
+        pickupGeofenceBadge.textContent = '🟢 Inside Service Area';
       } else {
         pickupGeofenceBadge.className = 'geofence-badge is-invalid';
         pickupGeofenceBadge.textContent = '🔴 Outside Service Area';
@@ -2727,7 +2772,7 @@
             console.log(`[GPS] Resolved address: "${formattedAddr}"`);
             setPickupLocation(formattedAddr, lat, lng);
           } else {
-            const fallbackAddr = allowed ? 'Current Location (Poortjie)' : 'Current Location (Outside Area)';
+            const fallbackAddr = allowed ? 'Current Location' : 'Current Location (Outside Area)';
             console.log(`[GPS] Reverse geocoding unfulfilled, using fallback label: "${fallbackAddr}"`);
             setPickupLocation(fallbackAddr, lat, lng);
           }
@@ -2735,7 +2780,7 @@
           resetButton();
         });
       } else {
-        const fallbackAddr = allowed ? 'Current Location (Poortjie)' : 'Current Location (Outside Area)';
+        const fallbackAddr = allowed ? 'Current Location' : 'Current Location (Outside Area)';
         console.log(`[GPS] Google Geocoder not loaded, using fallback label: "${fallbackAddr}"`);
         setPickupLocation(fallbackAddr, lat, lng);
         if (pickupClearBtn) pickupClearBtn.classList.remove('is-hidden');
@@ -2743,9 +2788,9 @@
       }
 
       if (allowed) {
-        showToast('📍 GPS location within Poortjie captured!');
+        showToast('📍 GPS location captured!');
       } else {
-        showToast('⚠️ Your GPS location is outside the Poortjie pickup area.');
+        showToast('⚠️ Your GPS location is outside the service area.');
       }
     }
 
@@ -2948,7 +2993,7 @@
     if (confirmModalError) confirmModalError.classList.add('is-hidden');
 
     const confirmFareText = document.getElementById('confirm-fare-text');
-    if (confirmPickupText) confirmPickupText.textContent = bookingState.pickup.address || 'Poortjie';
+    if (confirmPickupText) confirmPickupText.textContent = bookingState.pickup.address || 'Pickup';
     if (confirmDropoffText) confirmDropoffText.textContent = bookingState.dropoff.address || 'Destination';
     if (confirmTripType) {
       confirmTripType.textContent = bookingState.isReturnTrip !== false ? 'Return Trip (Round trip)' : 'Single Trip (One way)';
