@@ -1191,6 +1191,38 @@
    * PLANNED RIDES (TAG ALONG & COMMUNITY ERRANDS)
    * ============================================================ */
 
+  let plannedReserveAutocomplete = null;
+
+  function formatDepartureDateTime(epoch) {
+    if (!epoch) return '--:--';
+    const d = new Date(epoch);
+    const dateFormatted = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    const timeFormatted = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return `${dateFormatted} at ${timeFormatted}`;
+  }
+
+  function ensurePlannedReserveAutocomplete() {
+    if (plannedReserveAutocomplete || !plannedReservePickupInput || !global.google || !global.google.maps || !global.google.maps.places) return;
+    const poortjieCenter = new google.maps.LatLng(SERVICE_AREA.center.lat, SERVICE_AREA.center.lng);
+    const circle = new google.maps.Circle({ center: poortjieCenter, radius: SERVICE_AREA.radiusMeters });
+    plannedReserveAutocomplete = new google.maps.places.Autocomplete(plannedReservePickupInput, {
+      bounds: circle.getBounds(),
+      componentRestrictions: { country: 'za' },
+      fields: ['formatted_address', 'name', 'geometry']
+    });
+    plannedReserveAutocomplete.addListener('place_changed', () => {
+      const place = plannedReserveAutocomplete.getPlace();
+      if (place && place.geometry && place.geometry.location) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        const addr = place.formatted_address || place.name || plannedReservePickupInput.value;
+        reservePickupLocation = { address: addr, lat, lng };
+        plannedReservePickupInput.value = addr;
+        if (plannedReserveError) plannedReserveError.classList.add('is-hidden');
+      }
+    });
+  }
+
   function initPlannedRidesListener(uid) {
     if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
     if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
@@ -1265,9 +1297,9 @@
       if (plannedCardDest) plannedCardDest.textContent = `Going to "${cleanDest}"`;
 
       const epoch = readEpochMillis(req.departure || req.startAt);
-      const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+      const timeStr = formatDepartureDateTime(epoch);
       const statusLabel = req.status === 'ACCEPTED' ? 'Confirmed' : (req.status || 'Booked');
-      if (plannedCardSub) plannedCardSub.textContent = timeStr ? `Departs ${timeStr} · ${statusLabel}` : statusLabel;
+      if (plannedCardSub) plannedCardSub.textContent = epoch ? `Departs ${timeStr} · ${statusLabel}` : statusLabel;
 
       const fullPickup = (req.pickup && req.pickup.address) || req.pickup || 'Pick-up Location';
       const fullDest = dest || '—';
@@ -1302,9 +1334,9 @@
       if (plannedCardDest) plannedCardDest.textContent = `Going to "${cleanDest}"`;
 
       const epoch = readEpochMillis(plan.startAt || plan.departure);
-      const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+      const timeStr = formatDepartureDateTime(epoch);
       const seats = plan.availablePlaces ?? plan.seats ?? 0;
-      if (plannedCardSub) plannedCardSub.textContent = timeStr ? `Departs ${timeStr} · ${seats} seats available` : `${seats} seats available`;
+      if (plannedCardSub) plannedCardSub.textContent = epoch ? `Departs ${timeStr} · ${seats} seats available` : `${seats} seats available`;
 
       const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Pick-up Location';
       const fullDest = dest || '—';
@@ -1402,7 +1434,7 @@
           const dest = (plan.destination && plan.destination.address) || plan.destination || 'Destination';
           const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
           const epoch = readEpochMillis(plan.startAt || plan.departure);
-          const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+          const timeStr = formatDepartureDateTime(epoch);
           const seats = plan.availablePlaces ?? plan.seats ?? 0;
           const fare = plan.oneWayFare ?? plan.fare;
           const fareStr = typeof fare === 'number' ? `R ${Math.round(fare)}` : 'R --';
@@ -1488,6 +1520,7 @@
       if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>To:</strong> <span>${dest}</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.textContent = 'Note for Driver (Optional)';
       if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. Near blue gate, 1 bag';
+      if (plannedReservePickupInput && !plannedReservePickupInput.value) plannedReservePickupInput.placeholder = 'Enter pickup address…';
 
       if (plan.isReturnRide && plannedReserveReturnWrap) {
         plannedReserveReturnWrap.classList.remove('is-hidden');
@@ -1509,6 +1542,7 @@
       if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Deliver to:</strong> <span>${dest}</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.innerHTML = 'Parcel Description & Recipient Contact <span class="field-req">required</span>';
       if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. 1 small parcel, Deliver to John 0821234567';
+      if (plannedReservePickupInput && !plannedReservePickupInput.value) plannedReservePickupInput.placeholder = 'Enter parcel collection address…';
 
       if (plannedReserveReturnWrap) plannedReserveReturnWrap.classList.add('is-hidden');
       if (plannedReserveFareDisplay) plannedReserveFareDisplay.textContent = `R ${Math.round(oneWayFare)}`;
@@ -1524,6 +1558,7 @@
       if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Drop-off:</strong> <span>Your address</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.innerHTML = 'Item Details & Collection Contact <span class="field-req">required</span>';
       if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. Order #445 at reception, collect from Sarah';
+      if (plannedReservePickupInput && !plannedReservePickupInput.value) plannedReservePickupInput.placeholder = 'Enter drop-off address…';
 
       if (plannedReserveReturnWrap) plannedReserveReturnWrap.classList.add('is-hidden');
       const fetchFare = Math.round(plan.returnFare || oneWayFare);
@@ -1540,7 +1575,7 @@
     if (plannedReserveDestHeader) plannedReserveDestHeader.textContent = `Going to "${cleanDest}"`;
 
     const epoch = readEpochMillis(plan.startAt || plan.departure);
-    const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+    const timeStr = formatDepartureDateTime(epoch);
     const seats = plan.availablePlaces ?? plan.seats ?? 0;
     if (plannedReserveTimeSeats) plannedReserveTimeSeats.textContent = `Departs ${timeStr} · ${seats} seats available`;
 
@@ -1553,14 +1588,15 @@
     const defaultKind = (seats <= 0 && plan.allowErrands) ? 'DELIVER' : initialKind;
     selectPlannedRole(defaultKind);
 
-    const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Pick-up Location';
-    const defaultPickupAddr = (bookingState.pickup && bookingState.pickup.address) || (typeof fullPickup === 'string' ? fullPickup : 'Pick-up Location');
-    reservePickupLocation = {
-      address: defaultPickupAddr,
-      lat: (bookingState.pickup && bookingState.pickup.lat) || (plan.pickup && plan.pickup.lat) || POORTJIE_MAP_CENTER.lat,
-      lng: (bookingState.pickup && bookingState.pickup.lng) || (plan.pickup && plan.pickup.lng) || POORTJIE_MAP_CENTER.lng
-    };
-    if (plannedReservePickupInput) plannedReservePickupInput.value = defaultPickupAddr;
+    // Leave pickup input empty so user enters their own location (not pre-populated with driver's route point)
+    reservePickupLocation = null;
+    if (plannedReservePickupInput) {
+      plannedReservePickupInput.value = '';
+      plannedReservePickupInput.placeholder = defaultKind === 'FETCH' ? 'Enter drop-off address…' : (defaultKind === 'DELIVER' ? 'Enter parcel collection address…' : 'Enter pickup address…');
+    }
+
+    // Attach Google Places Autocomplete if not already attached
+    ensurePlannedReserveAutocomplete();
 
     if (plannedReserveNoteInput) plannedReserveNoteInput.value = '';
     if (plannedReserveError) {
@@ -2393,6 +2429,8 @@
         }
       });
     }
+
+    ensurePlannedReserveAutocomplete();
   };
 
   /** ============================================================
