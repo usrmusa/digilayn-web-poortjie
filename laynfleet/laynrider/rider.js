@@ -336,10 +336,16 @@
 
   // Dashboard Planned & Scheduled Cards
   const plannedRideCard = document.getElementById('planned-ride-card');
+  const plannedCardBadge = document.getElementById('planned-card-badge');
+  const plannedCardCount = document.getElementById('planned-card-count');
   const plannedCardDest = document.getElementById('planned-card-dest');
   const plannedCardSub = document.getElementById('planned-card-sub');
+  const plannedCardRouteBox = document.getElementById('planned-card-route-box');
+  const plannedCardFrom = document.getElementById('planned-card-from');
+  const plannedCardTo = document.getElementById('planned-card-to');
   const plannedCardFare = document.getElementById('planned-card-fare');
-  const plannedCardCount = document.getElementById('planned-card-count');
+  const plannedCardActionText = document.getElementById('planned-card-action-text');
+  const plannedRideAppNudge = document.getElementById('planned-ride-app-nudge');
 
   const heroNameEl = document.getElementById('hero-name');
   const heroQuickCard = document.getElementById('hero-quick-card');
@@ -376,6 +382,40 @@
   const plannedModalDoneBtn = document.getElementById('planned-modal-done-btn');
   const plannedRidesList = document.getElementById('planned-rides-list');
 
+  // Planned Reserve Modal Elements
+  const plannedReserveModal = document.getElementById('planned-reserve-modal');
+  const plannedReserveClose = document.getElementById('planned-reserve-close');
+  const plannedReserveCancelBtn = document.getElementById('planned-reserve-cancel-btn');
+  const plannedReserveSubmitBtn = document.getElementById('planned-reserve-submit-btn');
+  const plannedReserveDestHeader = document.getElementById('planned-reserve-dest-header');
+  const plannedReserveTimeSeats = document.getElementById('planned-reserve-time-seats');
+  const plannedReserveFromText = document.getElementById('planned-reserve-from-text');
+  const plannedReserveToText = document.getElementById('planned-reserve-to-text');
+  const plannedReserveFareDisplay = document.getElementById('planned-reserve-fare-display');
+  const plannedReservePickupInput = document.getElementById('planned-reserve-pickup-input');
+  const plannedReservePickupGpsBtn = document.getElementById('planned-reserve-pickup-gps-btn');
+  const plannedReserveReturnWrap = document.getElementById('planned-reserve-return-wrap');
+  const plannedReserveReturnCheckbox = document.getElementById('planned-reserve-return-checkbox');
+  const plannedReserveReturnHint = document.getElementById('planned-reserve-return-hint');
+  const plannedReserveNoteInput = document.getElementById('planned-reserve-note-input');
+  const plannedReserveError = document.getElementById('planned-reserve-error');
+
+  // Planned Booking Details Modal Elements
+  const plannedBookingDetailsModal = document.getElementById('planned-booking-details-modal');
+  const plannedBookingClose = document.getElementById('planned-booking-close');
+  const plannedBookingDismissBtn = document.getElementById('planned-booking-dismiss-btn');
+  const plannedBookingWithdrawBtn = document.getElementById('planned-booking-withdraw-btn');
+  const plannedBookingStatusPill = document.getElementById('planned-booking-status-pill');
+  const plannedBookingTime = document.getElementById('planned-booking-time');
+  const plannedBookingPickup = document.getElementById('planned-booking-pickup');
+  const plannedBookingDropoff = document.getElementById('planned-booking-dropoff');
+  const plannedBookingFare = document.getElementById('planned-booking-fare');
+  const plannedBookingDriverBox = document.getElementById('planned-booking-driver-box');
+  const plannedBookingDriverPhoto = document.getElementById('planned-booking-driver-photo');
+  const plannedBookingDriverName = document.getElementById('planned-booking-driver-name');
+  const plannedBookingVehicle = document.getElementById('planned-booking-vehicle');
+  const plannedBookingError = document.getElementById('planned-booking-error');
+
   // Scheduled Details Modal Elements
   const scheduledDetailsModal = document.getElementById('scheduled-details-modal');
   const scheduledDetailsClose = document.getElementById('scheduled-details-close');
@@ -400,6 +440,9 @@
   let activePlannedRequestsUnsub = null;
   let availablePlannedPlans = [];
   let myPlannedRequests = [];
+  let selectedPlannedRide = null;
+  let selectedPlannedBooking = null;
+  let reservePickupLocation = null;
   let scheduleState = {
     date: '',
     time: '',
@@ -1158,49 +1201,66 @@
     if (myPlannedRequests.length > 0) {
       const req = myPlannedRequests[0];
       const dest = (req.destination && req.destination.address) || req.destination || '';
-      const cleanDest = typeof dest === 'string' ? dest.split(',')[0] : '';
-      if (plannedCardDest) plannedCardDest.textContent = cleanDest;
+      const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
+      if (plannedCardDest) plannedCardDest.textContent = `Going to "${cleanDest}"`;
 
       const epoch = readEpochMillis(req.departure || req.startAt);
       const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
       const statusLabel = req.status === 'ACCEPTED' ? 'Confirmed' : (req.status || 'Booked');
       if (plannedCardSub) plannedCardSub.textContent = timeStr ? `Departs ${timeStr} · ${statusLabel}` : statusLabel;
 
+      const fullPickup = (req.pickup && req.pickup.address) || req.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
+      const fullDest = dest || '—';
+      if (plannedCardFrom) plannedCardFrom.textContent = `📍 From: ${fullPickup}`;
+      if (plannedCardTo) plannedCardTo.textContent = `🎯 To: ${fullDest}`;
+
       const fare = req.fare || req.oneWayFare;
       if (plannedCardFare) plannedCardFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)}` : '';
+      if (plannedCardActionText) plannedCardActionText.textContent = 'View Booking ➔';
+      if (plannedCardBadge) plannedCardBadge.textContent = 'TAG ALONG · BOOKED';
       if (plannedCardCount) {
         plannedCardCount.textContent = `${myPlannedRequests.length} booked`;
         plannedCardCount.classList.remove('is-hidden');
       }
 
       plannedRideCard.classList.remove('is-hidden');
+      if (plannedRideAppNudge) plannedRideAppNudge.classList.remove('is-hidden');
     } else if (unbookedCommunityPlans.length > 0) {
       // 2. Otherwise show earliest available community plan from drivers
       const plan = unbookedCommunityPlans[0];
       const dest = (plan.destination && plan.destination.address) || plan.destination || '';
-      const cleanDest = typeof dest === 'string' ? dest.split(',')[0] : '';
-      if (plannedCardDest) plannedCardDest.textContent = cleanDest;
+      const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
+      if (plannedCardDest) plannedCardDest.textContent = `Going to "${cleanDest}"`;
 
       const epoch = readEpochMillis(plan.startAt || plan.departure);
       const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
       const seats = plan.availablePlaces ?? plan.seats ?? 0;
       if (plannedCardSub) plannedCardSub.textContent = timeStr ? `Departs ${timeStr} · ${seats} seats available` : `${seats} seats available`;
 
+      const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
+      const fullDest = dest || '—';
+      if (plannedCardFrom) plannedCardFrom.textContent = `📍 From: ${fullPickup}`;
+      if (plannedCardTo) plannedCardTo.textContent = `🎯 To: ${fullDest}`;
+
       const fare = plan.oneWayFare ?? plan.fare;
       if (plannedCardFare) plannedCardFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)} per person` : '';
+      if (plannedCardActionText) plannedCardActionText.textContent = 'Reserve Seat ➔';
+      if (plannedCardBadge) plannedCardBadge.textContent = 'TAG ALONG';
       if (plannedCardCount) {
         plannedCardCount.textContent = `1 of ${unbookedCommunityPlans.length}`;
         plannedCardCount.classList.remove('is-hidden');
       }
 
       plannedRideCard.classList.remove('is-hidden');
+      if (plannedRideAppNudge) plannedRideAppNudge.classList.remove('is-hidden');
     } else {
-      // 3. Otherwise hide the card completely
+      // 3. Otherwise hide the card and app nudge completely
       if (plannedCardDest) plannedCardDest.textContent = '';
       if (plannedCardSub) plannedCardSub.textContent = '';
       if (plannedCardFare) plannedCardFare.textContent = '';
       if (plannedCardCount) plannedCardCount.classList.add('is-hidden');
       plannedRideCard.classList.add('is-hidden');
+      if (plannedRideAppNudge) plannedRideAppNudge.classList.add('is-hidden');
     }
   }
 
@@ -1215,24 +1275,31 @@
           item.style.padding = '12px 16px';
           item.style.marginBottom = '8px';
           item.style.borderColor = 'var(--digilayn-primary)';
+          item.style.cursor = 'pointer';
 
           const dest = (req.destination && req.destination.address) || req.destination || 'Destination';
+          const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
           const epoch = readEpochMillis(req.departure || req.startAt);
           const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
           const fare = req.fare || req.oneWayFare;
           const fareStr = typeof fare === 'number' ? `R ${Math.round(fare)}` : 'R --';
-          const status = req.status || 'BOOKED';
+          const status = req.status === 'ACCEPTED' ? 'CONFIRMED' : (req.status || 'BOOKED');
 
           item.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
                 <span class="badge-pill badge-planned" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">YOUR BOOKING · ${status}</span>
-                <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">${dest}</strong>
+                <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">Going to "${cleanDest}"</strong>
                 <p style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 2px 0 0 0;">Departs ${timeStr}</p>
               </div>
               <span class="planned-fare-tag">${fareStr}</span>
             </div>
+            <p style="font-size: 12px; color: var(--digilayn-primary); font-weight: 700; margin-top: 6px;">Tap to view booking details ➔</p>
           `;
+          item.addEventListener('click', () => {
+            closePlannedModal();
+            openPlannedBookingDetailsModal(req);
+          });
           plannedRidesList.appendChild(item);
         });
       }
@@ -1247,8 +1314,10 @@
           item.className = 'dashboard-card';
           item.style.padding = '12px 16px';
           item.style.marginBottom = '8px';
+          item.style.cursor = 'pointer';
 
           const dest = (plan.destination && plan.destination.address) || plan.destination || 'Destination';
+          const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
           const epoch = readEpochMillis(plan.startAt || plan.departure);
           const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
           const seats = plan.availablePlaces ?? plan.seats ?? 0;
@@ -1258,13 +1327,20 @@
           item.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
-                <strong style="font-size: 15px; color: var(--digilayn-on-surface);">${dest}</strong>
+                <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">Going to "${cleanDest}"</strong>
                 <p style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 2px 0 0 0;">Departs ${timeStr} · ${seats} seats left</p>
               </div>
               <span class="planned-fare-tag">${fareStr}</span>
             </div>
-            <p style="font-size: 12px; color: var(--digilayn-on-surface-variant); margin-top: 8px;">Pay driver directly upon boarding.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+              <span style="font-size: 11.5px; color: var(--digilayn-on-surface-variant);">Pay driver upon boarding</span>
+              <span style="font-size: 12px; font-weight: 700; color: var(--digilayn-primary);">Reserve Seat ➔</span>
+            </div>
           `;
+          item.addEventListener('click', () => {
+            closePlannedModal();
+            openPlannedReserveModal(plan);
+          });
           plannedRidesList.appendChild(item);
         });
       }
@@ -1284,6 +1360,279 @@
 
   function closePlannedModal() {
     if (plannedModal) plannedModal.classList.add('is-hidden');
+  }
+
+  function openPlannedReserveModal(plan) {
+    if (!plan) return;
+    selectedPlannedRide = plan;
+    const dest = (plan.destination && plan.destination.address) || plan.destination || '';
+    const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
+    if (plannedReserveDestHeader) plannedReserveDestHeader.textContent = `Going to "${cleanDest}"`;
+
+    const epoch = readEpochMillis(plan.startAt || plan.departure);
+    const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+    const seats = plan.availablePlaces ?? plan.seats ?? 0;
+    if (plannedReserveTimeSeats) plannedReserveTimeSeats.textContent = `Departs ${timeStr} · ${seats} seats available`;
+
+    const fullPickup = (plan.pickup && plan.pickup.address) || plan.pickup || 'Poortjie Taxi Rank, Thwala Dr, Poortjie';
+    const fullDest = dest || '—';
+    if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>From:</strong> <span>${fullPickup}</span>`;
+    if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>To:</strong> <span>${fullDest}</span>`;
+
+    const oneWayFare = plan.oneWayFare ?? plan.fare ?? 0;
+    const returnFare = plan.returnFare ?? (oneWayFare * 2);
+
+    function updateReserveFare() {
+      const isReturn = !!(plan.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
+      const activeFare = isReturn ? returnFare : oneWayFare;
+      if (plannedReserveFareDisplay) plannedReserveFareDisplay.textContent = `R ${Math.round(activeFare)}`;
+    }
+
+    if (plan.isReturnRide && plannedReserveReturnWrap) {
+      plannedReserveReturnWrap.classList.remove('is-hidden');
+      if (plannedReserveReturnCheckbox) {
+        plannedReserveReturnCheckbox.checked = false;
+        plannedReserveReturnCheckbox.onchange = updateReserveFare;
+      }
+      if (plannedReserveReturnHint) {
+        plannedReserveReturnHint.textContent = `Driver is offering a return ride. Total fare: R ${Math.round(returnFare)}.`;
+      }
+    } else if (plannedReserveReturnWrap) {
+      plannedReserveReturnWrap.classList.add('is-hidden');
+    }
+
+    updateReserveFare();
+
+    // Default pickup address: use user's saved pickup, plan pickup, or Poortjie Taxi Rank
+    const defaultPickupAddr = (bookingState.pickup && bookingState.pickup.address) || (typeof fullPickup === 'string' ? fullPickup : 'Poortjie Taxi Rank, Thwala Dr, Poortjie');
+    reservePickupLocation = {
+      address: defaultPickupAddr,
+      lat: (bookingState.pickup && bookingState.pickup.lat) || (plan.pickup && plan.pickup.lat) || POORTJIE_MAP_CENTER.lat,
+      lng: (bookingState.pickup && bookingState.pickup.lng) || (plan.pickup && plan.pickup.lng) || POORTJIE_MAP_CENTER.lng
+    };
+    if (plannedReservePickupInput) plannedReservePickupInput.value = defaultPickupAddr;
+
+    if (plannedReserveNoteInput) plannedReserveNoteInput.value = '';
+    if (plannedReserveError) {
+      plannedReserveError.textContent = '';
+      plannedReserveError.classList.add('is-hidden');
+    }
+
+    if (plannedReserveSubmitBtn) {
+      plannedReserveSubmitBtn.disabled = false;
+      plannedReserveSubmitBtn.innerHTML = '<span>⚡</span> Confirm Seat Reservation';
+    }
+
+    if (plannedReserveModal) plannedReserveModal.classList.remove('is-hidden');
+  }
+
+  function closePlannedReserveModal() {
+    if (plannedReserveModal) plannedReserveModal.classList.add('is-hidden');
+    selectedPlannedRide = null;
+  }
+
+  async function handlePlannedReserveSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!selectedPlannedRide) return;
+
+    if (!auth.currentUser) {
+      if (plannedReserveError) {
+        plannedReserveError.textContent = 'Please sign in to reserve a seat.';
+        plannedReserveError.classList.remove('is-hidden');
+      }
+      return;
+    }
+
+    const pickupAddr = plannedReservePickupInput ? plannedReservePickupInput.value.trim() : '';
+    if (!pickupAddr) {
+      if (plannedReserveError) {
+        plannedReserveError.textContent = 'Please enter your pickup location in Poortjie.';
+        plannedReserveError.classList.remove('is-hidden');
+      }
+      return;
+    }
+
+    const loc = {
+      address: pickupAddr,
+      lat: (reservePickupLocation && typeof reservePickupLocation.lat === 'number') ? reservePickupLocation.lat : ((selectedPlannedRide.pickup && selectedPlannedRide.pickup.lat) || POORTJIE_MAP_CENTER.lat),
+      lng: (reservePickupLocation && typeof reservePickupLocation.lng === 'number') ? reservePickupLocation.lng : ((selectedPlannedRide.pickup && selectedPlannedRide.pickup.lng) || POORTJIE_MAP_CENTER.lng)
+    };
+
+    if (plannedReserveSubmitBtn) {
+      plannedReserveSubmitBtn.disabled = true;
+      plannedReserveSubmitBtn.innerHTML = '<span>⏳</span> Reserving…';
+    }
+    if (plannedReserveError) plannedReserveError.classList.add('is-hidden');
+
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const requestId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('req_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
+      const isReturn = !!(selectedPlannedRide.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
+      const note = plannedReserveNoteInput ? plannedReserveNoteInput.value.trim() : '';
+
+      const payload = {
+        requestId: requestId,
+        kind: 'PASSENGER',
+        isReturnRide: isReturn,
+        note: note,
+        location: loc
+      };
+
+      const resp = await fetch(`https://api.digilayn.co.za/planned-rides/${selectedPlannedRide.id}/requests`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Layn-App': 'laynrider',
+          'X-Layn-Environment': fleetEnvironment
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await resp.json().catch(() => null);
+
+      if (!resp.ok) {
+        const msg = (data && data.error && data.error.message) || 'Failed to reserve seat. Please try again.';
+        if (plannedReserveError) {
+          plannedReserveError.textContent = msg;
+          plannedReserveError.classList.remove('is-hidden');
+        }
+        if (plannedReserveSubmitBtn) {
+          plannedReserveSubmitBtn.disabled = false;
+          plannedReserveSubmitBtn.innerHTML = '<span>⚡</span> Confirm Seat Reservation';
+        }
+        return;
+      }
+
+      closePlannedReserveModal();
+      if (plannedModal && !plannedModal.classList.contains('is-hidden')) {
+        plannedModal.classList.add('is-hidden');
+      }
+      showToast('🎉 Seat reserved! Pay driver directly upon boarding.');
+    } catch (err) {
+      console.error('[LaynRider] Seat reservation error:', err);
+      if (plannedReserveError) {
+        plannedReserveError.textContent = err.message || 'Network error. Please try again.';
+        plannedReserveError.classList.remove('is-hidden');
+      }
+      if (plannedReserveSubmitBtn) {
+        plannedReserveSubmitBtn.disabled = false;
+        plannedReserveSubmitBtn.innerHTML = '<span>⚡</span> Confirm Seat Reservation';
+      }
+    }
+  }
+
+  function openPlannedBookingDetailsModal(booking) {
+    if (!booking) return;
+    selectedPlannedBooking = booking;
+
+    const epoch = readEpochMillis(booking.departure || booking.startAt);
+    const timeStr = epoch ? new Date(epoch).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
+    if (plannedBookingTime) plannedBookingTime.textContent = `Departs ${timeStr}`;
+
+    const dest = (booking.destination && booking.destination.address) || booking.destination || '—';
+    const pickup = (booking.pickup && booking.pickup.address) || booking.pickup || '—';
+    if (plannedBookingPickup) plannedBookingPickup.textContent = pickup;
+    if (plannedBookingDropoff) plannedBookingDropoff.textContent = dest;
+
+    const fare = booking.fare || booking.oneWayFare;
+    if (plannedBookingFare) plannedBookingFare.textContent = typeof fare === 'number' ? `R ${Math.round(fare)}` : 'R --';
+
+    const status = booking.status === 'ACCEPTED' ? 'CONFIRMED' : (booking.status || 'BOOKED');
+    if (plannedBookingStatusPill) plannedBookingStatusPill.textContent = status;
+
+    if (plannedBookingDriverBox) {
+      if (booking.driverName) {
+        plannedBookingDriverBox.classList.remove('is-hidden');
+        if (plannedBookingDriverName) plannedBookingDriverName.textContent = booking.driverName;
+        if (plannedBookingVehicle) plannedBookingVehicle.textContent = booking.vehicleType || 'Fleet Vehicle';
+        if (plannedBookingDriverPhoto) {
+          plannedBookingDriverPhoto.src = booking.driverPhotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(booking.driverName)}&background=22c55e&color=fff&size=88`;
+        }
+      } else {
+        plannedBookingDriverBox.classList.add('is-hidden');
+      }
+    }
+
+    if (plannedBookingError) {
+      plannedBookingError.textContent = '';
+      plannedBookingError.classList.add('is-hidden');
+    }
+    if (plannedBookingWithdrawBtn) {
+      plannedBookingWithdrawBtn.disabled = false;
+      plannedBookingWithdrawBtn.textContent = 'Withdraw Reservation';
+    }
+
+    if (plannedBookingDetailsModal) plannedBookingDetailsModal.classList.remove('is-hidden');
+  }
+
+  function closePlannedBookingDetailsModal() {
+    if (plannedBookingDetailsModal) plannedBookingDetailsModal.classList.add('is-hidden');
+    selectedPlannedBooking = null;
+  }
+
+  async function handlePlannedWithdraw() {
+    if (!selectedPlannedBooking) return;
+    if (!confirm('Are you sure you want to withdraw your reserved seat?')) {
+      return;
+    }
+    if (!auth.currentUser) return;
+
+    const planId = selectedPlannedBooking.planId || selectedPlannedBooking.id;
+    const requestId = selectedPlannedBooking.requestId || selectedPlannedBooking.id;
+
+    if (plannedBookingWithdrawBtn) {
+      plannedBookingWithdrawBtn.disabled = true;
+      plannedBookingWithdrawBtn.textContent = 'Withdrawing…';
+    }
+    if (plannedBookingError) plannedBookingError.classList.add('is-hidden');
+
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const actionId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('act_' + Date.now());
+
+      const resp = await fetch(`https://api.digilayn.co.za/planned-rides/${planId}/requests/${requestId}/withdraw`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-Layn-App': 'laynrider',
+          'X-Layn-Environment': fleetEnvironment
+        },
+        body: JSON.stringify({
+          actionId: actionId,
+          reason: 'Rider withdrew seat reservation'
+        })
+      });
+
+      const data = await resp.json().catch(() => null);
+
+      if (!resp.ok) {
+        const msg = (data && data.error && data.error.message) || 'Failed to withdraw reservation.';
+        if (plannedBookingError) {
+          plannedBookingError.textContent = msg;
+          plannedBookingError.classList.remove('is-hidden');
+        }
+        if (plannedBookingWithdrawBtn) {
+          plannedBookingWithdrawBtn.disabled = false;
+          plannedBookingWithdrawBtn.textContent = 'Withdraw Reservation';
+        }
+        return;
+      }
+
+      closePlannedBookingDetailsModal();
+      showToast('Reservation withdrawn.');
+    } catch (err) {
+      console.error('[LaynRider] Withdraw error:', err);
+      if (plannedBookingError) {
+        plannedBookingError.textContent = err.message || 'Network error.';
+        plannedBookingError.classList.remove('is-hidden');
+      }
+      if (plannedBookingWithdrawBtn) {
+        plannedBookingWithdrawBtn.disabled = false;
+        plannedBookingWithdrawBtn.textContent = 'Withdraw Reservation';
+      }
+    }
   }
 
   /** Switch primary UI views */
@@ -3586,10 +3935,71 @@
       });
     }
 
-    // Planned Ride Card & Modal
-    if (plannedRideCard) plannedRideCard.addEventListener('click', openPlannedModal);
+    // Planned Ride Card & Modals
+    if (plannedRideCard) {
+      plannedRideCard.addEventListener('click', () => {
+        if (myPlannedRequests.length > 0) {
+          openPlannedBookingDetailsModal(myPlannedRequests[0]);
+        } else {
+          const unbookedCommunityPlans = availablePlannedPlans.filter(p =>
+            !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id)
+          );
+          if (unbookedCommunityPlans.length > 0) {
+            openPlannedReserveModal(unbookedCommunityPlans[0]);
+          } else {
+            openPlannedModal();
+          }
+        }
+      });
+    }
     if (plannedModalClose) plannedModalClose.addEventListener('click', closePlannedModal);
     if (plannedModalDoneBtn) plannedModalDoneBtn.addEventListener('click', closePlannedModal);
+
+    // Planned Reserve Modal Listeners
+    if (plannedReserveClose) plannedReserveClose.addEventListener('click', closePlannedReserveModal);
+    if (plannedReserveCancelBtn) plannedReserveCancelBtn.addEventListener('click', closePlannedReserveModal);
+    if (plannedReserveSubmitBtn) plannedReserveSubmitBtn.addEventListener('click', handlePlannedReserveSubmit);
+    if (plannedReservePickupGpsBtn) {
+      plannedReservePickupGpsBtn.addEventListener('click', () => {
+        if (!navigator.geolocation) {
+          showToast('Geolocation is not supported by your browser.');
+          return;
+        }
+        plannedReservePickupGpsBtn.disabled = true;
+        plannedReservePickupGpsBtn.textContent = '…';
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            plannedReservePickupGpsBtn.disabled = false;
+            plannedReservePickupGpsBtn.textContent = '📍 GPS';
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            if (global.google && global.google.maps) {
+              const geocoder = new google.maps.Geocoder();
+              geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+                const addr = (status === 'OK' && results[0]) ? results[0].formatted_address : `GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                reservePickupLocation = { address: addr, lat, lng };
+                if (plannedReservePickupInput) plannedReservePickupInput.value = addr;
+              });
+            } else {
+              const addr = `GPS (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+              reservePickupLocation = { address: addr, lat, lng };
+              if (plannedReservePickupInput) plannedReservePickupInput.value = addr;
+            }
+          },
+          (err) => {
+            plannedReservePickupGpsBtn.disabled = false;
+            plannedReservePickupGpsBtn.textContent = '📍 GPS';
+            showToast('Could not fetch GPS location.');
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      });
+    }
+
+    // Planned Booking Details Modal Listeners
+    if (plannedBookingClose) plannedBookingClose.addEventListener('click', closePlannedBookingDetailsModal);
+    if (plannedBookingDismissBtn) plannedBookingDismissBtn.addEventListener('click', closePlannedBookingDetailsModal);
+    if (plannedBookingWithdrawBtn) plannedBookingWithdrawBtn.addEventListener('click', handlePlannedWithdraw);
 
     // Quick Ride
     if (quickRideBtn) quickRideBtn.addEventListener('click', () => openBookingForm());
