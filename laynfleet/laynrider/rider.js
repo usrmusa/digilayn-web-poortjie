@@ -3355,12 +3355,6 @@
       availablePlannedPlans = [];
       myPlannedRequests = [];
       updatePlannedRideDisplay();
-      if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
-      if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
-      if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
-      availablePlannedPlans = [];
-      myPlannedRequests = [];
-      updatePlannedRideDisplay();
 
       if (headerSignInBtn) headerSignInBtn.classList.remove('is-hidden');
       if (headerUserBtn) headerUserBtn.classList.add('is-hidden');
@@ -3382,12 +3376,6 @@
         reasonEl.textContent = userProfile.suspendedReason || 'Account suspended by management.';
       }
       if (activeBookingUnsub) { activeBookingUnsub(); activeBookingUnsub = null; }
-      if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
-      if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
-      if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
-      availablePlannedPlans = [];
-      myPlannedRequests = [];
-      updatePlannedRideDisplay();
       if (activeScheduledUnsub) { activeScheduledUnsub(); activeScheduledUnsub = null; }
       if (activePlannedListingsUnsub) { activePlannedListingsUnsub(); activePlannedListingsUnsub = null; }
       if (activePlannedRequestsUnsub) { activePlannedRequestsUnsub(); activePlannedRequestsUnsub = null; }
