@@ -74,6 +74,20 @@
         return store;
     }
 
+    /** Checks whether global account creation is currently enabled */
+    async function checkAccountCreationEnabled() {
+        if (typeof firebase === 'undefined' || typeof firebase.app !== 'function') return false;
+        try {
+            const callable = firebase.app().functions('us-central1').httpsCallable('getAccountCreationPolicy');
+            const result = await callable({});
+            const data = result && result.data;
+            return !!(data && (data.accountCreation === true || data.accountCreationEnabled === true));
+        } catch (err) {
+            console.warn('AuthStore: failed to check account creation policy', err);
+            return false;
+        }
+    }
+
     /** Ensures the user's Firestore document exists upon Google Sign-In or initial auth */
     async function ensureUserDoc(authUser, allowCreate = false) {
         if (!authUser || !authUser.uid) return null;
@@ -84,6 +98,13 @@
                 if (!allowCreate) {
                     const error = new Error(AccountAccessCore.messages['auth/account-unverified']);
                     error.code = 'auth/account-unverified';
+                    throw error;
+                }
+                const allowed = await checkAccountCreationEnabled();
+                if (!allowed) {
+                    await firebase.auth().signOut();
+                    const error = new Error(AccountAccessCore.messages['auth/account-creation-disabled']);
+                    error.code = 'auth/account-creation-disabled';
                     throw error;
                 }
                 return window.sharedProfileRepository.ensureIdentity(authUser);
@@ -137,5 +158,5 @@
     const subscribe = (listener, options) => store.subscribe(listener, options);
     const getState = () => store.getState();
 
-    global.AuthStore = { init, subscribe, getState, signIn, signInWithGoogle, signOut, ensureUserDoc };
+    global.AuthStore = { init, subscribe, getState, signIn, signInWithGoogle, signOut, ensureUserDoc, checkAccountCreationEnabled };
 })(window);

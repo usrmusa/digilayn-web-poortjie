@@ -3,7 +3,8 @@
   'use strict';
   const messages = Object.freeze({
     'auth/account-suspended': 'This account is not active. Please contact support.',
-    'auth/account-unverified': "We couldn't verify your account. Please try again."
+    'auth/account-unverified': "We couldn't verify your account. Please try again.",
+    'auth/account-creation-disabled': "We can't create new accounts at the moment, check again later."
   });
 
   function accessError(code) {

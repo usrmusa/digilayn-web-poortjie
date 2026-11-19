@@ -243,6 +243,7 @@
 
     const getFriendlyErrorMessage = (errorCode) => {
         switch (errorCode) {
+            case 'auth/account-creation-disabled': return AccountAccessCore.messages['auth/account-creation-disabled'];
             case 'auth/account-suspended': return AccountAccessCore.messages['auth/account-suspended'];
             case 'auth/account-unverified': return AccountAccessCore.messages['auth/account-unverified'];
             case 'auth/claims-too-large':
@@ -419,9 +420,18 @@
         }
     });
 
-    registerForm.addEventListener('submit', event => {
+    registerForm.addEventListener('submit', async event => {
         event.preventDefault();
         errorMessage.classList.add('hidden');
+
+        const allowed = await AuthStore.checkAccountCreationEnabled();
+        if (!allowed) {
+            errorMessage.textContent = AccountAccessCore.messages['auth/account-creation-disabled'];
+            errorMessage.classList.remove('hidden');
+            submitBtn.disabled = true;
+            if (googleRegisterBtn) googleRegisterBtn.disabled = true;
+            return;
+        }
 
         const validation = validateForm();
         if (!validation.isValid) {
@@ -528,6 +538,14 @@
     if (googleRegisterBtn) {
         googleRegisterBtn.addEventListener('click', async () => {
             errorMessage.classList.add('hidden');
+            const allowed = await AuthStore.checkAccountCreationEnabled();
+            if (!allowed) {
+                errorMessage.textContent = AccountAccessCore.messages['auth/account-creation-disabled'];
+                errorMessage.classList.remove('hidden');
+                googleRegisterBtn.disabled = true;
+                if (submitBtn) submitBtn.disabled = true;
+                return;
+            }
             googleRegisterBtn.disabled = true;
             const originalContent = googleRegisterBtn.innerHTML;
             googleRegisterBtn.innerHTML = `<span class="flex items-center justify-center gap-2">
@@ -551,6 +569,21 @@
             }
         });
     }
+
+    // Check account creation availability on page load
+    AuthStore.checkAccountCreationEnabled().then(allowed => {
+        if (!allowed) {
+            errorMessage.textContent = AccountAccessCore.messages['auth/account-creation-disabled'];
+            errorMessage.classList.remove('hidden');
+            if (submitBtn) submitBtn.disabled = true;
+            if (googleRegisterBtn) googleRegisterBtn.disabled = true;
+        }
+    }).catch(() => {
+        errorMessage.textContent = AccountAccessCore.messages['auth/account-creation-disabled'];
+        errorMessage.classList.remove('hidden');
+        if (submitBtn) submitBtn.disabled = true;
+        if (googleRegisterBtn) googleRegisterBtn.disabled = true;
+    });
 
     // Check redirect login results if redirect mode was used
     if (typeof firebase !== 'undefined' && firebase.auth) {
