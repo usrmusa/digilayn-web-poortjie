@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html data-theme-default="light" lang="en">
 <head>
+    <script>
+        if (window.console) {
+            const shouldFilter = (args) => {
+                const text = Array.from(args).map(a => typeof a === 'string' ? a : (a && a.message) || '').join(' ');
+                return text.includes('enableMultiTabIndexedDbPersistence');
+            };
+            if (window.console.warn) {
+                const originalWarn = window.console.warn;
+                window.console.warn = function() {
+                    if (shouldFilter(arguments)) return;
+                    originalWarn.apply(window.console, arguments);
+                };
+            }
+        }
+    </script>
     <link rel="stylesheet" href="../../styles/digilayn-theme.css">
     <script src="../../scripts/theme.js"></script>
     <script src="/scripts/site.js"></script>
