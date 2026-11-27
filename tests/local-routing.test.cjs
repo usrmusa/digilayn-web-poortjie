@@ -34,20 +34,26 @@ test('external links, fragments and unknown destinations remain unchanged', () =
     assert.equal(state.resolve(value), value);
   }
 });
-test('local index redirects to the real home file while preserving query and hash', () => {
-  const state = load('index.html');
+test('legacy home redirects to the local index while preserving query and hash', () => {
+  const state = load('home.html');
   let destination;
   Object.assign(state.window.location, { search: '?_ijt=key', hash: '#home', replace: url => { destination = url; } });
-  const source = fs.readFileSync(path.join(root, 'dist/local/index.html'), 'utf8');
+  const source = fs.readFileSync(path.join(root, 'dist/local/home.html'), 'utf8');
   const script = [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
   vm.runInContext(script, state.context);
-  assert.equal(destination, 'http://localhost:63343/web-poortjie/dist/local/home.html?_ijt=key#home');
-  assert.match(source, /content="0; url=home.html"/);
+  assert.equal(destination, 'http://localhost:63343/web-poortjie/dist/local/index.html?_ijt=key#home');
+  assert.match(source, /content="0; url=index.html"/);
+});
+test('local index serves the home page and its loaders directly', () => {
+  const source = fs.readFileSync(path.join(root, 'dist/local/index.html'), 'utf8');
+  assert.match(source, /id="loader-overlay"/);
+  assert.match(source, /id="spotlight-loader"/);
+  assert.doesNotMatch(source, /http-equiv="refresh"/);
 });
 test('local site script does not strip file extensions or send analytics', () => {
-  const state = load('home.html');
+  const state = load('index.html');
   vm.runInContext(fs.readFileSync(path.join(root, 'dist/local/scripts/site.js'), 'utf8'), state.context);
-  assert.equal(state.window.location.href.endsWith('/home.html'), true);
+  assert.equal(state.window.location.href.endsWith('/index.html'), true);
   assert.equal(state.window.dataLayer, undefined);
 });
 test('live output retains original HTML and JavaScript byte for byte', () => {

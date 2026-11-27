@@ -13,7 +13,7 @@ test('local registration manifest includes IntelliJ credentials and resolves to 
   assert.equal(manifest.name, 'Poortjie Services');
 });
 test('live manifest links remain unchanged', () => {
-  for (const target of ['authentication/register.html', 'authentication/profile.html', 'home.html']) {
+  for (const target of ['authentication/register.html', 'authentication/profile.html', 'index.html']) {
     assert.equal(fs.readFileSync(path.join(root, 'dist/live', target), 'utf8'), fs.readFileSync(path.join(root, target), 'utf8'));
   }
 });

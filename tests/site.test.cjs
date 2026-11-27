@@ -57,7 +57,7 @@ function files(dir) {
     entry.isDirectory() ? files(path.join(dir, entry.name)) : [path.join(dir, entry.name)]);
 }
 test('every full content page loads shared analytics exactly once; redirects and fragment do not', () => {
-  for (const file of files(root).filter(file => file.endsWith('.html'))) {
+  for (const file of files(root).filter(file => file.endsWith('.html') && !file.startsWith(path.join(root, 'dist') + path.sep))) {
     const html = fs.readFileSync(file, 'utf8');
     const redirectOrFragment = !/<head>/i.test(html) || /http-equiv="refresh"/i.test(html);
     assert.equal((html.match(/src="\/scripts\/site.js"/g) || []).length, redirectOrFragment ? 0 : 1, file);

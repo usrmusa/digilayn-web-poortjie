@@ -39,12 +39,12 @@
   <header class="header-nav">
     <div class="header-content">
       <div class="header-left">
-        <a href="../../home" class="back-link" title="Back Home">
+        <a href="../../" class="back-link" title="Back Home">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
         </a>
-        <a href="../../home" class="brand-wrap" title="LaynFleet Services">
+        <a href="../../" class="brand-wrap" title="LaynFleet Services">
           <div class="brand-text">
             <h1 class="brand-title">Layn<span class="brand-accent">Rider</span></h1>
           </div>
@@ -52,6 +52,9 @@
       </div>
 
       <div class="nav-actions">
+        <button id="header-track-driver-btn" type="button" class="btn btn-sm btn-ghost is-hidden" aria-controls="active-trip-modal">
+          Track Driver
+        </button>
         <a href="../download" class="btn btn-sm btn-ghost nav-app-link" title="Download LaynRider & LaynDriver Android Apps" style="gap: 4px;">
           <span>📱</span> <span class="nav-btn-text">Apps</span>
         </a>
@@ -582,8 +585,8 @@
           </div>
 
           <!-- App Driver Tracking Link -->
-          <a href="download" target="_blank" rel="noopener" class="btn-track-app-link" title="Track Driver Live in LaynRider Android App">
-            <span>📱</span> <span>Track driver live on LaynRider App</span> <span style="font-size: 11px; opacity: 0.7;">↗</span>
+          <a href="../download#laynrider-app" target="_blank" rel="noopener" class="btn-track-app-link" title="Get the LaynRider Android app for live driver tracking">
+            <span>📱</span> <span>Get LaynRider for live driver tracking</span> <span style="font-size: 11px; opacity: 0.7;">↗</span>
           </a>
         </div>
 
@@ -714,7 +717,7 @@
             <p>Real-time background GPS tracking & push alerts on Android</p>
           </div>
         </div>
-        <a href="download" target="_blank" rel="noopener" class="btn btn-sm btn-ghost confirm-app-track-btn" title="Open or Download LaynRider Android App">
+        <a href="../download#laynrider-app" target="_blank" rel="noopener" class="btn btn-sm btn-ghost confirm-app-track-btn" title="Get the LaynRider Android app">
           <span>Get App</span> ↗
         </a>
       </div>
@@ -1081,8 +1084,8 @@
     </div>
   </div>
 
-  <!-- ===================== ANDROID APP TEST / BETA MODAL ===================== -->
-  <div id="app-test-modal" class="modal-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="app-test-modal-title">
+  <!-- ===================== ANDROID APP INSTALL DIALOG ===================== -->
+  <dialog id="app-test-modal" class="modal-overlay" aria-labelledby="app-test-modal-title">
     <div class="modal-card app-test-modal-card">
       <div class="modal-drag-handle"></div>
       <div class="modal-header">
@@ -1096,9 +1099,9 @@
         <div class="test-modal-icon-wrap">
           <span class="test-modal-icon">📱</span>
         </div>
-        <h3 id="app-test-modal-title" class="test-modal-title">LaynRider Is Now on Google Play!</h3>
+        <h3 id="app-test-modal-title" class="test-modal-title">Get the LaynRider Android app</h3>
         <p class="test-modal-subtitle">
-          Get the official LaynRider Android app to book local rides.
+          Book local rides, track your driver live, and get ride updates on your phone.
         </p>
       </div>
 
@@ -1142,12 +1145,12 @@
         <a id="app-test-download-btn" href="https://play.google.com/store/apps/details?id=com.digilayn.laynrider" class="btn btn-primary btn-block app-test-cta-btn">
           <span>🚀</span> Get LaynRider on Google Play
         </a>
-        <button type="button" id="app-test-modal-cancel" class="btn btn-ghost btn-block">
-          Maybe Later
+        <button type="button" id="app-test-modal-cancel" class="btn btn-ghost btn-block" autofocus>
+          Continue on web
         </button>
       </div>
     </div>
-  </div>
+  </dialog>
 
   <!-- ===================== TOAST ===================== -->
   <div id="toast" class="toast is-hidden"></div>

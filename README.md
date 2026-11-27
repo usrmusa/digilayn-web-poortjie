@@ -13,8 +13,8 @@ Static HTML, CSS and JavaScript, with Tailwind CSS, Firebase-backed functionalit
 
 ## Structure
 
-- `index.html`: redirects visitors to the home page.
-- `home.html`: community home page and local business discovery.
+- `index.html`: community home page and local business discovery.
+- `home.html`: redirects legacy home links to the root page.
 - `market.html`: marketplace.
 - `services/`: service categories, business and marketplace forms, and ratings.
 - `authentication/`: sign-in, registration and profile pages.
@@ -40,7 +40,7 @@ python3 tools/build-site.py local
 python3 -m http.server 8000 --bind 127.0.0.1 --directory dist/local
 ```
 
-Open [localhost:8000/home.html](http://127.0.0.1:8000/home.html). Serve this output
+Open [localhost:8000](http://127.0.0.1:8000/). Serve this output
 as the document root when configuring IntelliJ local preview, or open the generated
 `dist/local/index.html` in IntelliJ. No URL environment parameter is needed. Local
 builds retain `.html` URLs, resolve internal navigation to existing files, and preserve

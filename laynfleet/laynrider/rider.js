@@ -147,6 +147,7 @@
   // Dashboard Banners & CTA
   const profileIncompleteBanner = document.getElementById('profile-incomplete-banner');
   const completeProfileBtn = document.getElementById('complete-profile-btn');
+  const headerTrackDriverBtn = document.getElementById('header-track-driver-btn');
   const activeBookingBanner = document.getElementById('active-booking-banner');
   const activeBookingIcon = document.getElementById('active-booking-icon');
   const activeBookingTitle = document.getElementById('active-booking-title');
@@ -335,7 +336,6 @@
   const appTestModal = document.getElementById('app-test-modal');
   const appTestModalClose = document.getElementById('app-test-modal-close');
   const appTestModalCancel = document.getElementById('app-test-modal-cancel');
-  const appTestDownloadBtn = document.getElementById('app-test-download-btn');
 
   // Gate Elements
   const termsGateView = document.getElementById('terms-gate-view');
@@ -2652,13 +2652,27 @@
     if (bookingModal) bookingModal.classList.add('is-hidden');
   }
 
-  /** Open / Close Android App Test Beta Modal */
   function openAppTestModal() {
-    if (appTestModal) appTestModal.classList.remove('is-hidden');
+    if (appTestModal && !appTestModal.open) appTestModal.showModal();
   }
 
   function closeAppTestModal() {
-    if (appTestModal) appTestModal.classList.add('is-hidden');
+    if (appTestModal?.open) appTestModal.close();
+  }
+
+  function promptAndroidAppInstall() {
+    const platform = global.navigator.userAgentData?.platform;
+    const isAndroid = platform ? platform === 'Android' : /\bAndroid\b/i.test(global.navigator.userAgent);
+    if (!isAndroid || !appTestModal) return;
+
+    try {
+      const promptKey = 'laynRiderAppPromptSeen';
+      if (global.sessionStorage.getItem(promptKey) || global.sessionStorage.getItem('pendingRideBooking')) return;
+      global.sessionStorage.setItem(promptKey, '1');
+    } catch {
+      // The dialog still works when browser storage is unavailable.
+    }
+    openAppTestModal();
   }
 
   /** Set Trip Type (Return or Single) */
@@ -2689,7 +2703,7 @@
   /** Set Booking Type (ASAP on Web, or Route to Download App for SCHEDULED) */
   function setBookingType(type) {
     if (type === 'SCHEDULED') {
-      window.location.href = 'download?feature=scheduled';
+      window.location.href = '../download?feature=scheduled#laynrider-app';
       return;
     }
     bookingState.type = 'ASAP';
@@ -3279,7 +3293,7 @@
           }
         } else {
           currentBookingDoc = null;
-          if (activeBookingBanner) activeBookingBanner.classList.add('is-hidden');
+          renderActiveBookingBanner(null, false);
           closeActiveTripModal();
         }
       }, (err) => {
@@ -3454,6 +3468,7 @@
 
   /** Render Dashboard Active Booking Widget */
   function renderActiveBookingBanner(booking, isLive) {
+    if (headerTrackDriverBtn) headerTrackDriverBtn.classList.toggle('is-hidden', !isLive);
     if (!activeBookingBanner) return;
 
     if (!isLive) {
@@ -4059,7 +4074,7 @@
       if (headerAvatar) headerAvatar.classList.add('is-hidden');
 
       if (heroNameEl) heroNameEl.textContent = 'Guest';
-      if (activeBookingBanner) activeBookingBanner.classList.add('is-hidden');
+      renderActiveBookingBanner(null, false);
 
       // TODO: Temporary guest exploration mode - allow unauthenticated guests to explore dashboard and planned rides. Revert to showView('auth') when exploration mode ends.
       showView('app');
@@ -4625,6 +4640,7 @@
     }
 
     // Active Trip Modal
+    if (headerTrackDriverBtn) headerTrackDriverBtn.addEventListener('click', openActiveTripModal);
     if (viewActiveBookingBtn) viewActiveBookingBtn.addEventListener('click', openActiveTripModal);
     if (activeTripModalClose) activeTripModalClose.addEventListener('click', closeActiveTripModal);
     if (cancelPendingBtn) cancelPendingBtn.addEventListener('click', handleCancelPending);
@@ -4666,6 +4682,7 @@
   /** Main App Boot */
   function boot() {
     initListeners();
+    promptAndroidAppInstall();
     initPricingRatesListener();
     initAppConfigListener();
 

@@ -7,7 +7,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Download LaynFleet Apps — LaynRider & LaynDriver</title>
-  <meta name="description" content="Download the official LaynRider and LaynDriver Android Apps. Schedule rides in advance, get live push notifications, track drivers in real-time, or join as a driver." />
+  <meta name="description" content="Book an instant ride, schedule a pickup, or join an available planned ride on LaynRider web or Android. Find LaynRider and LaynDriver Android downloads." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,20 +24,6 @@
       flex-direction: column;
       align-items: center;
       gap: 14px;
-    }
-
-    .dl-hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--digilayn-primary-soft);
-      color: var(--digilayn-primary);
-      border: 1px solid rgb(var(--digilayn-primary-rgb) / 0.2);
-      padding: 6px 14px;
-      border-radius: var(--radius-pill);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
     }
 
     .dl-hero-title {
@@ -438,12 +424,12 @@
   <header class="header-nav">
     <div class="header-content">
       <div class="header-left">
-        <a href="laynrider" class="back-link" title="Back to LaynRider Web Booking">
+        <a href="laynrider/" class="back-link" title="Back to LaynRider Web Booking">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
         </a>
-        <a href="laynrider" class="brand-wrap" title="LaynRider">
+        <a href="laynrider/" class="brand-wrap" title="LaynRider">
           <div class="brand-text">
             <h1 class="brand-title">LaynFleet <span class="brand-accent">Apps</span></h1>
           </div>
@@ -451,10 +437,10 @@
       </div>
 
       <div class="nav-actions">
-        <a href="laynrider" class="btn btn-sm btn-ghost" title="Web Booking">
+        <a href="laynrider/" class="btn btn-sm btn-ghost" title="Web Booking">
           <span>⚡</span> <span class="nav-btn-text">Web Ride</span>
         </a>
-        <a href="../../home" class="btn btn-sm btn-ghost" title="Home">
+        <a href="../" class="btn btn-sm btn-ghost" title="Home">
           <span>🏠</span> <span class="nav-btn-text">Home</span>
         </a>
       </div>
@@ -466,14 +452,11 @@
 
     <!-- HERO INTRO -->
     <section class="dl-hero">
-      <div class="dl-hero-badge">
-        <span>🚀</span> Official Android Releases · LaynFleet
-      </div>
       <h2 class="dl-hero-title">
-        Unlock All Features with <span>LaynFleet</span> Android Apps
+        Book with <span>LaynRider</span> on Web or Android
       </h2>
       <p class="dl-hero-subtitle">
-        Schedule rides ahead of time, receive instant driver arrival push notifications, track turn-by-turn background GPS, or join our democratic driver community.
+        Request a ride now, schedule a pickup, or tag along on an available driver-planned trip. The LaynRider Android app also sends push notifications for ride updates.
       </p>
     </section>
 
@@ -481,7 +464,7 @@
     <section class="apps-grid">
 
       <!-- CARD 1: LAYNRIDER PASSENGER APP -->
-      <article class="app-card">
+      <article id="laynrider-app" class="app-card">
         <span class="app-card-featured-tag">Passenger App</span>
         <div class="app-card-head">
           <div class="app-card-icon">🚖</div>
@@ -497,7 +480,7 @@
           <span class="press-progress" aria-hidden="true"></span>
         </a>
         <div class="app-meta-text">
-          Public release v1.1.2 · Android 10+ · Download size shown in Google Play
+          Android 10+ · Direct APK v1.1.7
           <div class="app-meta-tip">💡 <strong>Long press</strong> to download APK directly</div>
         </div>
 
@@ -506,28 +489,28 @@
             <span class="feat-icon">📅</span>
             <div>
               <strong>Schedule Trips in Advance:</strong>
-              <span class="desc">Book rides hours or days ahead for appointments, work, or early-morning trips.</span>
+              <span class="desc">Choose a pickup time for a one-way or return trip.</span>
             </div>
           </li>
           <li>
             <span class="feat-icon">🔔</span>
             <div>
               <strong>Instant Push Notifications:</strong>
-              <span class="desc">Receive alerts the instant your driver accepts, arrives, or messages.</span>
+              <span class="desc">Get push alerts for ride updates.</span>
             </div>
           </li>
           <li>
             <span class="feat-icon">📍</span>
             <div>
-              <strong>Background Live GPS Tracking:</strong>
-              <span class="desc">Follow your driver in real-time even with your phone locked or in your pocket.</span>
+              <strong>Live Driver Tracking:</strong>
+              <span class="desc">See your driver’s location on the ride map when it’s available.</span>
             </div>
           </li>
           <li>
             <span class="feat-icon">💵</span>
             <div>
-              <strong>Locked Upfront Pricing:</strong>
-              <span class="desc">Know the exact fare before you ride. Pay cash or EFT on arrival.</span>
+              <strong>Upfront Fare:</strong>
+              <span class="desc">Review the fare before you confirm. Pay your driver directly by cash or EFT.</span>
             </div>
           </li>
         </ul>
@@ -550,7 +533,7 @@
           <span class="press-progress" aria-hidden="true"></span>
         </a>
         <div class="app-meta-text">
-          Closed testing · Approved testers only · Requirements and size shown in Google Play
+          Google Play closed testing · Android 10+ · Direct APK v1.1.7
           <div class="app-meta-tip">💡 <strong>Long press</strong> to download APK directly</div>
         </div>
 
@@ -558,29 +541,29 @@
           <li>
             <span class="feat-icon">🗳️</span>
             <div>
-              <strong>Democratic Pricing Governance:</strong>
+              <strong>Fare Proposals and Voting:</strong>
               <span class="desc">Vote on per-km rates and minimum fares with fellow drivers in your vehicle category.</span>
             </div>
           </li>
           <li>
             <span class="feat-icon">📅</span>
             <div>
-              <strong>Scheduled & ASAP Trips:</strong>
-              <span class="desc">Accept upcoming scheduled bookings in advance without blocking instant ASAP rides.</span>
+              <strong>Instant, Scheduled and Planned Trips:</strong>
+              <span class="desc">Accept on-demand or scheduled ride requests and post planned trips for riders to join.</span>
             </div>
           </li>
           <li>
             <span class="feat-icon">💰</span>
             <div>
-              <strong>100% Direct Cash Settlement:</strong>
-              <span class="desc">Keep everything you earn. Riders pay you directly via cash or EFT on arrival.</span>
+              <strong>Direct Rider Payments:</strong>
+              <span class="desc">Riders pay you directly by cash or EFT.</span>
             </div>
           </li>
           <li>
             <span class="feat-icon">🧭</span>
             <div>
-              <strong>Built-in GPS Navigation:</strong>
-              <span class="desc">Get instant turn-by-turn routing directly to pickup and drop-off locations.</span>
+              <strong>Navigation to Pickup and Drop-off:</strong>
+              <span class="desc">Open navigation for the current trip.</span>
             </div>
           </li>
         </ul>
@@ -598,7 +581,7 @@
         <div class="step-card">
           <div class="step-num">1</div>
           <h4>Open Google Play</h4>
-          <p>Tap <strong>Google Play</strong> above on your Android phone, or hold down the button to download the APK directly.</p>
+          <p>Tap <strong>Google Play</strong> above on your Android phone.</p>
         </div>
         <div class="step-card">
           <div class="step-num">2</div>
@@ -615,46 +598,46 @@
 
     <!-- FEATURE COMPARISON TABLE (WEB vs NATIVE APP) -->
     <section class="compare-section">
-      <h3 style="font-size: 18px; font-weight: 800; text-align: center;">Web vs. Android App Comparison</h3>
+      <h3 style="font-size: 18px; font-weight: 800; text-align: center;">LaynRider Booking Features</h3>
       <div class="compare-table-wrap">
         <table class="compare-table">
           <thead>
             <tr>
               <th>Feature</th>
               <th>Web Browser</th>
-              <th>Android Native App</th>
+              <th>LaynRider for Android</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Instant Ride Now (ASAP)</strong></td>
-              <td>✅ Available</td>
-              <td>✅ Available</td>
+              <td><strong>Request a ride now</strong></td>
+              <td>Available</td>
+              <td>Available</td>
             </tr>
             <tr>
-              <td><strong>Schedule Trips in Advance</strong></td>
-              <td>❌ App Exclusive</td>
-              <td>✅ Full Support</td>
+              <td><strong>Schedule a pickup</strong></td>
+              <td>One-way or return, at least 30 minutes ahead</td>
+              <td>Available</td>
             </tr>
             <tr>
-              <td><strong>Push Arrival Notifications</strong></td>
-              <td>⚠️ Only with Tab Open</td>
-              <td>✅ Instant Background Alerts</td>
+              <td><strong>Join a planned ride</strong></td>
+              <td>Tag along on available driver-planned trips</td>
+              <td>Tag along on available driver-planned trips</td>
             </tr>
             <tr>
-              <td><strong>Live Background GPS Tracking</strong></td>
-              <td>⚠️ Active Tab Only</td>
-              <td>✅ High-Accuracy Live Map</td>
+              <td><strong>Request an errand on a planned trip</strong></td>
+              <td>Delivery on trips that allow errands, or collection on eligible return trips</td>
+              <td>Delivery on trips that allow errands, or collection on eligible return trips</td>
             </tr>
             <tr>
-              <td><strong>Driver Democratic Pricing Voting</strong></td>
-              <td>❌ View Rates Only</td>
-              <td>✅ Full Voting Rights (LaynDriver)</td>
+              <td><strong>Live ride status and tracking</strong></td>
+              <td>In the booking page</td>
+              <td>In the app</td>
             </tr>
             <tr>
-              <td><strong>Offline Driver Mode & Fast Dispatch</strong></td>
-              <td>❌ No</td>
-              <td>✅ Built-in Driver Radar</td>
+              <td><strong>Ride notifications</strong></td>
+              <td>Status updates while the booking page is open</td>
+              <td>Push notifications when enabled</td>
             </tr>
           </tbody>
         </table>
@@ -664,10 +647,10 @@
     <!-- RETURN TO WEB BOOKING BANNER -->
     <div class="return-banner">
       <div class="return-banner-text">
-        <h4>Web Booking & Android App</h4>
-        <p>Book local rides directly on the web or get the official LaynRider app from Google Play.</p>
+        <h4>Book on the web</h4>
+        <p>Request a ride now, schedule a pickup, or browse available planned rides.</p>
       </div>
-      <a href="laynrider" class="btn btn-primary btn-md">
+      <a href="laynrider/" class="btn btn-primary btn-md">
         <span>🚖</span> Book a Ride on Web
       </a>
     </div>
