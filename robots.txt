@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://poortjie.services/sitemap.xml

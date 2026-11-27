@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html data-theme-default="light" lang="en">
+<head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
+    <script src="/scripts/site.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | Poortjie Services</title>
+    <meta name="author" content="Musa Mgijima">
+    <meta name="description" content="Manage your Poortjie Services account.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
+    <script>
+        if (window.console && window.console.log) {
+            const originalLog = window.console.log;
+            window.console.log = function() {
+                if (arguments[0] && typeof arguments[0] === 'string' && (arguments[0].includes('cdn.tailwindcss.com should not be used in production') || arguments[0].includes('Tailwind CSS: You should not use the CDN'))) return;
+                originalLog.apply(window.console, arguments);
+            };
+        }
+    </script>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="../favicon/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+    <!-- Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
+</head>
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
+
+<header class="max-w-6xl mx-auto pt-24 pb-16 px-6 text-center text-digilayn-on-surface dark:text-digilayn-on-surface">
+    <a href="../"
+       onclick="if(window.top.history.length > 1) { window.top.history.back(); return false; } else { window.top.location.replace('../'); return false; }"
+       class="text-6xl font-extrabold mb-4 tracking-tight">Poortjie</a>
+</header>
+
+<main class="max-w-md mx-auto px-6 pb-24">
+    <div class="card flex flex-col p-8 rounded-2xl border-l-4 border-l-digilayn-primary">
+        <h2 class="text-2xl font-bold mb-6 text-center">Your Profile</h2>
+        <div id="status-message" class="hidden mb-4 p-3 rounded-lg text-sm font-medium border"></div>
+
+        <form id="profile-form">
+            <div class="flex flex-col items-center mb-6">
+                <div class="relative group cursor-pointer">
+                    <img id="profile-picture" src="https://placehold.co/150" alt="Profile Picture" class="w-32 h-32 rounded-full object-cover border-4 border-digilayn-primary shadow-md transition transform hover:scale-105">
+                    <label for="photo-input" class="absolute bottom-0 right-0 bg-digilayn-primary text-digilayn-on-primary p-2 rounded-full cursor-pointer hover:bg-digilayn-primary transition shadow-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </label>
+                    <input type="file" id="photo-input" accept="image/*" class="hidden">
+                    <input type="hidden" id="photo-url" name="photo-url">
+                </div>
+                <p class="text-xs opacity-70 mt-2">Click icon to change picture</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs opacity-70 mb-1 pl-1">Username</label>
+                <label for="username"></label><input type="text" id="username" maxlength="30" class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-2 border-transparent focus:border-digilayn-primary">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs opacity-70 mb-1 pl-1">Email (cannot be changed)</label>
+                <label for="email"></label><input type="email" id="email" disabled class="w-full p-3 rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant border-2 border-transparent focus:border-digilayn-primary">
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs opacity-70 mb-1 pl-1">Full Name (max 3 names)</label>
+                <input type="text" id="display-name" maxlength="64" name="display-name" placeholder="Full Name" class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition" required title="Please enter your full name (max 3 names).">
+                <p class="text-[11px] opacity-70 mt-1 pl-1">Required for LaynFleet ride booking.</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-xs opacity-70 mb-1 pl-1">Phone Number (10 digits)</label>
+                <input type="tel" id="phone-number" maxlength="10" name="phone-number" placeholder="e.g. 0123456789" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                <p class="text-[11px] opacity-70 mt-1 pl-1">Optional for general account, but required for LaynFleet ride booking.</p>
+            </div>
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-1 pl-1">
+                    <label class="block text-xs opacity-70">Bio / About</label>
+                    <span id="bio-counter" class="text-xs opacity-70">0/128</span>
+                </div>
+                <label for="bio"></label><textarea id="bio" name="bio" rows="3" maxlength="128" placeholder="Tell us about yourself..." class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition"></textarea>
+            </div>
+
+            <div id="admin-toggle-section" class="hidden mb-6 p-4 rounded-xl bg-digilayn-info-container dark:bg-digilayn-info/10 border border-digilayn-info dark:border-digilayn-info">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-digilayn-on-info-container dark:text-digilayn-info">Support Listing</h3>
+                        <p class="text-xs text-digilayn-info dark:text-digilayn-info opacity-80">Appear on the support page</p>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="list-for-support" class="sr-only peer">
+                        <div class="w-11 h-6 bg-digilayn-surface-container-high peer-focus:outline-none rounded-full peer dark:bg-digilayn-surface-container-high peer-checked:after:translate-x-full peer-checked:after:border-digilayn-outline-variant after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-digilayn-surface-container-lowest after:border-digilayn-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-digilayn-outline-variant peer-checked:bg-digilayn-info"></div>
+                    </label>
+                </div>
+            </div>
+
+            <button type="button" id="save-btn" class="w-full px-8 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md mb-4 digilayn-button">
+                Back
+            </button>
+        </form>
+
+        <button id="logout-btn" class="w-full px-8 py-3 border-2 border-digilayn-error text-digilayn-error font-bold rounded-lg hover:bg-digilayn-error hover:text-digilayn-on-primary transition">
+            Logout
+        </button>
+    </div>
+
+    <!-- Password & Security Card (Hidden by default if password linked, shown for forgot-password or unlinked accounts) -->
+    <div id="password-section" class="card hidden flex-col p-8 rounded-2xl border-l-4 border-l-digilayn-info mt-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 id="password-section-title" class="text-xl font-bold text-digilayn-on-surface dark:text-digilayn-on-surface">Password & Security</h3>
+                <p id="password-section-subtitle" class="text-xs text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant mt-1">Set or change your password to log in with email and password.</p>
+            </div>
+            <span id="password-status-badge" class="px-2.5 py-1 text-xs font-bold rounded-full bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:bg-digilayn-surface-container-high dark:text-digilayn-on-surface-variant">
+                Checking...
+            </span>
+        </div>
+
+        <div id="password-alert-banner" class="hidden mb-4 p-3 rounded-lg bg-digilayn-info-container dark:bg-digilayn-info/10 text-digilayn-on-info-container dark:text-digilayn-info text-xs font-medium border border-digilayn-info dark:border-digilayn-info">
+            ✨ <strong>Google Verified!</strong> Enter your new password below to link it to your account so you can log in with either Google or your email & password next time.
+        </div>
+
+        <div id="password-status-msg" class="hidden mb-4 p-3 rounded-lg text-sm font-medium border"></div>
+
+        <form id="password-form" class="space-y-4">
+            <div>
+                <label for="new-password" class="block text-xs font-bold uppercase tracking-wider mb-1 opacity-70">New Password</label>
+                <div class="relative">
+                    <input type="password" id="new-password" placeholder="At least 6 characters" minlength="6" required
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                    <button type="button" id="toggle-new-password" class="absolute right-3 top-3 text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-primary text-xs font-bold cursor-pointer">
+                        SHOW
+                    </button>
+                </div>
+            </div>
+            <div>
+                <label for="confirm-password" class="block text-xs font-bold uppercase tracking-wider mb-1 opacity-70">Confirm New Password</label>
+                <div class="relative">
+                    <input type="password" id="confirm-password" placeholder="Re-enter new password" minlength="6" required
+                           class="w-full p-3 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-low text-digilayn-on-surface dark:text-digilayn-on-surface border-2 border-transparent focus:border-digilayn-primary focus:outline-none transition">
+                </div>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" id="save-password-btn" class="w-full py-3 bg-digilayn-info hover:bg-digilayn-info text-digilayn-on-info font-bold rounded-lg transition shadow-md cursor-pointer digilayn-button">
+                    Save & Link Password
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<!-- Image Modal -->
+<div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-digilayn-scrim bg-opacity-90 transition-opacity duration-300">
+    <button id="close-modal" class="absolute top-6 right-6 text-digilayn-on-primary hover:text-digilayn-on-surface-variant focus:outline-none">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+    <img id="modal-image" src="" alt="Expanded Profile Picture" class="max-w-[90%] max-h-[90%] rounded-lg shadow-2xl transform transition-transform duration-300">
+</div>
+
+<!-- Crop Modal -->
+<div id="crop-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center bg-digilayn-scrim bg-opacity-90 p-4">
+    <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl">
+        <div class="p-4 border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant flex justify-between items-center">
+            <h3 class="font-bold text-lg">Crop Profile Picture</h3>
+            <button id="cancel-crop" class="text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-primary transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="p-4 max-h-[60vh] flex items-center justify-center bg-digilayn-surface dark:bg-digilayn-surface">
+            <img id="crop-image" src="" class="max-w-full" alt="">
+        </div>
+        <div class="p-4 flex gap-3">
+            <button id="rotate-left" class="flex-1 py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high rounded-lg hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-highest transition font-bold text-xs uppercase tracking-widest">
+                <i class="fas fa-undo mr-1"></i> Left
+            </button>
+            <button id="rotate-right" class="flex-1 py-2 bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high rounded-lg hover:bg-digilayn-surface-container-high dark:hover:bg-digilayn-surface-container-highest transition font-bold text-xs uppercase tracking-widest">
+                <i class="fas fa-redo mr-1"></i> Right
+            </button>
+        </div>
+        <div class="p-4 bg-digilayn-surface dark:bg-digilayn-surface flex gap-3">
+            <button id="apply-crop" class="flex-[2] py-3 bg-digilayn-primary text-digilayn-on-primary rounded-xl hover:bg-digilayn-primary transition font-bold uppercase tracking-widest shadow-lg shadow-digilayn-primary/20 digilayn-button">
+                Apply Crop
+            </button>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-70 text-xs">
+    &copy; 2026 Poortjie Services. Empowering poortjie economies.<br><a href="../support" class="hover:underline">Data Policy</a>
+</footer>
+
+<!-- Firebase (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
+<script src="../scripts/shared-profile-repository.js"></script>
+<script src="../scripts/build-target.js"></script>
+<script src="../scripts/firebase.js"></script>
+<script src="../scripts/image-upload.js"></script>
+
+<script>
+    const profileForm = document.getElementById('profile-form');
+    const statusMessage = document.getElementById('status-message');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const displayNameInput = document.getElementById('display-name');
+    const phoneNumberInput = document.getElementById('phone-number');
+    const bioInput = document.getElementById('bio');
+    const photoUrlInput = document.getElementById('photo-url');
+    const photoInput = document.getElementById('photo-input');
+    const profilePicture = document.getElementById('profile-picture');
+    const saveBtn = document.getElementById('save-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const imageModal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    const closeModal = document.getElementById('close-modal');
+    const bioCounter = document.getElementById('bio-counter');
+    const adminToggleSection = document.getElementById('admin-toggle-section');
+    const listForSupportToggle = document.getElementById('list-for-support');
+
+    const cropModal = document.getElementById('crop-modal');
+    const cropImage = document.getElementById('crop-image');
+    const applyCropBtn = document.getElementById('apply-crop');
+    const cancelCropBtn = document.getElementById('cancel-crop');
+    const rotateLeftBtn = document.getElementById('rotate-left');
+    const rotateRightBtn = document.getElementById('rotate-right');
+    let cropper = null;
+
+    const DEFAULT_AVATAR = "https://placehold.co/150";
+    let initialData = {};
+    let profileLoaded = false;
+
+    function showStatus(message, isError = false) {
+        statusMessage.textContent = message;
+        statusMessage.classList.remove('hidden', 'bg-digilayn-error-container', 'text-digilayn-error', 'border-digilayn-error', 'bg-digilayn-primary-container', 'text-digilayn-primary', 'border-digilayn-primary');
+        if (isError) {
+            statusMessage.classList.add('bg-digilayn-error-container', 'text-digilayn-error', 'border-digilayn-error');
+        } else {
+            statusMessage.classList.add('bg-digilayn-primary-container', 'text-digilayn-primary', 'border-digilayn-primary');
+        }
+        statusMessage.classList.remove('hidden');
+        setTimeout(() => {
+            statusMessage.classList.add('hidden');
+        }, 5000);
+    }
+
+    function checkChanges() {
+        if (!profileLoaded) { saveBtn.disabled = true; return; }
+        const currentData = {
+            username: usernameInput.value,
+            displayName: displayNameInput.value.trim(),
+            phone: phoneNumberInput.value.trim(),
+            bio: bioInput.value,
+            photoUrl: photoUrlInput.value,
+            listForSupport: listForSupportToggle.checked
+        };
+
+        const hasChanged =
+            currentData.displayName !== initialData.displayName ||
+            currentData.phone !== initialData.phone ||
+            currentData.username !== initialData.username ||
+            currentData.bio !== initialData.bio ||
+            currentData.photoUrl !== initialData.photoUrl ||
+            currentData.listForSupport !== initialData.listForSupport;
+
+        if (hasChanged) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+            saveBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            saveBtn.type = 'submit';
+        } else {
+            saveBtn.disabled = false; // Enabled for "Back" functionality
+            saveBtn.textContent = 'Back';
+            saveBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            saveBtn.type = 'button';
+        }
+    }
+
+    saveBtn.addEventListener('click', (e) => {
+        if (saveBtn.textContent === 'Back') {
+            if (history.length > 1) {
+                window.top.history.back();
+            } else {
+                window.top.location.replace('../');
+            }
+        }
+    });
+
+    [usernameInput, displayNameInput, phoneNumberInput, bioInput, listForSupportToggle].forEach(input => {
+        const eventName = input.type === 'checkbox' ? 'change' : 'input';
+        input.addEventListener(eventName, () => {
+            if (input === bioInput) {
+                bioCounter.textContent = `${input.value.length}/128`;
+            }
+            checkChanges();
+        });
+    });
+
+    phoneNumberInput.addEventListener('keypress', (e) => {
+        if (!/\p{Nd}/u.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    profilePicture.addEventListener('click', () => {
+        modalImage.src = profilePicture.src;
+        imageModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeModal.addEventListener('click', () => {
+        imageModal.classList.add('hidden');
+        document.body.style.overflow = '';
+    });
+
+    imageModal.addEventListener('click', (e) => {
+        if (e.target === imageModal) {
+            imageModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Image error fallback
+    profilePicture.addEventListener('error', () => {
+        profilePicture.src = DEFAULT_AVATAR;
+    });
+
+    usernameInput.addEventListener('input', () => {
+        usernameInput.value = usernameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 30);
+    });
+
+    // Load profile
+    AccountAccess.observe(user => {
+        if (user) {
+            profileLoaded = false;
+            emailInput.value = user.email || '';
+            usernameInput.value = '';
+            saveBtn.disabled = true;
+
+            firebase.firestore().collection('users').doc(user.uid).get({ source: 'server' }).then(doc => {
+                if (AccountAccess.currentUser?.uid !== user.uid) return;
+                if (!doc.exists) throw new Error('Shared account is missing.');
+                const userData = doc.data();
+                const stored = field => SharedProfileRepository.optionalString(userData, field);
+                const resolvedDisplayName = stored('displayName');
+                const resolvedPhone = stored('phone');
+                const resolvedBio = stored('bio');
+                const resolvedPhotoUrl = stored('photoUrl');
+                const resolvedUsername = stored('username');
+
+                usernameInput.value = resolvedUsername;
+                displayNameInput.value = resolvedDisplayName;
+                phoneNumberInput.value = resolvedPhone;
+                bioInput.value = resolvedBio;
+                photoUrlInput.value = resolvedPhotoUrl;
+                profilePicture.src = resolvedPhotoUrl || DEFAULT_AVATAR;
+
+                if (userData.roles?.poortjie?.isAdmin === true) {
+                    adminToggleSection.classList.remove('hidden');
+                    listForSupportToggle.checked = userData.roles?.poortjie?.listForSupport === true;
+                }
+
+                initialData = {
+                    username: usernameInput.value,
+            displayName: displayNameInput.value.trim(),
+                    phone: phoneNumberInput.value.trim(),
+                    bio: bioInput.value,
+                    photoUrl: photoUrlInput.value,
+                    listForSupport: listForSupportToggle.checked
+                };
+                bioCounter.textContent = `${bioInput.value.length}/128`;
+                profileLoaded = true;
+                checkChanges();
+            }).catch(error => {
+                console.error("Error fetching user data:", error);
+                showStatus("Error loading profile data.", true);
+            });
+
+            // Update Password section visibility (hidden if already linked, shown if from forgot password or unlinked)
+            updatePasswordSectionVisibility(user);
+        } else {
+            window.top.location.replace('login');
+        }
+    });
+
+    // Open crop modal
+    photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            cropImage.src = event.target.result;
+            cropModal.classList.remove('hidden');
+
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+                guides: true,
+                background: false,
+                autoCropArea: 1,
+                responsive: true
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // ---- Android Spec: user-photos/{uid}/profile-{timestamp}.jpg (< 1MB) ----
+    applyCropBtn.addEventListener('click', async () => {
+        if (!cropper) return;
+
+        const user = AccountAccess.currentUser;
+        if (!user) {
+            showStatus("Not logged in.", true);
+            return;
+        }
+
+        const canvas = cropper.getCroppedCanvas({ width: 800, height: 800 });
+
+        try {
+            let progress = document.getElementById('photo-compression-progress');
+            if (!progress) {
+                progress = document.createElement('p');
+                progress.id = 'photo-compression-progress';
+                progress.setAttribute('role', 'status');
+                progress.className = 'text-sm my-3';
+                applyCropBtn.parentElement.before(progress);
+            }
+            applyCropBtn.disabled = true;
+
+            const reportProgress = message => {
+                progress.textContent = message;
+            };
+            const blob = await ImageUpload.compressCanvas(canvas, reportProgress);
+            if (!blob) throw new Error("Could not convert image");
+
+            const storageRef = firebase.storage().ref();
+            const time = Date.now();
+            const fileRef = storageRef.child(`users/${user.uid}/profile/${time}.jpg`);
+
+            await ImageUpload.upload(fileRef, blob, reportProgress, {
+                contentType: "image/jpeg",
+                cacheControl: "public,max-age=86400"
+            });
+
+            const url = await fileRef.getDownloadURL();
+            await window.sharedProfileRepository.save(user.uid, { photoUrl: url });
+            initialData.photoUrl = url;
+
+            profilePicture.src = url;
+            photoUrlInput.value = url;
+            checkChanges();
+
+            cropModal.classList.add('hidden');
+            cropper.destroy();
+            cropper = null;
+
+            // Reset file input so user can re-select same file later
+            photoInput.value = '';
+
+            checkChanges();
+            showStatus("Photo uploaded. Now save changes.");
+        } catch (err) {
+            console.error("Upload failed:", err);
+            const progress = document.getElementById('photo-compression-progress');
+            if (progress) progress.textContent = 'Picture upload failed. Please try again or choose another image.';
+            showStatus('Picture upload failed. Please try again or choose another image.', true);
+        } finally {
+            applyCropBtn.disabled = false;
+        }
+    });
+
+    cancelCropBtn.addEventListener('click', () => {
+        cropModal.classList.add('hidden');
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        photoInput.value = '';
+    });
+
+    rotateLeftBtn.addEventListener('click', () => cropper && cropper.rotate(-90));
+    rotateRightBtn.addEventListener('click', () => cropper && cropper.rotate(90));
+
+    profileForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const user = AccountAccess.currentUser;
+        if (!user) return;
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+
+        const newDisplayName = displayNameInput.value;
+        const newPhoneNumber = phoneNumberInput.value.trim();
+        const newBio = bioInput.value;
+        const newPhotoUrl = photoUrlInput.value;
+        const newListForSupport = listForSupportToggle.checked;
+
+        const candidates = {
+            displayName: newDisplayName, phone: newPhoneNumber, bio: newBio,
+            photoUrl: newPhotoUrl, username: usernameInput.value
+        };
+        const updates = Object.fromEntries(Object.entries(candidates).filter(([key, value]) => value !== initialData[key]));
+        if (newListForSupport !== initialData.listForSupport) {
+            updates.roles = { poortjie: { listForSupport: newListForSupport } };
+        }
+        window.sharedProfileRepository.save(user.uid, updates).then(saved => {
+            displayNameInput.value = SharedProfileRepository.optionalString(saved, 'displayName');
+            try {
+                sessionStorage.removeItem('authUserCache');
+            } catch (e) {}
+
+            showStatus("Profile updated successfully!");
+            initialData = {
+                username: usernameInput.value,
+                displayName: SharedProfileRepository.optionalString(saved, 'displayName'),
+                phone: newPhoneNumber,
+                bio: newBio,
+                photoUrl: newPhotoUrl,
+                listForSupport: newListForSupport
+            };
+            checkChanges();
+
+            user.updateProfile({
+                displayName: SharedProfileRepository.optionalString(saved, 'displayName'),
+                photoURL: newPhotoUrl
+            }).catch(err => console.error("Error updating auth profile:", err));
+        }).catch(error => {
+            console.error("Error updating profile:", error);
+            showStatus(error.message, true);
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+        });
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        firebase.auth().signOut().then(() => {
+            window.top.location.replace('../');
+        }).catch(error => {
+            console.error("Logout failed:", error);
+            window.top.location.replace('../');
+        });
+    });
+
+    displayNameInput.addEventListener('blur', (e) => {
+        let value = e.target.value.trim().replace(/\s+/g, ' ');
+        if (value) {
+            const words = value.split(' ');
+            const formattedWords = words.slice(0, 3).map(word => {
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            });
+            e.target.value = formattedWords.join(' ');
+        }
+        checkChanges();
+    });
+
+    // ── Password & Security Management ──────────────────────────────────────────
+    const passwordForm = document.getElementById('password-form');
+    const passwordStatusMsg = document.getElementById('password-status-msg');
+    const passwordStatusBadge = document.getElementById('password-status-badge');
+    const newPasswordInput = document.getElementById('new-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const toggleNewPasswordBtn = document.getElementById('toggle-new-password');
+    const savePasswordBtn = document.getElementById('save-password-btn');
+
+    function updatePasswordBadge(user) {
+        if (!passwordStatusBadge || !user) return;
+        const providers = (user.providerData || []).map(p => p.providerId);
+        const hasGoogle = providers.includes('google.com');
+        const hasPassword = providers.includes('password');
+
+        if (hasPassword && hasGoogle) {
+            passwordStatusBadge.textContent = 'Linked (Google + Password)';
+            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/10 dark:text-digilayn-primary';
+            if (savePasswordBtn) savePasswordBtn.textContent = 'Update Password';
+        } else if (hasPassword) {
+            passwordStatusBadge.textContent = 'Password Active';
+            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/10 dark:text-digilayn-primary';
+            if (savePasswordBtn) savePasswordBtn.textContent = 'Update Password';
+        } else if (hasGoogle) {
+            passwordStatusBadge.textContent = 'Google Only (No Password)';
+            passwordStatusBadge.className = 'px-2.5 py-1 text-xs font-bold rounded-full bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info/10 dark:text-digilayn-info';
+            if (savePasswordBtn) savePasswordBtn.textContent = 'Save & Link Password';
+        }
+    }
+
+    function updatePasswordSectionVisibility(user) {
+        const passwordSection = document.getElementById('password-section');
+        const alertBanner = document.getElementById('password-alert-banner');
+        if (!passwordSection || !user) return;
+
+        const providers = (user.providerData || []).map(p => p.providerId);
+        const hasPassword = providers.includes('password');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const isFromForgotPassword = urlParams.get('action') === 'set-password' ||
+                                     urlParams.get('action') === 'change-password' ||
+                                     sessionStorage.getItem('openPasswordModal') === 'true';
+
+        updatePasswordBadge(user);
+
+        // Hide if user account is already linked with password and did not come from forgot password
+        if (hasPassword && !isFromForgotPassword) {
+            passwordSection.classList.add('hidden');
+            passwordSection.classList.remove('flex');
+        } else {
+            passwordSection.classList.remove('hidden');
+            passwordSection.classList.add('flex');
+
+            if (isFromForgotPassword) {
+                sessionStorage.removeItem('openPasswordModal');
+                if (alertBanner) alertBanner.classList.remove('hidden');
+                setTimeout(() => {
+                    passwordSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.getElementById('new-password')?.focus();
+                }, 400);
+            }
+        }
+    }
+
+    function showPasswordStatus(message, isError = false) {
+        if (!passwordStatusMsg) return;
+        passwordStatusMsg.textContent = message;
+        passwordStatusMsg.classList.remove('hidden', 'bg-digilayn-error-container', 'text-digilayn-error', 'border-digilayn-error', 'bg-digilayn-primary-container', 'text-digilayn-primary', 'border-digilayn-primary');
+        if (isError) {
+            passwordStatusMsg.classList.add('bg-digilayn-error-container', 'text-digilayn-error', 'border-digilayn-error');
+        } else {
+            passwordStatusMsg.classList.add('bg-digilayn-primary-container', 'text-digilayn-primary', 'border-digilayn-primary');
+        }
+        passwordStatusMsg.classList.remove('hidden');
+        setTimeout(() => {
+            passwordStatusMsg.classList.add('hidden');
+        }, 7000);
+    }
+
+    if (toggleNewPasswordBtn && newPasswordInput) {
+        toggleNewPasswordBtn.addEventListener('click', () => {
+            const isPassword = newPasswordInput.type === 'password';
+            newPasswordInput.type = isPassword ? 'text' : 'password';
+            toggleNewPasswordBtn.textContent = isPassword ? 'HIDE' : 'SHOW';
+        });
+    }
+
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = newPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (newPassword.length < 6) {
+                showPasswordStatus('Password must be at least 6 characters long.', true);
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showPasswordStatus('Passwords do not match. Please re-enter your password to confirm.', true);
+                return;
+            }
+
+            savePasswordBtn.disabled = true;
+            const originalBtnText = savePasswordBtn.textContent;
+            savePasswordBtn.innerHTML = `<span class="inline-flex items-center justify-center gap-2">
+                <svg class="animate-spin h-4 w-4 text-digilayn-on-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-70" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Saving Password...
+            </span>`;
+
+            try {
+                const currentUser = AccountAccess.currentUser;
+                if (!currentUser) throw new Error('Not authenticated.');
+
+                const hasPassword = (currentUser.providerData || []).some(p => p.providerId === 'password');
+
+                if (hasPassword) {
+                    await currentUser.updatePassword(newPassword);
+                } else {
+                    try {
+                        const credential = firebase.auth.EmailAuthProvider.credential(currentUser.email, newPassword);
+                        await currentUser.linkWithCredential(credential);
+                    } catch (linkErr) {
+                        if (linkErr.code === 'auth/provider-already-linked' || linkErr.code === 'auth/credential-already-in-use') {
+                            await currentUser.updatePassword(newPassword);
+                        } else {
+                            throw linkErr;
+                        }
+                    }
+                }
+
+                showPasswordStatus('Password saved and linked successfully! You can now log in using your email and this password next time.', false);
+                newPasswordInput.value = '';
+                confirmPasswordInput.value = '';
+                updatePasswordBadge(currentUser);
+            } catch (err) {
+                console.error('Error updating password:', err);
+                if (err.code === 'auth/requires-recent-login') {
+                    showPasswordStatus('Recent login required: Please sign in with Google again before setting your password.', true);
+                } else if (err.code === 'auth/weak-password') {
+                    showPasswordStatus('Password is too weak. Please use at least 6 characters.', true);
+                } else {
+                    showPasswordStatus(err.message || 'Could not save password. Please try again.', true);
+                }
+            } finally {
+                savePasswordBtn.disabled = false;
+                savePasswordBtn.textContent = originalBtnText;
+            }
+        });
+    }
+</script>
+</body>
+</html>

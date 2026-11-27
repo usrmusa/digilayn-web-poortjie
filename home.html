@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html data-theme-default="light" lang="en">
+<head>
+    <link rel="stylesheet" href="styles/digilayn-theme.css">
+    <script src="scripts/theme.js"></script>
+    <script src="/scripts/site.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poortjie Services</title>
+    <meta name="author" content="Musa Mgijima">
+    <meta name="description"
+          content="Poortjie Services connects you with local Kasi services: From school transport and tow trucks to professional designers and web developers.">
+    <meta name="keywords"
+          content="Poortjie, Kasi services, transport, school transport, graphic design, web development, South Africa">
+    <meta name="copyright" content="© 2026 Poortjie Services. All rights reserved.">
+    <meta name="robots" content="index,follow">
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg">
+    <link rel="shortcut icon" type="image/png" sizes="48x48" href="favicon/favicon-48x48.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <script>
+        if (window.console) {
+            const shouldFilter = (args) => {
+                const text = Array.from(args).map(a => typeof a === 'string' ? a : (a && a.message) || '').join(' ');
+                return text.includes('cdn.tailwindcss.com should not be used in production') ||
+                       text.includes('Tailwind CSS: You should not use the CDN') ||
+                       text.includes('enableMultiTabIndexedDbPersistence');
+            };
+            if (window.console.warn) {
+                const originalWarn = window.console.warn;
+                window.console.warn = function() {
+                    if (shouldFilter(arguments)) return;
+                    originalWarn.apply(window.console, arguments);
+                };
+            }
+            if (window.console.log) {
+                const originalLog = window.console.log;
+                window.console.log = function() {
+                    if (shouldFilter(arguments)) return;
+                    originalLog.apply(window.console, arguments);
+                };
+            }
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="scripts/digilayn-tailwind.js"></script>
+    <script>
+        console.log(
+            "%cDigilayn",
+            `color: ${window.DigilaynTheme.getColor("primary")}; font-size: 40px; font-weight: bold; text-shadow: 2px 2px 0 ${window.DigilaynTheme.getColor("surface")};`
+        );
+        console.log(
+            "%cWebsite developed by Musa Mgijima",
+            `color: ${window.DigilaynTheme.getColor("on-surface-variant")}; font-size: 16px; font-style: italic;`
+        );
+    </script>
+    <style>
+        #loader-overlay { background-color: var(--digilayn-surface-container-lowest); }
+        .dark #loader-overlay { background-color: var(--digilayn-surface); }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/spotlight.css">
+    <link rel="stylesheet" href="styles/digilayn-components.css">
+</head>
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
+<div class="fixed top-5 left-5 z-50" id="business-form-control">
+    <a href="services/business-form" id="add-business-btn"
+       class="p-3 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition flex items-center justify-center digilayn-button"
+       title="Add Your Business">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+    </a>
+</div>
+<div class="fixed top-5 right-5 z-50 flex gap-3" id="user-controls">
+    <div id="hamburger-menu" class="relative">
+        <button id="hamburger-btn"
+                class="p-3 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition digilayn-button">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+        <div id="menu-items"
+             class="hidden absolute right-0 mt-2 w-48 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-md shadow-lg py-1 ring-1 ring-digilayn-shadow ring-opacity-5">
+            <a href="market"
+               class="block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Marketplace</a>
+            <button id="menu-theme-toggle"
+                    class="w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high flex items-center gap-3">
+                <span id="menu-theme-icon">🌓</span> Mode
+            </button>
+            <a id="admin-link" href="manage/business"
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Business
+                Admin</a>
+            <a id="home-admin-link" href="manage/home-manager"
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Home
+                Manager</a>
+            <a id="news-admin-link" href="manage/news-writer"
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Post
+                News/Alert</a>
+            <a id="taxi-admin-link" href="manage/public transport"
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Public Transport Admin</a>
+            <a href="support"
+               class="block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Support</a>
+            <a id="profile-link" href="authentication/profile"
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Profile</a>
+            <div id="auth-divider" class="hidden border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant my-1"></div>
+            <a id="login-link" href="authentication/login"
+               onclick="sessionStorage.setItem('redirectUrl', window.location.href); window.location.href = 'authentication/login'; return false;"
+               class="hidden block w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Login</a>
+            <button id="logout-btn"
+                    class="hidden w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">
+                Logout
+            </button>
+        </div>
+    </div>
+</div>
+<header class="max-w-6xl mx-auto pt-24 pb-8 px-4 sm:px-6 text-center">
+    <div id="loader-overlay" class="fixed inset-0 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface z-[60] flex items-center justify-center transition-opacity duration-500">
+        <div class="flex flex-col items-center">
+            <div class="w-12 h-12 border-4 border-digilayn-primary border-t-digilayn-primary rounded-full animate-spin mb-4"></div>
+            <p class="text-sm font-medium opacity-70">Loading Poortjie...</p>
+        </div>
+    </div>
+    <div class="mb-4 flex justify-center">
+        <div class="bg-digilayn-primary text-digilayn-on-primary px-4 py-1 rounded-full text-sm font-bold tracking-widest uppercase">
+            services
+        </div>
+    </div>
+    <h1 class="text-4xl sm:text-6xl font-extrabold mb-4 tracking-tight">Poortjie</h1>
+    <p class="text-lg opacity-80 mb-6">Discover the people and businesses around you.</p>
+    <section id="local-spotlight" class="local-spotlight" aria-label="Discover local businesses" aria-busy="true">
+        <div id="spotlight-loader" class="spotlight-loader" role="status" aria-label="Loading local businesses"></div>
+        <p id="spotlight-status" role="status" class="p-6" hidden></p>
+        <article id="spotlight-card" hidden>
+            <div class="spotlight-heading"><span class="spotlight-eyebrow">Discover local</span><h2 id="spotlight-category"></h2></div>
+            <div class="spotlight-layout">
+                <img id="spotlight-photo" class="spotlight-photo" alt="" decoding="async">
+                <div class="spotlight-details">
+                    <p id="spotlight-service" class="spotlight-eyebrow"></p>
+                    <h3 id="spotlight-name"></h3>
+                    <p id="spotlight-description"></p>
+                    <p id="spotlight-address" class="text-sm opacity-70"></p>
+                    <a id="spotlight-contact" class="underline" hidden></a>
+                    <div class="spotlight-actions">
+                        <a id="spotlight-whatsapp" class="spotlight-primary text-center" target="_blank" rel="noopener noreferrer" hidden>WhatsApp</a>
+                        <button id="spotlight-full-details" class="spotlight-secondary" type="button">View Full Details</button>
+                        <button id="spotlight-pictures" class="spotlight-primary" type="button">View Pictures</button>
+                        <button id="spotlight-next" class="spotlight-secondary" type="button">Discover Another →</button>
+                    </div>
+                    <a id="spotlight-category-link" class="text-sm underline">Explore this category</a>
+                </div>
+            </div>
+        </article>
+    </section>
+    <dialog id="spotlight-gallery" aria-labelledby="spotlight-gallery-title">
+        <div class="spotlight-gallery-header"><h2 id="spotlight-gallery-title">Business pictures</h2><button id="spotlight-close" type="button" aria-label="Close pictures">✕</button></div>
+        <img id="spotlight-gallery-photo" alt="">
+        <p id="spotlight-gallery-status" role="status"></p>
+        <div class="spotlight-gallery-controls"><button id="spotlight-previous-photo" type="button">← Previous</button><span id="spotlight-count" aria-live="polite"></span><button id="spotlight-next-photo" type="button">Next →</button></div>
+    </dialog>
+    <div id="alert-container" class="max-w-2xl mx-auto mb-4 hidden">
+    </div>
+    <div id="news-slider-container" class="max-w-2xl mx-auto mb-8 hidden">
+        <div id="news-slider"
+             class="bg-digilayn-primary-container dark:bg-digilayn-surface-container-low/50 border border-digilayn-primary dark:border-digilayn-outline-variant rounded-2xl p-6 relative group overflow-hidden">
+            <div id="news-content-area" class="transition-opacity duration-500">
+                <div class="animate-pulse flex flex-col items-center">
+                    <div class="h-4 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-3/4 mb-2"></div>
+                    <div class="h-3 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-1/2"></div>
+                </div>
+            </div>
+            <button id="prev-news" class="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-digilayn-surface-container-lowest/20 hover:bg-digilayn-surface-container-lowest/40 dark:bg-digilayn-surface/20 dark:hover:bg-digilayn-surface/40 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none" aria-label="Previous news">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <button id="next-news" class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-digilayn-surface-container-lowest/20 hover:bg-digilayn-surface-container-lowest/40 dark:bg-digilayn-surface/20 dark:hover:bg-digilayn-surface/40 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 focus:outline-none" aria-label="Next news">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+            <div class="flex justify-center gap-2 mt-4" id="slider-dots"></div>
+        </div>
+    </div>
+    <p id="hero-static-text" class="text-xl opacity-80 max-w-2xl mx-auto leading-relaxed">
+        The digital heartbeat of the township. Access reliable transport, professional designers, and expert
+        developers—all in one place.
+    </p>
+    <div class="flex flex-wrap justify-center gap-4 mt-8">
+        <a href="#services"
+           class="px-8 py-3 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-lg hover:bg-digilayn-primary transition shadow-md digilayn-button">Explore
+            Services</a>
+        <a href="market"
+           class="px-8 py-3 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-high transition shadow-md border border-digilayn-primary dark:border-digilayn-outline-variant">Marketplace</a>
+        <a href="services/public%20transport"
+           class="px-8 py-3 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-primary hover:text-digilayn-on-primary transition">Public Transport Info</a>
+    </div>
+</header>
+<main class="max-w-6xl mx-auto px-6 pb-24" id="services">
+    <div id="services-grid" class="grid md:grid-cols-3 gap-8">
+    </div>
+    <section class="mt-24 card p-10 rounded-3xl bg-gradient-to-br from-digilayn-primary-container to-transparent dark:from-digilayn-primary-container/10">
+        <div class="max-w-3xl">
+            <h2 class="text-3xl font-bold mb-4">Built for the community, by the community.</h2>
+            <p class="text-lg opacity-80 mb-6">
+                Poortjie Services is all about lifting our local businesses. We make sure every hustle in the hood has a professional home online, without any of the complicated talk or heavy costs.
+            </p>
+            <div class="flex gap-4">
+                <span class="text-[10px] font-bold px-2 py-1 border border-digilayn-primary/30 rounded text-digilayn-primary uppercase tracking-widest">Mobile First</span>
+                <span class="text-[10px] font-bold px-2 py-1 border border-digilayn-primary/30 rounded text-digilayn-primary uppercase tracking-widest">Kasi Focused</span>
+            </div>
+        </div>
+    </section>
+    <div id="business-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm">
+        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl relative">
+            <button onclick="closeBusinessModal()" class="sticky top-4 float-right mr-4 z-10 p-2 bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur rounded-full shadow-lg text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface-variant">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div id="business-modal-content" class="p-1">
+            </div>
+        </div>
+    </div>
+    <div id="rating-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm"></div>
+</main>
+<footer class="text-center py-12 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant opacity-70 text-xs">
+    &copy; 2026 <a href="./" onclick="window.top.location.replace('./'); return false;"
+                   class="hover:underline">Poortjie Services</a>. Empowering poortjie economies.
+    <div class="mt-2 flex justify-center gap-4">
+        <a href="support" class="hover:underline">Support</a>
+        <a href="support" class="hover:underline">Data Policy</a>
+    </div>
+</footer>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="scripts/account-access-core.js"></script>
+<script src="scripts/account-access-compat.js"></script>
+<script src="scripts/shared-profile-repository.js" defer></script>
+<script src="scripts/build-target.js" defer></script>
+<script src="scripts/firebase.js" defer></script>
+<script src="scripts/spotlight.js" defer></script>
+<script src="scripts/core/observable.js" defer></script>
+<script src="scripts/core/case-mapper.js" defer></script>
+<script src="scripts/models/user-model.js" defer></script>
+<script src="scripts/viewmodels/auth-store.js" defer></script>
+<script src="https://unpkg.com/dexie/dist/dexie.js" defer></script>
+<script src="scripts/card-renderer.js" defer></script>
+<script src="scripts/rating.js" defer></script>
+<script>
+    const LAYN_RIDER_SERVICE = {
+        category: 'Transport',
+        title: 'Layn Rider',
+        description: 'Request a ride from verified local Poortjie drivers instantly. Safe, fast, and affordable township transport.',
+        list: [
+            'Instant local ride booking',
+            'Verified community drivers',
+            'Affordable upfront pricing',
+            'Live ride tracking & fast pickup'
+        ],
+        isTransport: true,
+        url: 'laynfleet/laynrider/',
+        btnText: 'Book a Ride'
+    };
+
+    const DEFAULT_SERVICES = [
+        LAYN_RIDER_SERVICE,
+        {
+            category: 'Creative',
+            title: 'Design & Digital Media',
+            description: 'Graphic design, branding, videography, photography, and creative content creation for businesses and events.',
+            list: ['Logo & Branding Design', 'Flyers, Posters & Menus', 'Event Photography & Video', 'Social Media Management'],
+            url: 'services/creative',
+            btnText: 'Explore Creative'
+        },
+        {
+            category: 'Information Technology',
+            title: 'Tech & Digital Solutions',
+            description: 'Web development, computer repairs, network setup, and software solutions to keep your business running.',
+            list: ['Website Design & Hosting', 'Computer & Laptop Repairs', 'Software & WiFi Installation', 'POS & Business Systems'],
+            url: 'services/information%20technology',
+            btnText: 'Explore Information Technology'
+        },
+        {
+            category: 'Food & Catering',
+            title: 'Kasi Flavors & Events',
+            description: 'Delicious local food, catering for functions, fast food takeaways, and baking for celebrations in Poortjie.',
+            list: ['Event & Wedding Catering', 'Township Street Food', 'Custom Cakes & Pastries', 'Platters & Family Meals'],
+            url: 'services/food%20&%20catering',
+            btnText: 'Explore Food & Catering'
+        },
+        {
+            category: 'Beauty & Freshness',
+            title: 'Personal Care & Salons',
+            description: 'Hair salons, barbershops, nail studios, skincare, and beauty treatments right in your neighborhood.',
+            list: ['Hair Styling & Braiding', 'Barbershops & Cuts', 'Nails & Lashes', 'Skincare & Makeup'],
+            url: 'services/beauty%20&%20freshness',
+            btnText: 'Explore Beauty & Freshness'
+        },
+        {
+            category: 'Repairs & Technical',
+            title: 'Home & Appliance Repairs',
+            description: 'Qualified technicians for electrical, plumbing, appliance repair, welding, and maintenance services.',
+            list: ['Electrical & Wiring', 'Plumbing & Geysers', 'Fridge & Washing Machine Fix', 'Welding & Gate Repairs'],
+            url: 'services/repairs%20&%20technical',
+            btnText: 'Explore Repairs & Technical'
+        }
+    ];
+
+    let allServices = [];
+    let newsUpdates = [];
+    let alertUpdates = [];
+    let currentNewsIndex = 0;
+    let sliderInterval;
+
+    function handleBookRideClick(event) {
+        if (event) event.preventDefault();
+        const targetUrl = 'laynfleet/laynrider/';
+        window.top.location.href = targetUrl;
+    }
+    window.handleBookRideClick = handleBookRideClick;
+
+    function renderCards(servicesData) {
+        if (!servicesData || !servicesData.length) return;
+        const grid = document.getElementById('services-grid');
+        grid.innerHTML = servicesData.map(service => {
+            const isTransport = service.isTransport || (service.category && (
+                service.category.toLowerCase() === 'transport' ||
+                service.category.toLowerCase().includes('layn rider') ||
+                service.category.toLowerCase().includes('laynrider')
+            ));
+
+            if (isTransport) {
+                return `
+                <section class="space-y-6">
+                    <h2 class="text-2xl font-bold flex items-center gap-3">
+                        <span class="w-8 h-1 bg-digilayn-primary"></span> ${service.category || 'Transport'}
+                    </h2>
+                    <div class="card flex flex-col p-6 rounded-2xl border-l-4 border-l-digilayn-primary">
+                        <div class="flex-grow">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-xl font-bold">${service.title || 'Layn Rider'}</h3>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-digilayn-primary-container text-digilayn-on-primary-container dark:bg-digilayn-primary/10 dark:text-digilayn-primary uppercase tracking-wider">Fast & Local</span>
+                            </div>
+                            <p class="text-sm opacity-70 mb-4">${service.description || 'Request a ride from verified local Poortjie drivers instantly. Safe, fast, and affordable township transport.'}</p>
+                            <ul class="space-y-2 text-sm font-medium">
+                                ${(service.list || [
+                                    'Instant local ride booking',
+                                    'Verified community drivers',
+                                    'Affordable upfront pricing',
+                                    'Live ride tracking & fast pickup'
+                                ]).map(item => `<li class="flex items-center gap-2">${item}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="mt-6 flex flex-col gap-2">
+                            <a href="laynfleet/laynrider/" onclick="handleBookRideClick(event); return false;" class="block text-center py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition cursor-pointer shadow digilayn-button">Book a Ride</a>
+                        </div>
+                    </div>
+                </section>`;
+            }
+
+            return `
+            <section class="space-y-6">
+                <h2 class="text-2xl font-bold flex items-center gap-3">
+                    <span class="w-8 h-1 bg-digilayn-primary"></span> ${service.category}
+                </h2>
+                <div class="card flex flex-col p-6 rounded-2xl border-l-4 border-l-digilayn-primary">
+                    <div class="flex-grow">
+                        <h3 class="text-xl font-bold mb-2">${service.title}</h3>
+                        <p class="text-sm opacity-70 mb-4">${service.description}</p>
+                        <ul class="space-y-2 text-sm font-medium">
+                            ${(service.list || []).map(item => `<li class="flex items-center gap-2">${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-2">
+                        <a href="${service.url}" class="block text-center py-2.5 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition digilayn-button">${service.btnText}</a>
+                        ${service.extraBtn ? `<a href="${service.extraBtn.url}" onclick="window.top.location.replace('${service.extraBtn.url}'); return false;" class="block text-center py-2.5 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary rounded-lg font-bold hover:bg-digilayn-primary hover:text-digilayn-on-primary transition">${service.extraBtn.text}</a>` : ''}
+                    </div>
+                </div>
+            </section>`;
+        }).join('');
+    }
+
+    function fetchAndRenderServices() {
+        let initialServices = DEFAULT_SERVICES;
+        try {
+            const cachedData = sessionStorage.getItem('homeServicesCache');
+            if (cachedData) {
+                const parsed = JSON.parse(cachedData);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    const other = parsed.filter(s => !(s.isTransport || (s.category && s.category.toLowerCase() === 'transport')));
+                    initialServices = [LAYN_RIDER_SERVICE, ...other];
+                }
+            }
+        } catch (e) {
+            console.error("Could not read from sessionStorage:", e);
+        }
+        allServices = initialServices;
+        renderCards(allServices);
+
+        const servicesDocRef = firebase.firestore().collection('poortjie').doc('services');
+        const processData = (doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                const homeScreenData = data.homeScreen;
+                if (homeScreenData && typeof homeScreenData === 'object') {
+                    const activeKeys = Object.keys(homeScreenData)
+                        .filter(key => homeScreenData[key].status !== 'inactive' && homeScreenData[key].status !== 'disabled');
+
+                    const otherServices = activeKeys
+                        .filter(key => key.toLowerCase() !== 'transport' && key.toLowerCase() !== 'layn rider' && key.toLowerCase() !== 'laynrider')
+                        .sort((a, b) => a.localeCompare(b))
+                        .map(key => {
+                            const service = homeScreenData[key];
+                            return {
+                                category: key,
+                                title: service.subtitle || key,
+                                description: service.description || '',
+                                list: service.listing || [],
+                                url: `services/${key.toLowerCase()}`,
+                                target: '_top',
+                                btnText: `Explore ${key}`
+                            };
+                        });
+
+                    // Transport card is ALWAYS Layn Rider and placed FIRST
+                    const newServices = [LAYN_RIDER_SERVICE, ...otherServices];
+
+                    if (JSON.stringify(newServices) !== JSON.stringify(allServices)) {
+                        allServices = newServices;
+                        renderCards(allServices);
+                        try {
+                            sessionStorage.setItem('homeServicesCache', JSON.stringify(allServices));
+                        } catch (e) {
+                            console.error("Could not write to sessionStorage:", e);
+                        }
+                    }
+                }
+            } else {
+                console.warn("Services document does not exist at poortjie/services");
+            }
+        };
+        servicesDocRef.get().then(processData).catch((error) => {
+            console.error("Error fetching services:", error);
+        });
+    }
+    window.onload = () => {
+        const loader = document.getElementById('loader-overlay');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.remove(), 500);
+        }
+        function startNewsSlider() {
+            if (newsUpdates.length === 0 && alertUpdates.length === 0) {
+                document.getElementById('news-slider-container').classList.add('hidden');
+                document.getElementById('alert-container').classList.add('hidden');
+                document.getElementById('hero-static-text').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('hero-static-text').classList.add('hidden');
+            if (alertUpdates.length > 0) {
+                renderAlerts();
+            } else {
+                document.getElementById('alert-container').classList.add('hidden');
+            }
+            if (newsUpdates.length > 0) {
+                document.getElementById('news-slider-container').classList.remove('hidden');
+                renderNewsSlide();
+                if (newsUpdates.length > 1) {
+                    resetSliderTimer();
+                }
+            } else {
+                document.getElementById('news-slider-container').classList.add('hidden');
+            }
+        }
+        function renderAlerts() {
+            const container = document.getElementById('alert-container');
+            container.innerHTML = alertUpdates.map(alert => `
+                <div class="bg-digilayn-error-container dark:bg-digilayn-error/10 border border-digilayn-error dark:border-digilayn-error rounded-2xl p-4 flex items-start gap-4 text-left animate-bounce-subtle mb-2">
+                    <div class="bg-digilayn-error text-digilayn-on-error p-2 rounded-full flex-shrink-0 mt-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-digilayn-on-error-container dark:text-digilayn-error uppercase text-xs tracking-wider">Emergency Alert</h3>
+                        <h2 class="text-lg font-bold text-digilayn-on-surface dark:text-digilayn-on-surface">${alert.title}</h2>
+                        <p class="text-sm opacity-80 leading-tight mt-1">${alert.content}</p>
+                    </div>
+                </div>
+            `).join('');
+            container.classList.remove('hidden');
+        }
+        const newsSlider = document.getElementById('news-slider');
+        newsSlider.addEventListener('mouseenter', () => {
+            if (newsUpdates.length > 1) {
+                clearInterval(sliderInterval);
+            }
+        });
+        newsSlider.addEventListener('mouseleave', () => {
+            if (newsUpdates.length > 1) {
+                resetSliderTimer();
+            }
+        });
+        function resetSliderTimer() {
+            clearInterval(sliderInterval);
+            sliderInterval = setInterval(() => {
+                showNextNews();
+            }, 10000);
+        }
+        function showNextNews() {
+            currentNewsIndex = (currentNewsIndex + 1) % newsUpdates.length;
+            renderNewsSlide();
+        }
+        function showPrevNews() {
+            currentNewsIndex = (currentNewsIndex - 1 + newsUpdates.length) % newsUpdates.length;
+            renderNewsSlide();
+        }
+        document.getElementById('next-news').addEventListener('click', () => {
+            showNextNews();
+            resetSliderTimer();
+        });
+        document.getElementById('prev-news').addEventListener('click', () => {
+            showPrevNews();
+            resetSliderTimer();
+        });
+        function renderNewsSlide() {
+            const news = newsUpdates[currentNewsIndex];
+            const contentArea = document.getElementById('news-content-area');
+            const dotsArea = document.getElementById('slider-dots');
+            contentArea.style.opacity = '0';
+            setTimeout(() => {
+                let typeLabel = '';
+                let typeColor = 'bg-digilayn-primary';
+                let actionButton = '';
+                if (news.type === 'event') {
+                    typeLabel = '📅 EVENT';
+                    typeColor = 'bg-digilayn-info';
+                } else if (news.type === 'promo') {
+                    typeLabel = '🎁 PROMO';
+                    typeColor = 'bg-digilayn-tertiary';
+                    if (news.promoBusiness) {
+                        actionButton = `
+                            <button onclick="showPromoBusiness('${news.promoBusiness.id}', '${news.promoBusiness.collection}')"
+                                    class="mt-4 px-6 py-2 ${typeColor} text-digilayn-on-primary font-bold rounded-full hover:scale-105 transition-transform shadow-md text-sm uppercase tracking-wider">
+                                View Promo
+                            </button>`;
+                    }
+                }
+                if (news.externalLink && news.externalLink.url) {
+                    const btnName = news.externalLink.name || 'View More';
+                    actionButton = `
+                        <button onclick="window.open('${news.externalLink.url}', '_blank')"
+                                class="mt-4 px-6 py-2 bg-digilayn-primary text-digilayn-on-primary font-bold rounded-full hover:scale-105 transition-transform shadow-md text-sm uppercase tracking-wider digilayn-button">
+                            ${btnName}
+                        </button>`;
+                }
+                contentArea.innerHTML = `
+                    <div class="flex flex-col items-center">
+                        ${typeLabel ? `<span class="${typeColor} text-[10px] text-digilayn-on-primary font-black px-2 py-0.5 rounded mb-2">${typeLabel}</span>` : ''}
+                        <h2 class="text-2xl md:text-3xl font-black mb-2 text-center text-digilayn-on-surface dark:text-digilayn-on-surface leading-tight">${news.title}</h2>
+                        <p class="text-lg opacity-80 text-center max-w-lg leading-relaxed">${news.content}</p>
+                        ${actionButton}
+                    </div>
+                `;
+                contentArea.style.opacity = '1';
+                if (newsUpdates.length > 1) {
+                    dotsArea.innerHTML = newsUpdates.map((_, i) => `
+                        <div onclick="goToNews(${i})" class="cursor-pointer w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentNewsIndex ? 'bg-digilayn-primary w-4' : 'bg-digilayn-surface-container-highest dark:bg-digilayn-surface-container-highest'}"></div>
+                    `).join('');
+                } else {
+                    dotsArea.innerHTML = '';
+                }
+            }, 300);
+        }
+        window.goToNews = (index) => {
+            currentNewsIndex = index;
+            renderNewsSlide();
+            resetSliderTimer();
+        };
+        window.showPromoBusiness = async (id, collection) => {
+            const modal = document.getElementById('business-modal');
+            const content = document.getElementById('business-modal-content');
+            content.innerHTML = `
+                <div class="p-12 text-center">
+                    <div class="w-10 h-10 border-4 border-digilayn-primary border-t-digilayn-primary rounded-full animate-spin mx-auto mb-4"></div>
+                    <p class="opacity-70">Opening business profile...</p>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            try {
+                const doc = await db.collection('poortjie').doc('services').collection(collection).doc(id).get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    const card = await renderServiceCard({id: doc.id, ...data}, collection);
+                    content.innerHTML = '';
+                    content.appendChild(card);
+                } else {
+                    content.innerHTML = '<p class="p-8 text-center opacity-70">Business not found.</p>';
+                }
+            } catch (error) {
+                console.error("Error fetching business:", error);
+                content.innerHTML = '<p class="p-8 text-center text-digilayn-error">Error loading business profile.</p>';
+            }
+        };
+        window.closeBusinessModal = () => {
+            document.getElementById('business-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+        document.getElementById('business-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'business-modal') {
+                closeBusinessModal();
+            }
+        });
+        function fetchNews() {
+            const now = new Date();
+            try {
+                const cachedNews = sessionStorage.getItem('newsUpdatesCache');
+                const cachedAlerts = sessionStorage.getItem('alertUpdatesCache');
+                if (cachedNews) newsUpdates = JSON.parse(cachedNews);
+                if (cachedAlerts) alertUpdates = JSON.parse(cachedAlerts);
+                if (newsUpdates.length > 0 || alertUpdates.length > 0) {
+                    startNewsSlider();
+                }
+            } catch (e) {
+                console.error("Error reading news cache:", e);
+            }
+            db.collection('poortjie').doc('news').collection('updates')
+                .where('status', '==', 'active')
+                .get()
+                .then(snapshot => {
+                    const newNewsUpdates = [];
+                    const newAlertUpdates = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const isExpired = data.expiry && data.expiry.toDate() < now;
+                        const isFuture = data.showFrom && data.showFrom.toDate() > now;
+                        if (!isExpired && !isFuture) {
+                            if (data.type === 'alert') {
+                                newAlertUpdates.push({id: doc.id, ...data});
+                            } else {
+                                newNewsUpdates.push({id: doc.id, ...data});
+                            }
+                        }
+                    });
+                    const sortFn = (a, b) => {
+                        const dateA = a.createdAt?.toDate() || new Date(0);
+                        const dateB = b.createdAt?.toDate() || new Date(0);
+                        return dateB - dateA;
+                    };
+                    newNewsUpdates.sort(sortFn);
+                    newAlertUpdates.sort(sortFn);
+                    const finalNews = newNewsUpdates.slice(0, 5);
+                    const finalAlerts = newAlertUpdates.slice(0, 2);
+                    if (JSON.stringify(finalNews) !== JSON.stringify(newsUpdates) ||
+                        JSON.stringify(finalAlerts) !== JSON.stringify(alertUpdates)) {
+                        newsUpdates = finalNews;
+                        alertUpdates = finalAlerts;
+                        try {
+                            sessionStorage.setItem('newsUpdatesCache', JSON.stringify(newsUpdates));
+                            sessionStorage.setItem('alertUpdatesCache', JSON.stringify(alertUpdates));
+                        } catch (e) {
+                            console.error("Error saving news cache:", e);
+                        }
+                        startNewsSlider();
+                    }
+                }).catch(error => {
+                    console.error("Error fetching news:", error);
+                    if (error.message && error.message.includes('index')) {
+                        console.warn("Firestore Index Required: " + error.message);
+                    }
+                    document.getElementById('news-slider-container').classList.add('hidden');
+                    document.getElementById('hero-static-text').classList.remove('hidden');
+                });
+        }
+        fetchAndRenderServices();
+        fetchNews();
+        const hamburgerMenu = document.getElementById('hamburger-menu');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const menuItems = document.getElementById('menu-items');
+        const profileLink = document.getElementById('profile-link');
+        const adminLink = document.getElementById('admin-link');
+        const homeAdminLink = document.getElementById('home-admin-link');
+        const taxiAdminLink = document.getElementById('taxi-admin-link');
+        const newsAdminLink = document.getElementById('news-admin-link');
+        const authDivider = document.getElementById('auth-divider');
+        const loginLink = document.getElementById('login-link');
+        const logoutBtn = document.getElementById('logout-btn');
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menuItems.classList.toggle('hidden');
+        });
+        // --- Auth UI: a pure View bound to the global AuthStore (MVVM) ---
+        // renderAuthUI is a "dumb" render: given state, it reflects it in the DOM.
+        // All login logic lives in AuthStore; this page only reacts to state.
+        function renderAuthUI(state) {
+            const resolved = state.status !== 'loading';
+            const isAuth = state.isAuthenticated;
+            const user = state.user;
+            const roles = (user && user.roles) || {};
+
+            if (authDivider) authDivider.classList.toggle('hidden', !resolved);
+            if (loginLink) loginLink.classList.toggle('hidden', isAuth);
+            if (logoutBtn) logoutBtn.classList.toggle('hidden', !isAuth);
+
+            if (profileLink) {
+                profileLink.classList.toggle('hidden', !isAuth);
+                if (isAuth) {
+                    const name = user.displayName || 'Profile';
+                    if (user.photoUrl) {
+                        profileLink.innerHTML = `<img src="${user.photoUrl}" class="w-6 h-6 rounded-full inline-block mr-2 object-cover" alt="" onerror="this.src='favicon/favicon-48x48.png'"> ${name}`;
+                    } else {
+                        profileLink.textContent = name;
+                    }
+                } else {
+                    profileLink.innerHTML = 'Profile';
+                }
+            }
+
+            if (adminLink) adminLink.classList.toggle('hidden', !(roles.isSuperUser || roles.isPoortjieAdmin));
+            if (newsAdminLink) newsAdminLink.classList.toggle('hidden', !(roles.isSuperUser || roles.isPoortjieAdmin));
+            if (homeAdminLink) homeAdminLink.classList.toggle('hidden', !roles.isSuperUser);
+            if (taxiAdminLink) taxiAdminLink.classList.toggle('hidden', !(roles.isSuperUser || roles.isTaxiRankAdmin));
+        }
+
+        AuthStore.subscribe(renderAuthUI);
+        AuthStore.init();
+
+        logoutBtn.addEventListener('click', () => {
+            AuthStore.signOut();
+        });
+        window.onclick = (e) => {
+            if (hamburgerMenu && !hamburgerMenu.contains(e.target)) menuItems.classList.add('hidden');
+        };
+    };
+    console.log("website developed by Musa Mgijima");
+</script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html data-theme-default="light" lang="en">
+<head>
+    <link rel="stylesheet" href="../styles/digilayn-theme.css">
+    <script src="../scripts/theme.js"></script>
+    <script src="/scripts/site.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Transport Manager | Poortjie Services</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="icon" type="image/png" sizes="48x48" href="../favicon/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="../favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="../favicon/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="../favicon/apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../scripts/digilayn-tailwind.js"></script>
+    <script>
+        if (window.console && window.console.log) {
+            const originalLog = window.console.log;
+            window.console.log = function() {
+                if (arguments[0] && typeof arguments[0] === 'string' && (arguments[0].includes('cdn.tailwindcss.com should not be used in production') || arguments[0].includes('Tailwind CSS: You should not use the CDN'))) return;
+                originalLog.apply(window.console, arguments);
+            };
+        }
+    </script>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="manifest" href="../favicon/site.webmanifest">
+    <link rel="stylesheet" href="../styles/digilayn-components.css">
+</head>
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
+
+<div id="admin-content" class="hidden">
+    <header class="max-w-6xl mx-auto pt-24 pb-16 px-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-extrabold mb-4 tracking-tight">Public Transport Manager</h1>
+                <p id="welcome-message" class="text-xl opacity-80">Manage news, taxi routes, and bus schedules for Poortjie</p>
+            </div>
+            <a href="../"
+               onclick="if(history.length > 1) { history.back(); return false; } else { window.top.location.replace('../'); return false; }"
+               class="w-full md:w-auto text-center px-6 py-3 border-2 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary font-bold rounded-lg hover:bg-digilayn-primary hover:text-digilayn-on-primary transition whitespace-nowrap">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Home
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 pb-24 space-y-8">
+        <!-- Tabs Section -->
+        <div class="flex border-b border-digilayn-outline-variant dark:border-digilayn-outline-variant mb-8">
+            <button id="tab-taxis" class="px-6 py-3 font-bold text-lg border-b-4 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary">
+                <i class="fas fa-taxi mr-2"></i>Taxis
+            </button>
+            <button id="tab-buses" class="px-6 py-3 font-bold text-lg border-b-4 border-transparent text-digilayn-on-surface-variant hover:text-digilayn-primary transition">
+                <i class="fas fa-bus mr-2"></i>Buses
+            </button>
+        </div>
+
+        <!-- News Management -->
+        <div class="card p-8 rounded-2xl bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low shadow-xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary">Latest News & Updates</h2>
+                <button id="add-news-btn"
+                        class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition text-sm digilayn-button">
+                    <i class="fas fa-plus mr-2"></i>Add News
+                </button>
+            </div>
+            <div id="news-list" class="space-y-3">
+                <!-- News items will be injected here -->
+            </div>
+        </div>
+
+        <!-- Routes Management -->
+        <div class="card p-8 rounded-2xl bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low shadow-xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="routes-title" class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary">Taxi Routes & Fares</h2>
+                <button id="add-route-btn"
+                        class="px-4 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg font-bold hover:bg-digilayn-primary transition text-sm digilayn-button">
+                    <i class="fas fa-plus mr-2"></i>Add Route
+                </button>
+            </div>
+            <div id="routes-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Route items will be injected here -->
+            </div>
+        </div>
+
+        <div id="status-message" class="fixed bottom-10 right-10 p-4 rounded-lg shadow-2xl hidden z-50"></div>
+    </main>
+
+    <!-- News Modal -->
+    <div id="news-modal"
+         class="fixed inset-0 bg-digilayn-scrim/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-2xl p-8 max-w-lg w-full shadow-2xl">
+            <h3 id="news-modal-title" class="text-2xl font-bold mb-6 text-digilayn-primary">Add News</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold mb-2 opacity-70">News Content</label>
+                    <label for="news-content"></label><textarea id="news-content" rows="4"
+                                                                class="w-full p-4 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
+                                                                placeholder="e.g., Taxi fares will increase by R2 starting next month."></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-4">
+                    <button id="close-news-modal"
+                            class="px-6 py-2 border rounded-lg hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high transition font-bold">
+                        Cancel
+                    </button>
+                    <button id="save-news-item"
+                            class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg hover:bg-digilayn-primary transition font-bold digilayn-button">
+                        Save News
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Route Modal -->
+    <div id="route-modal"
+         class="fixed inset-0 bg-digilayn-scrim/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h3 id="route-modal-title" class="text-2xl font-bold mb-6 text-digilayn-primary">Add Route</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold mb-2 opacity-70">Origin</label>
+                    <label for="route-origin"></label><input type="text" id="route-origin"
+                                                             class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
+                                                             value="Poortjie">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2 opacity-70">Destination</label>
+                    <label for="route-destination"></label><input type="text" id="route-destination"
+                                                                  class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
+                                                                  placeholder="e.g., Lenasia">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2 opacity-70">Fare (Rand)</label>
+                    <label for="route-fare"></label><input type="number" id="route-fare"
+                                                           class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
+                                                           placeholder="e.g., 25">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2 opacity-70">Operating Hours</label>
+                    <label for="route-hours"></label><input type="text" id="route-hours"
+                                                            class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
+                                                            placeholder="e.g., 6am - 8pm">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-2 opacity-70">Route Type</label>
+                    <label for="route-type"></label><select id="route-type"
+                                                            class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none">
+                        <option value="standard">Standard</option>
+                        <option value="morning_only">Morning Only</option>
+                        <option value="afternoon_only">Afternoon Only</option>
+                        <option value="express">Express</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2 pt-8">
+                    <input type="checkbox" id="route-returns" class="w-5 h-5 accent-digilayn-primary">
+                    <label for="route-returns" class="text-sm font-bold opacity-70">Returns available?</label>
+                </div>
+                <div class="col-span-full">
+                    <label class="block text-sm font-bold mb-2 opacity-70">Station/Rank Location Name/Info</label>
+                    <label for="route-location"></label><input type="text" id="route-location"
+                                                               class="w-full p-3 border rounded-lg bg-digilayn-surface dark:bg-digilayn-surface dark:border-digilayn-outline-variant focus:ring-2 focus:ring-digilayn-primary outline-none"
+                                                               placeholder="e.g., Lenasia Main Taxi Rank or Bus Station">
+                </div>
+                <div class="col-span-full">
+                    <label class="block text-sm font-bold mb-2 opacity-70">Rank Coordinates (Google Maps Pin)</label>
+                    <div class="flex gap-2 mb-2">
+                        <label for="route-lat"></label><input type="text" id="route-lat" readonly
+                                                              class="flex-grow p-3 border rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high dark:border-digilayn-outline-variant outline-none text-sm"
+                                                              placeholder="Latitude">
+                        <label for="route-lng"></label><input type="text" id="route-lng" readonly
+                                                              class="flex-grow p-3 border rounded-lg bg-digilayn-surface-container-low dark:bg-digilayn-surface-container-high dark:border-digilayn-outline-variant outline-none text-sm"
+                                                              placeholder="Longitude">
+                    </div>
+                    <div id="map"
+                         class="w-full h-64 rounded-lg bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high relative flex items-center justify-center overflow-hidden">
+                        <p class="text-sm opacity-70">Loading Map...</p>
+                    </div>
+                    <p class="text-xs mt-2 opacity-70">Click on the map to set the rank location pin.</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-8 border-t dark:border-digilayn-outline-variant mt-6">
+                <button id="close-route-modal"
+                        class="px-6 py-2 border rounded-lg hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high transition font-bold">
+                    Cancel
+                </button>
+                <button id="save-route-item"
+                        class="px-6 py-2 bg-digilayn-primary text-digilayn-on-primary rounded-lg hover:bg-digilayn-primary transition font-bold digilayn-button">
+                    Save Route
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../scripts/account-access-core.js"></script>
+<script src="../scripts/account-access-compat.js"></script>
+<script src="../scripts/shared-profile-repository.js"></script>
+<script src="../scripts/build-target.js"></script>
+<script src="../scripts/firebase.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<!-- Leaflet for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+    const newsList = document.getElementById('news-list');
+    const routesList = document.getElementById('routes-list');
+    const statusMsg = document.getElementById('status-message');
+    const tabTaxis = document.getElementById('tab-taxis');
+    const tabBuses = document.getElementById('tab-buses');
+    const routesTitle = document.getElementById('routes-title');
+    const addRouteBtn = document.getElementById('add-route-btn');
+
+    let currentMode = 'taxis'; // 'taxis' or 'buses'
+
+    tabTaxis.onclick = () => switchTab('taxis');
+    tabBuses.onclick = () => switchTab('buses');
+
+    function switchTab(mode) {
+        currentMode = mode;
+        if (mode === 'taxis') {
+            tabTaxis.className = 'px-6 py-3 font-bold text-lg border-b-4 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary';
+            tabBuses.className = 'px-6 py-3 font-bold text-lg border-b-4 border-transparent text-digilayn-on-surface-variant hover:text-digilayn-primary transition';
+            routesTitle.textContent = 'Taxi Routes & Fares';
+            addRouteBtn.innerHTML = '<i class="fas fa-plus mr-2"></i>Add Taxi Route';
+        } else {
+            tabBuses.className = 'px-6 py-3 font-bold text-lg border-b-4 border-digilayn-primary text-digilayn-primary dark:text-digilayn-primary';
+            tabTaxis.className = 'px-6 py-3 font-bold text-lg border-b-4 border-transparent text-digilayn-on-surface-variant hover:text-digilayn-primary transition';
+            routesTitle.textContent = 'Bus Routes & Fares';
+            addRouteBtn.innerHTML = '<i class="fas fa-plus mr-2"></i>Add Bus Route';
+        }
+        renderRoutes();
+    }
+
+    // Modals
+    const newsModal = document.getElementById('news-modal');
+    const routeModal = document.getElementById('route-modal');
+
+    // Map
+    let map;
+    let marker;
+    let selectedLat = null;
+    let selectedLng = null;
+
+    function initMap() {
+        if (map) return;
+
+        // Default center to Poortjie rank
+        map = L.map('map').setView([-26.456778308219796, 27.767730640546663], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        map.on('click', function (e) {
+            setMarker(e.latlng.lat, e.latlng.lng);
+        });
+    }
+
+    function setMarker(lat, lng) {
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng]).addTo(map);
+        }
+        selectedLat = lat;
+        selectedLng = lng;
+        document.getElementById('route-lat').value = lat.toFixed(6);
+        document.getElementById('route-lng').value = lng.toFixed(6);
+    }
+
+    // State
+    let currentData = {news: [], routes: {}, busRoutes: {}};
+    let editingNewsIndex = -1;
+    let editingRouteKey = null;
+
+    function showStatus(message, isError = false) {
+        statusMsg.textContent = message;
+        statusMsg.classList.remove('hidden', 'bg-digilayn-error', 'bg-digilayn-primary', 'text-digilayn-on-primary');
+        statusMsg.classList.add(isError ? 'bg-digilayn-error' : 'bg-digilayn-primary');
+        statusMsg.classList.add('text-digilayn-on-primary');
+        statusMsg.classList.remove('hidden');
+        setTimeout(() => statusMsg.classList.add('hidden'), 5000);
+    }
+
+    AccountAccess.observe(user => {
+        if (user) {
+            db.collection('users').doc(user.uid).get({ source: 'server' }).then(doc => {
+                if (AccountAccess.currentUser?.uid !== user.uid) return;
+                if (doc.exists) {
+                    const userData = doc.data();
+                    const isSuperUser = userData.roles?.digilayn?.isSuperUser === true;
+                    const isTaxiRankAdmin = userData.roles?.poortjie?.isTaxiRankAdmin === true;
+
+                    if (isSuperUser || isTaxiRankAdmin) {
+                        const welcomeMsg = document.getElementById('welcome-message');
+                        const name = userData.displayName || (isSuperUser ? 'Super User' : 'Admin');
+                        welcomeMsg.textContent = `Welcome, ${name}!`;
+
+                        document.getElementById('admin-content').classList.remove('hidden');
+                        loadData();
+                    } else {
+                        window.location.replace('../home');
+                    }
+                } else {
+                    window.location.replace('../home');
+                }
+            });
+        } else {
+            sessionStorage.setItem('redirectUrl', window.location.href);
+            window.location.replace('../authentication/login');
+        }
+    });
+
+    async function loadData() {
+        try {
+            const doc = await db.collection('poortjie').doc('taxi_routes').get();
+            if (doc.exists) {
+                currentData = doc.data();
+                if (!currentData.news) currentData.news = [];
+                if (!currentData.routes) currentData.routes = {};
+                if (!currentData.busRoutes) currentData.busRoutes = {};
+            }
+            renderAll();
+        } catch (err) {
+            console.error("Error loading data:", err);
+            showStatus("Error loading data", true);
+        }
+    }
+
+    function renderAll() {
+        renderNews();
+        renderRoutes();
+    }
+
+    function renderNews() {
+        newsList.innerHTML = currentData.news.length === 0 ?
+            '<p class="text-center py-4 opacity-70 italic text-sm">No news added yet.</p>' : '';
+
+        currentData.news.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-center p-4 bg-digilayn-surface dark:bg-digilayn-surface/50 rounded-lg border border-digilayn-outline-variant dark:border-digilayn-outline-variant';
+            div.innerHTML = `
+                <p class="text-sm flex-grow pr-4">${item}</p>
+                <div class="flex gap-2">
+                    <button onclick="editNews(${index})" class="p-2 text-digilayn-info hover:bg-digilayn-info-container dark:hover:bg-digilayn-info-container/20 rounded-lg transition"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteNews(${index})" class="p-2 text-digilayn-error hover:bg-digilayn-error-container dark:hover:bg-digilayn-error-container/20 rounded-lg transition"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            newsList.appendChild(div);
+        });
+    }
+
+    function renderRoutes() {
+        const routesData = currentMode === 'taxis' ? currentData.routes : (currentData.busRoutes || {});
+        routesList.innerHTML = Object.keys(routesData).length === 0 ?
+            `<p class="col-span-full text-center py-8 opacity-70 italic text-sm">No ${currentMode} routes added yet.</p>` : '';
+
+        // Sort by destination
+        const sortedKeys = Object.keys(routesData).sort((a, b) =>
+            routesData[a].destination.localeCompare(routesData[b].destination)
+        );
+
+        sortedKeys.forEach(key => {
+            const r = routesData[key];
+            const div = document.createElement('div');
+            div.className = 'p-5 bg-digilayn-surface dark:bg-digilayn-surface/50 rounded-xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant flex flex-col justify-between';
+            div.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-digilayn-primary">${r.origin} &rarr;</span>
+                        <span class="font-black text-lg text-digilayn-primary">R${r.fare}</span>
+                    </div>
+                    <h3 class="font-extrabold text-xl mb-1">${r.destination}</h3>
+                    <div class="space-y-1 text-xs opacity-70 mb-4">
+                        <p><i class="fas fa-clock mr-1"></i> ${r.hours}</p>
+                        <p><i class="fas fa-tag mr-1"></i> ${r.type}</p>
+                        ${r.returns ? '<p class="text-digilayn-primary font-semibold"><i class="fas fa-undo mr-1"></i> Return Available</p>' : ''}
+                        ${r.location ? `<p class="truncate"><i class="fas fa-map-marker-alt mr-1"></i> ${r.location}</p>` : ''}
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-4 border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant">
+                    <button onclick="editRoute('${key}')" class="flex-1 py-2 bg-digilayn-info-container text-digilayn-on-info-container dark:bg-digilayn-info/10 dark:text-digilayn-info font-bold rounded-lg text-sm hover:bg-digilayn-info-container transition">Edit</button>
+                    <button onclick="deleteRoute('${key}')" class="flex-1 py-2 bg-digilayn-error-container text-digilayn-on-error-container dark:bg-digilayn-error/10 dark:text-digilayn-error font-bold rounded-lg text-sm hover:bg-digilayn-error-container transition">Delete</button>
+                </div>
+            `;
+            routesList.appendChild(div);
+        });
+    }
+
+    // Modal Controls
+    document.getElementById('add-news-btn').onclick = () => {
+        editingNewsIndex = -1;
+        document.getElementById('news-modal-title').textContent = 'Add News';
+        document.getElementById('news-content').value = '';
+        newsModal.classList.remove('hidden');
+    };
+
+    document.getElementById('add-route-btn').onclick = () => {
+        editingRouteKey = null;
+        document.getElementById('route-modal-title').textContent = currentMode === 'taxis' ? 'Add Taxi Route' : 'Add Bus Route';
+        document.getElementById('route-origin').value = 'Poortjie';
+        document.getElementById('route-destination').value = '';
+        document.getElementById('route-fare').value = '';
+        document.getElementById('route-hours').value = currentMode === 'taxis' ? '6am - 7pm' : '5am - 8pm';
+        document.getElementById('route-type').value = 'standard';
+        document.getElementById('route-returns').checked = true;
+        document.getElementById('route-location').value = '';
+        document.getElementById('route-lat').value = '';
+        document.getElementById('route-lng').value = '';
+        selectedLat = null;
+        selectedLng = null;
+        if (marker) map.removeLayer(marker);
+        marker = null;
+
+        routeModal.classList.remove('hidden');
+        setTimeout(() => {
+            initMap();
+            map.invalidateSize();
+            map.setView([-26.456778308219796, 27.767730640546663], 15);
+        }, 100);
+    };
+
+    document.getElementById('close-news-modal').onclick = () => newsModal.classList.add('hidden');
+    document.getElementById('close-route-modal').onclick = () => routeModal.classList.add('hidden');
+
+    window.editNews = (index) => {
+        editingNewsIndex = index;
+        document.getElementById('news-modal-title').textContent = 'Edit News Item';
+        document.getElementById('news-content').value = currentData.news[index];
+        newsModal.classList.remove('hidden');
+    };
+
+    window.deleteNews = async (index) => {
+        if (confirm('Delete this news item?')) {
+            currentData.news.splice(index, 1);
+            await saveToFirestore('News deleted successfully');
+            renderNews();
+        }
+    };
+
+    window.editRoute = (key) => {
+        editingRouteKey = key;
+        const routesData = currentMode === 'taxis' ? currentData.routes : (currentData.busRoutes || {});
+        const r = routesData[key];
+        document.getElementById('route-modal-title').textContent = `Edit ${currentMode === 'taxis' ? 'Taxi' : 'Bus'} Route`;
+        document.getElementById('route-origin').value = r.origin;
+        document.getElementById('route-destination').value = r.destination;
+        document.getElementById('route-fare').value = r.fare;
+        document.getElementById('route-hours').value = r.hours;
+        document.getElementById('route-type').value = r.type || 'standard';
+        document.getElementById('route-returns').checked = r.returns || false;
+        document.getElementById('route-location').value = r.location || '';
+
+        routeModal.classList.remove('hidden');
+        setTimeout(() => {
+            initMap();
+            map.invalidateSize();
+            if (r.lat && r.lng) {
+                setMarker(r.lat, r.lng);
+                map.setView([r.lat, r.lng], 16);
+            } else {
+                if (marker) map.removeLayer(marker);
+                marker = null;
+                selectedLat = null;
+                selectedLng = null;
+                map.setView([-26.456778308219796, 27.767730640546663], 15);
+            }
+        }, 100);
+    };
+
+    window.deleteRoute = async (key) => {
+        if (confirm(`Delete this ${currentMode === 'taxis' ? 'taxi' : 'bus'} route?`)) {
+            if (currentMode === 'taxis') {
+                delete currentData.routes[key];
+            } else {
+                delete currentData.busRoutes[key];
+            }
+            await saveToFirestore('Route deleted successfully');
+            renderRoutes();
+        }
+    };
+
+    async function saveToFirestore(successMsg = 'Changes saved successfully') {
+        try {
+            const currentUserId = AccountAccess.currentUser?.uid;
+            const dataToSave = {
+                ...currentData,
+                lastModifiedBy: currentUserId,
+                lastModifiedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            await db.collection('poortjie').doc('taxi_routes').set(dataToSave);
+            showStatus(successMsg);
+        } catch (err) {
+            console.error("Error saving data:", err);
+            showStatus('Error saving data: ' + err.message, true);
+        }
+    }
+
+    document.getElementById('save-news-item').onclick = async () => {
+        const content = document.getElementById('news-content').value.trim();
+        if (!content) return alert('News content cannot be empty.');
+
+        const btn = document.getElementById('save-news-item');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        if (editingNewsIndex > -1) {
+            currentData.news[editingNewsIndex] = content;
+        } else {
+            currentData.news.unshift(content);
+        }
+
+        await saveToFirestore('News saved successfully');
+        newsModal.classList.add('hidden');
+        renderNews();
+        btn.disabled = false;
+        btn.textContent = 'Save News';
+    };
+
+    document.getElementById('save-route-item').onclick = async () => {
+        const origin = document.getElementById('route-origin').value.trim();
+        const dest = document.getElementById('route-destination').value.trim();
+        const fare = parseInt(document.getElementById('route-fare').value);
+        const hours = document.getElementById('route-hours').value.trim();
+        const type = document.getElementById('route-type').value;
+        const returns = document.getElementById('route-returns').checked;
+        const location = document.getElementById('route-location').value.trim();
+
+        if (!origin || !dest || isNaN(fare) || !hours) {
+            return alert('Please fill in all required fields.');
+        }
+
+        if (returns && (!selectedLat || !selectedLng)) {
+            return alert('Rank location (map pin) is mandatory for return routes.');
+        }
+
+        const btn = document.getElementById('save-route-item');
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+
+        const routeData = {
+            origin,
+            destination: dest,
+            fare,
+            hours,
+            returns,
+            type,
+            location,
+            lat: selectedLat,
+            lng: selectedLng
+        };
+
+        const key = editingRouteKey || `${origin.toLowerCase().replace(/\s+/g, '_')}_to_${dest.toLowerCase().replace(/\s+/g, '_')}`;
+
+        if (currentMode === 'taxis') {
+            currentData.routes[key] = routeData;
+        } else {
+            if (!currentData.busRoutes) currentData.busRoutes = {};
+            currentData.busRoutes[key] = routeData;
+        }
+
+        await saveToFirestore('Route saved successfully');
+        routeModal.classList.add('hidden');
+        renderRoutes();
+        btn.disabled = false;
+        btn.textContent = 'Save Route';
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html data-theme-default="light" lang="en">
+<head>
+    <link rel="stylesheet" href="styles/digilayn-theme.css">
+    <script src="scripts/theme.js"></script>
+    <script src="/scripts/site.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poortjie Marketplace | Buy & Sell Local</title>
+    <meta name="author" content="Musa Mgijima">
+    <meta name="description"
+          content="Connect with the Poortjie community. Buy and sell electronics, vehicles, property, and clothing. The best local Kasi marketplace.">
+    <meta name="keywords"
+          content="Poortjie, Marketplace, Buy and Sell, Kasi economy, local trade, South Africa, Township deals">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://poortjie.info/market">
+    <meta property="og:title" content="Poortjie Marketplace | Buy & Sell Local">
+    <meta property="og:description" content="Find the best deals in Poortjie. Post your items for free and reach your local community.">
+    <meta property="og:image" content="https://poortjie.services/favicon/web-app-manifest-512x512.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://poortjie.info/market">
+    <meta property="twitter:title" content="Poortjie Marketplace | Buy & Sell Local">
+    <meta property="twitter:description" content="Find the best deals in Poortjie. Post your items for free and reach your local community.">
+    <meta property="twitter:image" content="https://poortjie.services/favicon/web-app-manifest-512x512.png">
+
+    <link rel="icon" type="image/png" sizes="48x48" href="favicon/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png">
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="scripts/digilayn-tailwind.js"></script>
+    <script>
+        if (window.console && window.console.log) {
+            const originalLog = window.console.log;
+            window.console.log = function() {
+                if (arguments[0] && typeof arguments[0] === 'string' && (arguments[0].includes('cdn.tailwindcss.com should not be used in production') || arguments[0].includes('Tailwind CSS: You should not use the CDN'))) return;
+                originalLog.apply(window.console, arguments);
+            };
+        }
+        </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .category-pill.active {
+            background-color: var(--digilayn-primary);
+            color: var(--digilayn-on-primary);
+        }
+        .item-card img {
+            aspect-ratio: 1/1;
+            object-fit: cover;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .image-carousel-container {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .image-carousel-item {
+            scroll-snap-align: center;
+            flex: 0 0 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="styles/digilayn-components.css">
+</head>
+<body class="font-sans antialiased bg-digilayn-surface bg-digilayn-surface text-digilayn-on-surface dark:text-digilayn-on-surface">
+
+<div class="fixed top-5 left-5 z-50">
+    <a href="services/market-form" id="sell-item-btn"
+       class="p-3 pr-5 rounded-full bg-digilayn-primary text-digilayn-on-primary shadow-lg hover:bg-digilayn-primary transition flex items-center gap-2 digilayn-button"
+       title="Sell Something">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span class="font-bold text-sm">Sell</span>
+    </a>
+</div>
+
+<div class="fixed top-5 right-5 z-50 flex gap-3" id="user-controls">
+    <div id="hamburger-menu" class="relative">
+        <button id="hamburger-btn"
+                class="p-3 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant shadow-lg hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high transition border border-digilayn-outline-variant dark:border-digilayn-outline-variant">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+        <div id="menu-items"
+             class="hidden absolute right-0 mt-2 w-48 bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-md shadow-lg py-1 ring-1 ring-digilayn-shadow ring-opacity-5">
+            <a href="home" class="block px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Services Home</a>
+            <div class="border-t border-digilayn-outline-variant dark:border-digilayn-outline-variant my-1"></div>
+            <button id="menu-theme-toggle"
+                    class="w-full text-left px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high flex items-center gap-3">
+                <span id="menu-theme-icon">🌓</span> Mode
+            </button>
+            <a href="authentication/profile" class="block px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Profile</a>
+            <a href="support" class="block px-4 py-2 text-sm text-digilayn-on-surface-variant dark:text-digilayn-on-surface hover:bg-digilayn-surface-container-low dark:hover:bg-digilayn-surface-container-high">Support</a>
+        </div>
+    </div>
+</div>
+
+<header class="max-w-6xl mx-auto pt-24 pb-8 px-6">
+    <div class="flex flex-col md:flex-row justify-between items-end gap-4">
+        <div>
+            <h1 class="text-4xl font-extrabold tracking-tight">Marketplace</h1>
+            <p class="text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant">Buy and sell in Poortjie</p>
+        </div>
+        <div class="w-full md:w-96">
+            <div class="relative">
+                <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-digilayn-on-surface-variant" fill="none"
+                     stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <label for="market-search" class="sr-only">Search marketplace</label>
+                <input type="text" id="market-search" placeholder="Search marketplace..."
+                       class="w-full pl-10 pr-4 py-2 rounded-full border border-digilayn-outline-variant bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low dark:border-digilayn-outline-variant dark:text-digilayn-on-surface focus:outline-none focus:ring-2 focus:ring-digilayn-primary shadow-sm">
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="flex gap-2 mt-8 overflow-x-auto pb-2 no-scrollbar" id="categories-container">
+        <button class="category-pill active whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="all">All</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Electronics">Electronics</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Vehicles">Vehicles</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Property">Property</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Clothing">Clothing</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Home">Home</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition" data-category="Other">Other</button>
+        <button class="category-pill whitespace-nowrap px-4 py-1.5 rounded-full bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low border border-digilayn-outline-variant dark:border-digilayn-outline-variant text-sm font-medium transition hidden" id="my-listings-pill" data-category="my-listings">My Listings</button>
+    </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-6 pb-24">
+    <div id="items-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <!-- Skeleton Loading -->
+        <div class="animate-pulse bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high aspect-square"></div>
+            <div class="p-3 space-y-2">
+                <div class="h-4 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-1/2"></div>
+                <div class="h-4 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-3/4"></div>
+                <div class="h-3 bg-digilayn-surface-container-high dark:bg-digilayn-surface-container-high rounded w-1/3"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="no-items" class="hidden text-center py-20">
+        <div class="text-6xl mb-4">🛍️</div>
+        <h2 class="text-xl font-bold">No items found</h2>
+        <p class="text-digilayn-on-surface-variant">Try adjusting your search or category.</p>
+    </div>
+</main>
+
+<!-- Item Detail Modal -->
+<div id="item-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-0 md:p-4 bg-digilayn-scrim/60 backdrop-blur-sm">
+    <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface rounded-none md:rounded-2xl w-full max-w-4xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto shadow-2xl relative flex flex-col md:flex-row">
+        <button onclick="closeItemModal()" class="absolute top-4 right-4 z-20 p-2 bg-digilayn-surface-container-lowest/80 dark:bg-digilayn-surface-container-low/80 backdrop-blur rounded-full shadow-lg text-digilayn-on-surface-variant hover:text-digilayn-on-surface-variant dark:hover:text-digilayn-on-surface-variant">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
+        <div class="w-full md:w-1/2 bg-digilayn-scrim flex flex-col items-center justify-center relative min-h-[300px] md:min-h-[500px]">
+            <div id="carousel-viewport" class="w-full h-full flex overflow-x-auto no-scrollbar image-carousel-container">
+                <!-- Images will be injected here -->
+            </div>
+
+            <!-- Indicators -->
+            <div id="carousel-indicators" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10"></div>
+
+            <button id="modal-share-btn" class="absolute bottom-4 right-4 p-3 bg-digilayn-surface-container-lowest/20 hover:bg-digilayn-surface-container-lowest/40 backdrop-blur-md text-digilayn-on-primary rounded-full transition shadow-lg z-10" title="Share Item">
+                <i class="fas fa-share-nodes"></i>
+            </button>
+        </div>
+
+        <div class="w-full md:w-1/2 p-6 md:p-8 flex flex-col h-full overflow-y-auto">
+            <div id="modal-content" class="mb-auto">
+                <!-- Content will be injected -->
+            </div>
+
+            <div id="public-actions" class="mt-8 flex gap-3 pb-6 md:pb-0">
+                <button id="modal-whatsapp" class="flex-1 bg-digilayn-primary text-digilayn-on-primary font-bold py-3 rounded-xl text-center hover:bg-digilayn-primary transition flex items-center justify-center gap-2 digilayn-button">
+                    <i class="fab fa-whatsapp text-xl"></i> <span>Message</span>
+                </button>
+                <button id="modal-call" class="flex-1 bg-digilayn-info text-digilayn-on-info font-bold py-3 rounded-xl text-center hover:bg-digilayn-info transition flex items-center justify-center gap-2 digilayn-button">
+                    <i class="fas fa-phone"></i> <span>Call</span>
+                </button>
+            </div>
+
+            <div id="owner-actions" class="hidden mt-8 flex flex-col gap-3 pb-6 md:pb-0">
+                <div class="flex gap-3">
+                    <button id="toggle-sold-btn" class="flex-1 bg-digilayn-tertiary text-digilayn-on-tertiary font-bold py-3 rounded-xl hover:bg-digilayn-tertiary transition flex items-center justify-center gap-2 digilayn-button">
+                        <i class="fas fa-check-circle"></i> Mark as Sold
+                    </button>
+                    <button id="toggle-stock-btn" class="flex-1 bg-digilayn-warning text-digilayn-on-warning font-bold py-3 rounded-xl hover:bg-digilayn-warning transition flex items-center justify-center gap-2 digilayn-button">
+                        <i class="fas fa-box-open"></i> Out of Stock
+                    </button>
+                </div>
+                <div class="flex gap-3">
+                    <button id="edit-item-btn" class="flex-1 bg-digilayn-primary-container text-digilayn-on-primary-container font-bold py-3 rounded-xl hover:bg-digilayn-primary-container transition flex items-center justify-center gap-2">
+                        <i class="fas fa-edit"></i> Edit Listing
+                    </button>
+                    <button id="delete-item-btn" class="flex-1 bg-digilayn-error-container text-digilayn-on-error-container font-bold py-3 rounded-xl hover:bg-digilayn-error-container transition flex items-center justify-center gap-2">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fullscreen Gallery -->
+<div id="gallery-fullscreen" class="fixed inset-0 z-[150] hidden flex items-center justify-center bg-digilayn-scrim">
+    <button onclick="closeFullscreen()" class="absolute top-6 right-6 z-20 p-3 bg-digilayn-surface-container-lowest/10 hover:bg-digilayn-surface-container-lowest/20 backdrop-blur rounded-full text-digilayn-on-primary transition">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+    <img id="fullscreen-img" src="" class="max-w-full max-h-full object-contain" alt="">
+</div>
+
+<!-- Login Alert Modal -->
+<div id="login-alert-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4 bg-digilayn-scrim/60 backdrop-blur-sm">
+    <div class="bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center">
+        <div class="w-16 h-16 bg-digilayn-primary-container dark:bg-digilayn-primary/10 text-digilayn-on-primary-container dark:text-digilayn-primary rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+            <i class="fas fa-user-lock"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Login Required</h3>
+        <p class="opacity-70 mb-6">You need to be logged in to contact sellers or post items.</p>
+        <div class="flex gap-3">
+            <button onclick="document.getElementById('login-alert-modal').classList.add('hidden')" class="flex-1 py-3 border border-digilayn-outline-variant dark:border-digilayn-outline-variant rounded-xl font-bold hover:bg-digilayn-surface dark:hover:bg-digilayn-surface-container-high transition">Cancel</button>
+            <button onclick="window.location.href='authentication/login'" class="flex-1 py-3 bg-digilayn-primary text-digilayn-on-primary rounded-xl font-bold hover:bg-digilayn-primary transition shadow-lg digilayn-button">Login Now</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="scripts/account-access-core.js"></script>
+<script src="scripts/account-access-compat.js"></script>
+<script src="scripts/shared-profile-repository.js"></script>
+<script src="scripts/build-target.js"></script>
+<script src="scripts/firebase.js"></script>
+
+<script>
+    let allItems = [];
+    let currentCategory = 'all';
+
+    const itemsGrid = document.getElementById('items-grid');
+    const noItems = document.getElementById('no-items');
+    const searchInput = document.getElementById('market-search');
+    const categoryPills = document.querySelectorAll('.category-pill');
+    const myListingsPill = document.getElementById('my-listings-pill');
+
+    // --- Analytics Helper ---
+    const logMarketEvent = (eventName, params = {}) => {
+        if (typeof analytics !== 'undefined') {
+            analytics.logEvent(eventName, params);
+        }
+    };
+
+    // --- Scroll Depth Tracking ---
+    let scrollDepthsTracked = new Set();
+    window.addEventListener('scroll', () => {
+        const h = document.documentElement,
+              b = document.body,
+              st = 'scrollTop',
+              sh = 'scrollHeight';
+        const percent = (h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight) * 100;
+
+        [25, 50, 75, 90].forEach(depth => {
+            if (percent >= depth && !scrollDepthsTracked.has(depth)) {
+                scrollDepthsTracked.add(depth);
+                logMarketEvent('scroll_depth', {
+                    percentage: depth,
+                    page_location: window.location.pathname
+                });
+            }
+        });
+    });
+
+    function renderItems(items) {
+        if (items.length === 0) {
+            itemsGrid.innerHTML = '';
+            noItems.classList.remove('hidden');
+            return;
+        }
+        noItems.classList.add('hidden');
+
+        itemsGrid.innerHTML = items.map(item => {
+            let statusBadge = '';
+            let opacity = 'opacity-100';
+
+            if (item.status === 'out of stock') {
+                statusBadge = '<div class="absolute top-2 right-2 bg-digilayn-warning text-digilayn-on-warning text-[10px] font-black px-2 py-0.5 rounded shadow-sm">OUT OF STOCK</div>';
+            } else if (item.status === 'sold') {
+                statusBadge = '<div class="absolute top-2 right-2 bg-digilayn-tertiary text-digilayn-on-tertiary text-[10px] font-black px-2 py-0.5 rounded shadow-sm">SOLD</div>';
+                opacity = 'opacity-70';
+            }
+
+            return `
+                <div class="item-card group bg-digilayn-surface-container-lowest dark:bg-digilayn-surface-container-low rounded-xl overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer border border-digilayn-outline-variant dark:border-digilayn-outline-variant ${opacity}" onclick="openItemModal('${item.id}')">
+                    <div class="relative aspect-square overflow-hidden">
+                        <img src="${item.images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/400?text=No+Image'}"
+                             alt="${item.title}"
+                             class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-2 left-2 bg-digilayn-scrim/50 backdrop-blur-md text-digilayn-inverse-on-surface text-[10px] font-bold px-2 py-0.5 rounded">
+                            ${item.category}
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-bold text-lg text-digilayn-primary dark:text-digilayn-primary">R${item.price}</h3>
+                        <h4 class="text-sm font-medium line-clamp-2 mb-1">${item.title}</h4>
+                        <p class="text-[10px] text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant flex items-center gap-1">
+                            <i class="fas fa-map-marker-alt"></i> ${item.location || 'Poortjie'}
+                        </p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function filterItems() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const currentUser = AccountAccess.currentUser;
+        let filtered = allItems;
+
+        // Security/Privacy Filter
+        filtered = filtered.filter(item => {
+            if (item.status === 'active' || item.status === 'out of stock') return true;
+            if (item.status === 'sold' && currentUser && item.userId === currentUser.uid) return true;
+            return false;
+        });
+
+        if (currentCategory === 'my-listings') {
+            if (currentUser) {
+                filtered = filtered.filter(item => item.userId === currentUser.uid);
+            }
+        } else if (currentCategory !== 'all') {
+            filtered = filtered.filter(item => item.category === currentCategory);
+        }
+
+        if (searchTerm) {
+            filtered = filtered.filter(item =>
+                item.title.toLowerCase().includes(searchTerm) ||
+                item.description.toLowerCase().includes(searchTerm) ||
+                item.category.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        renderItems(filtered);
+    }
+
+    async function fetchItems() {
+        db.collection('poortjie').doc('market').collection('items')
+            .onSnapshot(snapshot => {
+                allItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                allItems.sort((a, b) => {
+                    const dateA = a.createdAt?.toDate() || new Date(0);
+                    const dateB = b.createdAt?.toDate() || new Date(0);
+                    return dateB - dateA;
+                });
+
+                // Check for direct link
+                const urlParams = new URLSearchParams(window.location.search);
+                const itemId = urlParams.get('id');
+                if (itemId) {
+                    const found = allItems.find(i => i.id === itemId);
+                    if (found) openItemModal(itemId);
+                }
+
+                filterItems();
+            }, error => {
+                console.error("Error fetching market items:", error);
+                itemsGrid.innerHTML = '<p class="col-span-full text-center py-10 opacity-70">Error loading items.</p>';
+            });
+    }
+
+    const modal = document.getElementById('item-modal');
+    const carouselViewport = document.getElementById('carousel-viewport');
+    const carouselIndicators = document.getElementById('carousel-indicators');
+    const modalContent = document.getElementById('modal-content');
+    const modalWhatsApp = document.getElementById('modal-whatsapp');
+    const modalCall = document.getElementById('modal-call');
+    const modalShare = document.getElementById('modal-share-btn');
+    const publicActions = document.getElementById('public-actions');
+    const ownerActions = document.getElementById('owner-actions');
+    const deleteBtn = document.getElementById('delete-item-btn');
+    const soldBtn = document.getElementById('toggle-sold-btn');
+    const stockBtn = document.getElementById('toggle-stock-btn');
+    const editBtn = document.getElementById('edit-item-btn');
+
+    const fullscreenGallery = document.getElementById('gallery-fullscreen');
+    const fullscreenImg = document.getElementById('fullscreen-img');
+
+    window.openFullscreen = (src) => {
+        fullscreenImg.src = src;
+        fullscreenGallery.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeFullscreen = () => {
+        fullscreenGallery.classList.add('hidden');
+        if (!modal.classList.contains('hidden')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    };
+
+    window.openItemModal = (id) => {
+        const item = allItems.find(i => i.id === id);
+        if (!item) return;
+
+        // Analytics: Select & View Item
+        logMarketEvent('select_item', {
+            item_id: id,
+            item_name: item.title,
+            item_category: item.category,
+            price: parseFloat(item.price)
+        });
+
+        logMarketEvent('view_item', {
+            currency: 'ZAR',
+            value: parseFloat(item.price),
+            items: [{
+                item_id: id,
+                item_name: item.title,
+                item_category: item.category,
+                price: parseFloat(item.price)
+            }]
+        });
+
+        // Update URL for sharing without reload
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + id;
+        window.history.pushState({path: newUrl}, '', newUrl);
+
+        const currentUser = AccountAccess.currentUser;
+        const isOwner = currentUser && item.userId === currentUser.uid;
+
+        // Render Carousel
+        const images = item.images && item.images.length > 0 ? item.images : ['https://via.placeholder.com/400?text=No+Image'];
+        carouselViewport.innerHTML = images.map(img => `
+            <div class="image-carousel-item w-full h-full flex-shrink-0 flex items-center justify-center bg-digilayn-scrim cursor-zoom-in" onclick="openFullscreen('${img}')">
+                <img src="${img}" class="w-full h-full object-contain">
+            </div>
+        `).join('');
+
+        // Render Indicators
+        carouselIndicators.innerHTML = images.map((_, idx) => `
+            <div class="w-2 h-2 rounded-full bg-digilayn-surface-container-lowest/30 transition-all duration-300 ${idx === 0 ? 'bg-digilayn-surface-container-lowest w-4' : ''}" data-idx="${idx}"></div>
+        `).join('');
+
+        // Carousel Scroll Listener
+        carouselViewport.onscroll = () => {
+            const width = carouselViewport.offsetWidth;
+            const idx = Math.round(carouselViewport.scrollLeft / width);
+            Array.from(carouselIndicators.children).forEach((dot, i) => {
+                dot.classList.toggle('bg-digilayn-surface-container-lowest', i === idx);
+                dot.classList.toggle('w-4', i === idx);
+                dot.classList.toggle('bg-digilayn-surface-container-lowest/30', i !== idx);
+            });
+        };
+
+        let statusTag = '';
+        if (item.status === 'out of stock') statusTag = '<span class="ml-2 bg-digilayn-warning text-digilayn-on-warning text-[10px] px-2 py-0.5 rounded font-black">OUT OF STOCK</span>';
+        if (item.status === 'sold') statusTag = '<span class="ml-2 bg-digilayn-tertiary text-digilayn-on-tertiary text-[10px] px-2 py-0.5 rounded font-black">SOLD</span>';
+
+        modalContent.innerHTML = `
+            <div class="mb-6">
+                <div class="flex items-center mb-1">
+                    <span class="text-xs font-bold uppercase tracking-widest text-digilayn-primary dark:text-digilayn-primary">${item.category}</span>
+                    ${statusTag}
+                </div>
+                <h2 class="text-3xl font-black mt-1 leading-tight text-digilayn-on-surface dark:text-digilayn-on-surface">${item.title}</h2>
+                <h3 class="text-2xl font-bold text-digilayn-primary dark:text-digilayn-primary mt-2">R${item.price}</h3>
+            </div>
+
+            <div class="space-y-6">
+                <div class="p-4 bg-digilayn-surface dark:bg-digilayn-surface-container-low/50 rounded-2xl border border-digilayn-outline-variant dark:border-digilayn-outline-variant/50">
+                    <h4 class="text-[10px] font-black uppercase opacity-70 tracking-widest mb-2 text-digilayn-on-surface dark:text-digilayn-on-surface">Item Description</h4>
+                    <p class="text-digilayn-on-surface-variant dark:text-digilayn-on-surface-variant leading-relaxed whitespace-pre-wrap">${item.description || 'No description provided.'}</p>
+                </div>
+
+                <div class="flex items-center gap-4 py-4 px-2 border-y border-digilayn-outline-variant dark:border-digilayn-outline-variant">
+                    <div class="w-14 h-14 bg-digilayn-surface-container-high rounded-full overflow-hidden border-2 border-digilayn-primary shadow-sm">
+                        <img src="${item.sellerPhoto || 'https://via.placeholder.com/100'}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 text-digilayn-on-surface dark:text-digilayn-on-surface">
+                        <p class="text-[10px] font-black uppercase opacity-70 tracking-widest mb-0.5">Contact Seller</p>
+                        <p class="font-bold text-lg">${item.sellerName || 'Local Seller'}</p>
+                        <p class="text-xs opacity-70 flex items-center gap-1">
+                            <i class="fas fa-map-marker-alt text-digilayn-primary"></i> ${item.location || 'Poortjie'}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center px-2">
+                    <p class="text-[10px] font-black uppercase opacity-70 tracking-widest flex items-center gap-1 text-digilayn-on-surface dark:text-digilayn-on-surface">
+                        <i class="fas fa-clock"></i> Posted ${item.createdAt ? formatRelativeTime(item.createdAt.toDate()) : 'recently'}
+                    </p>
+                    <p class="text-[10px] font-black uppercase opacity-70 tracking-widest text-digilayn-on-surface dark:text-digilayn-on-surface">
+                        ID: ${id.substring(0,8)}
+                    </p>
+                </div>
+            </div>
+        `;
+
+        modalShare.onclick = (e) => {
+            e.stopPropagation();
+            shareItem(item);
+        };
+
+        if (isOwner) {
+            publicActions.classList.add('hidden');
+            ownerActions.classList.remove('hidden');
+
+            soldBtn.innerHTML = item.status === 'sold' ? '<i class="fas fa-redo"></i> Relist Item' : '<i class="fas fa-check-circle"></i> Mark as Sold';
+            soldBtn.onclick = () => updateItemStatus(id, item.status === 'sold' ? 'active' : 'sold');
+
+            stockBtn.innerHTML = item.status === 'out of stock' ? '<i class="fas fa-box text-sm"></i> Back in Stock' : '<i class="fas fa-box-open text-sm"></i> Out of Stock';
+            stockBtn.onclick = () => updateItemStatus(id, item.status === 'out of stock' ? 'active' : 'out of stock');
+
+            editBtn.onclick = () => {
+                window.location.href = `services/market-form?id=${id}`;
+            };
+
+            deleteBtn.onclick = () => deleteItem(id, item.images);
+        } else {
+            publicActions.classList.remove('hidden');
+            ownerActions.classList.add('hidden');
+
+            const handleContact = (type) => {
+                if (!currentUser) {
+                    document.getElementById('login-alert-modal').classList.remove('hidden');
+                    return;
+                }
+                const phone = item.sellerPhone || '';
+
+                // Analytics: Contact Seller
+                logMarketEvent('contact_seller', {
+                    method: type, // 'call' or 'whatsapp'
+                    item_id: id,
+                    item_name: item.title,
+                    item_category: item.category,
+                    seller_name: item.sellerName
+                });
+
+                if (type === 'call') {
+                    window.location.href = `tel:${phone}`;
+                } else {
+                    window.open(`https://wa.me/27${phone.substring(1)}?text=Hi, I am interested in your ${item.title} on Poortjie Marketplace.`, '_blank');
+                }
+            };
+
+            modalCall.onclick = () => handleContact('call');
+            modalWhatsApp.onclick = () => handleContact('whatsapp');
+
+            if (item.status === 'sold') {
+                publicActions.classList.add('opacity-70', 'pointer-events-none');
+            } else {
+                publicActions.classList.remove('opacity-70', 'pointer-events-none');
+            }
+        }
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+
+    async function shareItem(item) {
+        const shareUrl = window.location.origin + window.location.pathname + '?id=' + item.id;
+        const shareData = {
+            title: `Poortjie Marketplace: ${item.title}`,
+            text: `Check out this ${item.title} for R${item.price} on Poortjie Marketplace!`,
+            url: shareUrl
+        };
+
+        // Analytics: Share Item
+        logMarketEvent('share', {
+            content_type: 'market_item',
+            item_id: item.id,
+            item_name: item.title
+        });
+
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                await navigator.clipboard.writeText(shareUrl);
+                alert("Link copied to clipboard!");
+            }
+        } catch (err) {
+            console.error("Share failed", err);
+        }
+    }
+
+    async function updateItemStatus(id, newStatus) {
+        try {
+            await db.collection('poortjie').doc('market').collection('items').doc(id).update({
+                status: newStatus,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            closeItemModal();
+        } catch (error) {
+            alert("Failed to update status: " + error.message);
+        }
+    }
+
+    async function deleteItem(id, imageUrls = []) {
+        if (!confirm("Are you sure you want to delete this listing permanently? This will also remove all item photos.")) return;
+
+        try {
+            // 1. Delete from Firestore
+            await db.collection('poortjie').doc('market').collection('items').doc(id).delete();
+
+            // 2. Delete images from Storage if they exist
+            if (imageUrls && imageUrls.length > 0) {
+                const storage = firebase.storage();
+                const deletePromises = imageUrls.map(url => {
+                    if (url.includes('firebasestorage.googleapis.com')) {
+                        return storage.refFromURL(url).delete().catch(e => {
+                            console.warn("Storage delete failed for URL:", url, e);
+                        });
+                    }
+                    return Promise.resolve();
+                });
+                await Promise.all(deletePromises);
+            }
+
+            closeItemModal();
+        } catch (error) {
+            alert("Failed to delete listing: " + error.message);
+        }
+    }
+
+    window.closeItemModal = () => {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.pushState({path: newUrl}, '', newUrl);
+    };
+
+    function formatRelativeTime(date) {
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+        if (diffInSeconds < 60) return 'just now';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+        return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    }
+
+    // --- Search Tracking with Debounce ---
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+        const term = searchInput.value.trim();
+        filterItems();
+
+        clearTimeout(searchTimeout);
+        if (term.length > 2) {
+            searchTimeout = setTimeout(() => {
+                logMarketEvent('search_market', {
+                    search_term: term,
+                    category: currentCategory
+                });
+            }, 1000);
+        }
+    });
+
+    // --- Category Tracking ---
+    categoryPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+            const cat = pill.dataset.category;
+            categoryPills.forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            currentCategory = cat;
+
+            logMarketEvent('select_category', {
+                category_name: cat
+            });
+
+            filterItems();
+        });
+    });
+
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const menuItems = document.getElementById('menu-items');
+    hamburgerBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menuItems.classList.toggle('hidden');
+    });
+
+    window.onclick = (e) => {
+        if (e.target === modal) closeItemModal();
+        if (menuItems && !menuItems.contains(e.target)) menuItems.classList.add('hidden');
+    };
+
+    AccountAccess.observe(user => {
+        if (user) {
+            myListingsPill.classList.remove('hidden');
+        } else {
+            myListingsPill.classList.add('hidden');
+            if (currentCategory === 'my-listings') {
+                currentCategory = 'all';
+                categoryPills[0].classList.add('active');
+            }
+        }
+        filterItems();
+    });
+
+    fetchItems();
+</script>
+</body>
+</html>
