@@ -1262,7 +1262,7 @@
 
         activePlannedRequestsUnsub = myRequestsCol.onSnapshot((snap) => {
           myPlannedRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-            .filter(d => !['COMPLETED', 'CANCELLED', 'REJECTED', 'WITHDRAWN'].includes(d.status))
+            .filter(d => !['COMPLETED', 'CANCELLED', 'REJECTED', 'WITHDRAWN', 'EXPIRED'].includes(d.status))
             .sort((a, b) => (readEpochMillis(a.departure || a.startAt) || 0) - (readEpochMillis(b.departure || b.startAt) || 0));
           updatePlannedRideDisplay();
         }, (err) => {
@@ -1278,41 +1278,62 @@
       myPlannedRequests = [];
     }
 
-    // 2. Open community planned rides published by drivers (matching Android Dataset.AVAILABLE_PLANS)
-    try {
-      // TODO: Temporary guest exploration mode - listen to plannedRides collection which has public read permission for welcoming guests.
-      const listingsCol = db.collection('laynfleet').doc(fleetEnvironment).collection('plannedRides');
-      activePlannedListingsUnsub = listingsCol
-        .where('status', 'in', ['OPEN', 'SCHEDULED', 'ACTIVE'])
-        .onSnapshot((snap) => {
-          const now = Date.now();
-          availablePlannedPlans = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-            .filter(p => {
-              const epoch = readEpochMillis(p.startAt || p.departure);
-              // Must not be expired: departure + 5 min must be > now (matches Android)
-              return epoch && (epoch + 5 * 60 * 1000 > now);
-            })
-            .sort((a, b) => (readEpochMillis(a.startAt || a.departure) || 0) - (readEpochMillis(b.startAt || b.departure) || 0));
+    // Poll the same listing source used by the current Android ride discovery.
+    let active = true;
+    let poll;
+    let requestController;
+    activePlannedListingsUnsub = () => {
+      active = false;
+      clearTimeout(poll);
+      requestController?.abort();
+    };
+    async function refreshListings() {
+      const controller = new AbortController();
+      requestController = controller;
+      const timeout = setTimeout(() => controller.abort(), 10_000);
+      try {
+        const headers = { 'X-Layn-App': 'laynrider', 'X-Layn-Environment': fleetEnvironment };
+        if (fleetEnvironment === 'dev' && uid) headers.Authorization = `Bearer ${await currentUser.getIdToken()}`;
+        const response = await fetch('https://api.digilayn.co.za/planned-rides', { headers, signal: controller.signal, cache: 'no-store' });
+        const result = await response.json();
+        if (!response.ok || !Array.isArray(result.data?.plans)) throw new Error('Planned rides are unavailable.');
+        if (active) availablePlannedPlans = result.data.plans;
+        return active;
+      } catch (error) {
+        if (active) console.warn('[LaynRider] Planned ride listings refresh failed:', error);
+        return false;
+      } finally {
+        clearTimeout(timeout);
+        if (active) {
           updatePlannedRideDisplay();
-        }, (err) => {
-          console.warn('[LaynRider] Planned ride listings listener warning:', err);
-          availablePlannedPlans = [];
-          updatePlannedRideDisplay();
-        });
-    } catch (e) {
-      console.warn('[LaynRider] Failed to init planned ride listings listener:', e);
-      availablePlannedPlans = [];
-      updatePlannedRideDisplay();
+          if (plannedModal && !plannedModal.classList.contains('is-hidden')) renderPlannedRidesList();
+          poll = setTimeout(refreshListings, 30_000);
+        }
+      }
     }
+    availablePlannedPlans = [];
+    updatePlannedRideDisplay();
+    return refreshListings();
+  }
+
+  function isAvailablePlannedRide(plan, now = Date.now()) {
+    const departure = readEpochMillis(plan.startAt);
+    return plan.status === 'OPEN' && Number.isFinite(departure) && departure + 5 * 60 * 1000 > now;
+  }
+
+  function unbookedPlannedRides() {
+    const now = Date.now();
+    return availablePlannedPlans.filter(plan =>
+      isAvailablePlannedRide(plan, now) &&
+      !myPlannedRequests.some(request => request.planId === plan.id || request.id === plan.id)
+    );
   }
 
   function updatePlannedRideDisplay() {
     if (!plannedRideCard) return;
 
     // Filter community plans: exclude plans where rider is already participating
-    const unbookedCommunityPlans = availablePlannedPlans.filter(p =>
-      !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id)
-    );
+    const unbookedCommunityPlans = unbookedPlannedRides();
 
     // Matching Android priority (RiderDashboardScreen.kt):
     // 1. If participating in a planned ride, show rider's booked plan first
@@ -1405,7 +1426,13 @@
     }
   }
 
-  function openPlannedModal() {
+  function plannedAddressText(value) {
+    const text = document.createElement('span');
+    text.textContent = value;
+    return text.innerHTML;
+  }
+
+  function renderPlannedRidesList() {
     if (plannedRidesList) {
       plannedRidesList.innerHTML = '';
 
@@ -1431,7 +1458,7 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
                 <span class="badge-pill badge-planned" style="font-size: 10px; margin-bottom: 4px; display: inline-block;">${kindLabel} · ${status}</span>
-                <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">Going to "${cleanDest}"</strong>
+                <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">Going to "${plannedAddressText(cleanDest)}"</strong>
                 <p style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 2px 0 0 0;">Departs ${timeStr}</p>
               </div>
               <span class="planned-fare-tag">${fareStr}</span>
@@ -1446,9 +1473,7 @@
         });
       }
 
-      const unbookedCommunityPlans = availablePlannedPlans.filter(p =>
-        !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id)
-      );
+      const unbookedCommunityPlans = unbookedPlannedRides();
 
       if (unbookedCommunityPlans.length > 0) {
         unbookedCommunityPlans.forEach(plan => {
@@ -1468,7 +1493,7 @@
           item.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
-                <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">Going to "${cleanDest}"</strong>
+                <strong style="font-size: 15px; color: var(--digilayn-on-surface); display: block;">Going to "${plannedAddressText(cleanDest)}"</strong>
                 <p style="font-size: 12.5px; color: var(--digilayn-on-surface-variant); margin: 2px 0 0 0;">Departs ${timeStr} · ${seats} seats left</p>
               </div>
               <span class="planned-fare-tag">${fareStr}</span>
@@ -1505,6 +1530,10 @@
         plannedRidesList.appendChild(placeholder);
       }
     }
+  }
+
+  function openPlannedModal() {
+    renderPlannedRidesList();
     if (plannedModal) plannedModal.classList.remove('is-hidden');
   }
 
@@ -1542,8 +1571,8 @@
       if (plannedReserveFareLabel) plannedReserveFareLabel.textContent = 'Seat Fare:';
       if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Your Pickup Location';
       if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will pick you up along their route.';
-      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>From:</strong> <span>${fullPickup}</span>`;
-      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>To:</strong> <span>${dest}</span>`;
+      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>From:</strong> <span>${plannedAddressText(fullPickup)}</span>`;
+      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>To:</strong> <span>${plannedAddressText(dest)}</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.textContent = 'Note for Driver (Optional)';
       if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. Near blue gate, 1 bag';
       if (plannedReservePickupInput && !plannedReservePickupInput.value) plannedReservePickupInput.placeholder = 'Enter pickup address…';
@@ -1565,7 +1594,7 @@
       if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Parcel Collection Location';
       if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will collect the package from you at this location.';
       if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>Collection:</strong> <span>Your address</span>`;
-      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Deliver to:</strong> <span>${dest}</span>`;
+      if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Deliver to:</strong> <span>${plannedAddressText(dest)}</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.innerHTML = 'Parcel Description & Recipient Contact <span class="field-req">required</span>';
       if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. 1 small parcel, Deliver to John 0821234567';
       if (plannedReservePickupInput && !plannedReservePickupInput.value) plannedReservePickupInput.placeholder = 'Enter parcel collection address…';
@@ -1580,7 +1609,7 @@
       if (plannedReserveFareLabel) plannedReserveFareLabel.textContent = 'Fetch Fare:';
       if (plannedReserveLocationLabel) plannedReserveLocationLabel.innerHTML = 'Your Drop-off Location';
       if (plannedReserveLocationHint) plannedReserveLocationHint.textContent = 'Driver will bring the fetched item to you at this location.';
-      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>Fetch at:</strong> <span>${dest}</span>`;
+      if (plannedReserveFromText) plannedReserveFromText.innerHTML = `📍 <strong>Fetch at:</strong> <span>${plannedAddressText(dest)}</span>`;
       if (plannedReserveToText) plannedReserveToText.innerHTML = `🎯 <strong>Drop-off:</strong> <span>Your address</span>`;
       if (plannedReserveNoteLabel) plannedReserveNoteLabel.innerHTML = 'Item Details & Collection Contact <span class="field-req">required</span>';
       if (plannedReserveNoteInput) plannedReserveNoteInput.placeholder = 'e.g. Order #445 at reception, collect from Sarah';
@@ -1594,7 +1623,11 @@
   }
 
   function openPlannedReserveModal(plan, initialKind = 'PASSENGER') {
-    if (!plan) return;
+    if (!plan || !isAvailablePlannedRide(plan)) {
+      updatePlannedRideDisplay();
+      showToast('This planned ride is no longer available.', 4000);
+      return;
+    }
     selectedPlannedRide = plan;
     const dest = (plan.destination && plan.destination.address) || plan.destination || '';
     const cleanDest = typeof dest === 'string' ? dest.split(',')[0].trim() : 'Destination';
@@ -1645,6 +1678,12 @@
   async function handlePlannedReserveSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     if (!selectedPlannedRide) return;
+    if (!unbookedPlannedRides().some(plan => plan.id === selectedPlannedRide.id)) {
+      closePlannedReserveModal();
+      updatePlannedRideDisplay();
+      showToast('This planned ride is no longer available.', 4000);
+      return;
+    }
 
     const pickupAddr = plannedReservePickupInput ? plannedReservePickupInput.value.trim() : '';
     if (!pickupAddr) {
@@ -1664,11 +1703,14 @@
       return;
     }
 
-    const loc = {
-      address: pickupAddr,
-      lat: (reservePickupLocation && typeof reservePickupLocation.lat === 'number') ? reservePickupLocation.lat : ((selectedPlannedRide.pickup && selectedPlannedRide.pickup.lat) || POORTJIE_MAP_CENTER.lat),
-      lng: (reservePickupLocation && typeof reservePickupLocation.lng === 'number') ? reservePickupLocation.lng : ((selectedPlannedRide.pickup && selectedPlannedRide.pickup.lng) || POORTJIE_MAP_CENTER.lng)
-    };
+    if (!reservePickupLocation || reservePickupLocation.address !== pickupAddr) {
+      if (plannedReserveError) {
+        plannedReserveError.textContent = 'Select your location from the address suggestions.';
+        plannedReserveError.classList.remove('is-hidden');
+      }
+      return;
+    }
+    const loc = reservePickupLocation;
     const isReturn = !!(selectedPlannedKind === 'PASSENGER' && selectedPlannedRide.isReturnRide && plannedReserveReturnCheckbox && plannedReserveReturnCheckbox.checked);
 
     if (!currentUser) {
@@ -3914,7 +3956,7 @@
   }
 
   /** Resume pending booking saved in sessionStorage before login */
-  async function checkAndResumePendingBooking() {
+  async function checkAndResumePendingBooking(plannedListingsReady) {
     let pendingRaw = null;
     try {
       pendingRaw = sessionStorage.getItem('pendingRideBooking');
@@ -3942,13 +3984,11 @@
     // 1. PLANNED RIDE RESUME
     if (type === 'PLANNED') {
       try {
-        let plan = availablePlannedPlans.find(p => p.id === pendingRide.planId);
-        if (!plan) {
-          const planDoc = await db.collection('laynfleet').doc(fleetEnvironment).collection('plannedRides').doc(pendingRide.planId).get();
-          if (planDoc.exists) {
-            plan = { id: planDoc.id, ...planDoc.data() };
-          }
+        if (!await plannedListingsReady) {
+          showToast('Could not check your planned ride. Reopen the page to try again.', 4000);
+          return;
         }
+        const plan = unbookedPlannedRides().find(ride => ride.id === pendingRide.planId);
         if (plan) {
           sessionStorage.removeItem('pendingRideBooking');
           openPlannedReserveModal(plan, pendingRide.kind || 'PASSENGER');
@@ -4149,10 +4189,10 @@
     }
     startActiveBookingListener(authUser.uid);
     initScheduledRidesListener(authUser.uid);
-    initPlannedRidesListener(authUser.uid);
+    const plannedListingsReady = initPlannedRidesListener(authUser.uid);
 
     // Check if there is a pending ride booking from before login
-    await checkAndResumePendingBooking();
+    await checkAndResumePendingBooking(plannedListingsReady);
   }
 
   /** Sign Out */
@@ -4310,9 +4350,7 @@
         if (myPlannedRequests.length > 0) {
           openPlannedBookingDetailsModal(myPlannedRequests[0]);
         } else {
-          const unbookedCommunityPlans = availablePlannedPlans.filter(p =>
-            !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id)
-          );
+          const unbookedCommunityPlans = unbookedPlannedRides();
           if (unbookedCommunityPlans.length > 0) {
             openPlannedReserveModal(unbookedCommunityPlans[0]);
           } else {
@@ -4326,7 +4364,7 @@
     if (plannedCardBtnTagAlong) {
       plannedCardBtnTagAlong.addEventListener('click', (e) => {
         e.stopPropagation();
-        const unbooked = availablePlannedPlans.filter(p => !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id));
+        const unbooked = unbookedPlannedRides();
         if (unbooked.length > 0) openPlannedReserveModal(unbooked[0], 'PASSENGER');
         else openPlannedModal();
       });
@@ -4334,7 +4372,7 @@
     if (plannedCardBtnDeliver) {
       plannedCardBtnDeliver.addEventListener('click', (e) => {
         e.stopPropagation();
-        const unbooked = availablePlannedPlans.filter(p => !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id));
+        const unbooked = unbookedPlannedRides();
         if (unbooked.length > 0) openPlannedReserveModal(unbooked[0], 'DELIVER');
         else openPlannedModal();
       });
@@ -4342,7 +4380,7 @@
     if (plannedCardBtnFetch) {
       plannedCardBtnFetch.addEventListener('click', (e) => {
         e.stopPropagation();
-        const unbooked = availablePlannedPlans.filter(p => !myPlannedRequests.some(r => r.planId === p.id || r.id === p.id));
+        const unbooked = unbookedPlannedRides();
         if (unbooked.length > 0) openPlannedReserveModal(unbooked[0], 'FETCH');
         else openPlannedModal();
       });
